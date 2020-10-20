@@ -5,3 +5,5 @@ gameStart:-
     write('Initialized...'),
     nl,
     printMap(InitialMap).
+
+#addPieces(InitialMap):-
