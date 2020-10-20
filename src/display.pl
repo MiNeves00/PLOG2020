@@ -3,13 +3,14 @@ initialMap([
 [empty,empty,empty,empty,empty],
 [empty,empty,empty,empty,empty],
 [empty,empty,empty,empty,empty],
-[empty,empty,empty,empty,empty]]).
+[empty,empty,empty,empty,empty]
+]).
 
-colLetter(1, L) :- L='A'.
-colLetter(2, L) :- L='B'.
-colLetter(3, L) :- L='C'.
-colLetter(4, L) :- L='D'.
-colLetter(5, L) :- L='E'.
+colLetter(1, LE) :- LE='A'.
+colLetter(2, LE) :- LE='B'.
+colLetter(3, LE) :- LE='C'.
+colLetter(4, LE) :- LE='D'.
+colLetter(5, LE) :- LE='E'.
 
 character(empty,C):- C='.'.
 character(whiteRing,C):- C='W'.
@@ -19,8 +20,28 @@ character(blackRing,C):- C='B'.
 character(blackBall,C):- C='(B)'.
 character(blackBase,S):- S='BoB'.
 
-printBoard(X) :-
+printMap(X) :-
     nl,
-    write('   ||  1  |  2  |  3  |  4  | 5 ||\n'),
-    write('---||---|---|---|---|---|---|---||\n'),
+    write('     |  1  |  2  |  3  |  4  |  5  |\n'),
+    write('-----|-----|-----|-----|-----|-----|\n'),
     printMatrix(X, 1).
+
+printMatrix([],6).
+
+printMatrix([H|T],N):-
+    colLetter(N,LE),
+    write(' '),
+    write(LE),
+    write('   |  '),
+    N1 is N + 1,
+    printRow(H),
+    write('\n-----|-----|-----|-----|-----|-----|\n'),
+    printMatrix(T,N1).
+
+printRow([]).
+
+printRow([H|T]):-
+    character(H, C),
+    write(C),
+    write('  |  '),
+    printRow(T).
