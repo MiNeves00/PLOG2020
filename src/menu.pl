@@ -1,7 +1,7 @@
 menu:-
     printMenu,
     write('>>> Insert your Game Mode or Exit the Game: '),
-    readInput(Input), %TO DO
+    read(Input), %TO DO
     handleInput(Input).
 
 printMenu:-
@@ -44,6 +44,6 @@ handleInput(0):-
 
 handleInput(_SomeOther):-
     write('Input incorrect please insert you option again: '),
-    readInput(Input),
+    read(Input),
     handleInput(Input).
 
