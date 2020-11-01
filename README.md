@@ -51,6 +51,8 @@ There are also two other atoms: __empty__ represents an empty space and __blackB
 ##### Current Player
 The current player is determined by a predicate gameLoop, that switches between players' turns.
 
+![game loop](./docs/gameLoop_prolog.png "gameLoop Code")
+
 ##### Initial state
 ![initial state](./docs/initial_state_prolog.png "Initial State Code")
 
