@@ -1,4 +1,4 @@
-initialMap([
+initial([
 [empty,empty,empty,empty,empty],
 [empty,empty,empty,empty,empty],
 [empty,empty,empty,empty,empty],
@@ -38,7 +38,7 @@ character(blackRing,C):- C=' B '.
 character(blackBall,C):- C='(B)'.
 character(blackBase,S):- S='BoB'.
 
-printMap(X) :-
+display_game(X) :-
     nl,
     write('       |   1   |   2   |   3   |   4   |   5   |\n'),
     write('-------|-------|-------|-------|-------|-------|\n'),

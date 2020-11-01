@@ -1,29 +1,29 @@
 /**Start Game */
-initial('Player','Player'):-
+gameStart('Player','Player'):-
     write('Starting Player vs Player game...'),
     nl,
-    initialMap(InitialMap),
+    initial(InitialMap),
    initializePieces(InitialMap,InitializedMap),
     write('Map has been initialized...'),
     nl,
-    printMap(InitializedMap),
+    display_game(InitializedMap),
     gameLoop(InitializedMap,'Player','Player').
 
-initial('Player','Com'):- %To Do
+gameStart('Player','Com'):- %To Do
     write('Starting Player vs Com game...'),
     nl,
-    initialMap(InitialMap),
+    initial(InitialMap),
     write('Initialized...'),
     nl,
-    printMap(InitialMap).
+    display_game(InitialMap).
 
-initial('Com','Com'):- %To Do
+gameStart('Com','Com'):- %To Do
     write('Starting Com vs Com game...'),
     nl,
-    initialMap(InitialMap),
+    initial(InitialMap),
     write('Initialized...'),
     nl,
-    printMap(InitialMap).
+    display_game(InitialMap).
 
 /**Initialize Map */
 initializePieces(InitialMap,InitializedMap):-
