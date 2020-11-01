@@ -42,11 +42,15 @@ If, at the end of your turn, all your balls have reached your opponents home spa
 ### Internal Game Representation
 
 ##### Board
-The board is represented internally using a 5x5 matrix (list of lists), initialized with all empty spaces, except for the starting spaces of each player (3 balls on top of 3 rings in one corner and the same for the opponent on the opposing corner). Rings and Balls are represented __!!!AQUI!!!__
+The board is represented internally using a 5x5 matrix (list of lists), initialized with all empty spaces, except for the starting spaces of each player (3 balls on top of 3 rings in one corner and the same for the opponent on the opposing corner).
+
+##### Pieces
+Rings and Balls are represented by atoms: __whiteRing__ and __blackRing__ are the atoms used to represent rings and __whiteBall__ and __blackBall__ are the atoms used to represent balls.
+There are also two other atoms: __empty__ represents an empty space and __blackBase__ and __whiteBase__ represent the home spaces of each player.
 
 ##### Current Player
 The current player is determined by a predicate gameLoop, that switches between players' turns.
-__!!!Deve incluir exemplos da representação, em Prolog, de estados de jogo inicial, intermédio e final (que deverão estar também no ficheiro de código - ver abaixo), e indicação do significado de cada átomo (ex., como representam as diferentes peças).!!!__
+__!!!Deve incluir exemplos da representação, em Prolog, de estados de jogo inicial, intermédio e final (que deverão estar também no ficheiro de código - ver abaixo).!!!__
 
 ### Game Display
 

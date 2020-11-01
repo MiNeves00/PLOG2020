@@ -4,7 +4,7 @@
 :- consult('utils.pl').
 :- use_module(library(system)).
 
-mitsudomoe :-
+play :-
     write('Begin Game'),
     nl,
     menu.
