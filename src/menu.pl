@@ -1,9 +1,13 @@
+/**Menu*/
+%menu
 menu:-
     printMenu,
     write('>>> Insert your Game Mode or Exit the Game: '),
     read(Input), %TO DO
     handleInput(Input).
 
+/**Print Menu*/
+%printMenu
 printMenu:-
     nl,nl,
     write('___________________________________________________________________________'),nl,
@@ -30,6 +34,8 @@ printMenu:-
     write('||-----------------------------------------------------------------------||'),nl,
     write('___________________________________________________________________________'),nl,nl,nl.
 
+/**Handle input for type of game*/
+%handleInput(+Input)
 handleInput(1):-
     gameStart('Player','Player').
 

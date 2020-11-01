@@ -4,6 +4,8 @@
 :- consult('utils.pl').
 :- use_module(library(system)).
 
+/**Play (main)*/
+%play
 play :-
     write('Begin Game'),
     nl,

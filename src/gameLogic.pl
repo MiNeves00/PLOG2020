@@ -1,13 +1,11 @@
 /**Start Game */
+%gameStart(+TypeOfPlayer1, +TypeOfPlayer2)
 gameStart('Player','Player'):-
     write('Starting Player vs Player game...'),
     nl,
-    initial(InitialMap),
-   initializePieces(InitialMap,InitializedMap),
-    write('Map has been initialized...'),
-    nl,
-    display_game(InitializedMap),
-    gameLoop(InitializedMap,'Player','Player').
+    initial(InitialMap), %Gets initial game state
+    display_game(InitialMap), %Displays game
+    gameLoop(InitialMap,'Player','Player').
 
 gameStart('Player','Com'):- %To Do
     write('Starting Player vs Com game...'),
@@ -25,25 +23,16 @@ gameStart('Com','Com'):- %To Do
     nl,
     display_game(InitialMap).
 
-/**Initialize Map */
-initializePieces(InitialMap,InitializedMap):-
-    changeValueInMap(InitialMap,0,4,blackBall,InitialMap2),
-    changeValueInMap(InitialMap2,0,3,blackBall,InitialMap3),
-    changeValueInMap(InitialMap3,1,4,blackBall,InitialMap4),
-
-    changeValueInMap(InitialMap4,4,0,whiteBall,InitialMap5),
-    changeValueInMap(InitialMap5,3,0,whiteBall,InitialMap6),
-    changeValueInMap(InitialMap6,4,1,whiteBall,InitializedMap).
-
-/**Game Loop */
-gameLoop(Map,'Player','Player'):-
+/**Game Loop*/
+%gameLoop(-GameState, +TypeOfPlayer1, +TypeOfPlayer2)
+gameLoop(Map,'Player','Player'):- %Each player has a turn in a loop
     whiteMoves(Map),
     checkIfWin(Map,HasWon),
     (HasWon = 'None' ->  
         blackMoves(Map),
         checkIfWin(Map,HasWon2),
         (HasWon2 = 'None' ->
-            gameLoop(Map,'Player','Player')
+            gameLoop(Map,'Player','Player') %Recursive call to continue to next player turns
             ; 
             won(HasWon2)
         )
@@ -52,17 +41,18 @@ gameLoop(Map,'Player','Player'):-
     )
     .
 
-/**Check Win*/
-checkIfWin(Map,HasWon):- %Updates HasWon If Someone Wins
-    nl,
+/**Check Win (for now not accurate)*/
+%checkIfWin(+GameState, -HasWon)
     write('Checking if win'),
     read(Input),
     winInput(Input,HasWon).
 
+%winInput(+Input, -HasWon)
 winInput(0,HasWon):- HasWon='None'.
 winInput(1,HasWon):- HasWon='B'.
 winInput(2,HasWon):- HasWon='W'.
 
+%won(+WhoWon)
 won('W'):-
     nl,
     write('White wins').
@@ -72,13 +62,17 @@ won('B'):-
     write('Black wins').
 
 
-/**Turn Move*/
+/**Turn Move (for now not accurate)*/
+%whiteMoves(-GameState)
 whiteMoves(Map):-
     write('White moves...').
 
+%blackMoves(-GameState)
 blackMoves(Map):-
     write('Black moves...').
 
+/**Handle Move (for now not accurate)*/
+%handleMove(+Input)
 handleMove(_Input).
 
 
