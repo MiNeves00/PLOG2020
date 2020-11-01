@@ -43,6 +43,8 @@ gameLoop(Map,'Player','Player'):- %Each player has a turn in a loop
 
 /**Check Win (for now not accurate)*/
 %checkIfWin(+GameState, -HasWon)
+checkIfWin(Map,HasWon):- %Updates HasWon If Someone Wins
+    nl,
     write('Checking if win'),
     read(Input),
     winInput(Input,HasWon).
