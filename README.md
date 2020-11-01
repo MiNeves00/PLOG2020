@@ -50,7 +50,15 @@ There are also two other atoms: __empty__ represents an empty space and __blackB
 
 ##### Current Player
 The current player is determined by a predicate gameLoop, that switches between players' turns.
-__!!!Deve incluir exemplos da representação, em Prolog, de estados de jogo inicial, intermédio e final (que deverão estar também no ficheiro de código - ver abaixo).!!!__
+
+##### Initial state
+![initial state](./docs/initial_state_prolog.png "Initial State Code")
+
+##### Intermediate state
+![intermediate state](./docs/intermediate_state_prolog.png "Intermediate State Code")
+
+##### End state
+![end state](./docs/end_state_prolog.png "End State Code")
 
 ### Game Display
 

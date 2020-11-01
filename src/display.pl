@@ -6,6 +6,24 @@ initialMap([
 [empty,empty,empty,empty,empty]
 ]).
 
+%intermediate state example
+intermediateMap([
+[empty,empty,empty,blackBase,blackBall],
+[empty,empty,empty,blackBall,blackBase],
+[whiteBall,empty,whiteRing,empty,blackBall],
+[whiteBase,empty,whiteBall,empty,blackRing],
+[whiteBase,whiteBall,empty,empty,empty]
+]).
+
+%end state example
+endMap([
+[empty,empty,blackBall,whiteBall,whiteBall],
+[empty,empty,empty,whiteRing,whiteBall],
+[empty,empty,whiteRing,blackBall,blackBall],
+[whiteBase,empty,empty,empty,blackRing],
+[whiteBase,whiteBase,empty,empty,empty]
+]).
+
 colLetter(1, LE) :- LE='A'.
 colLetter(2, LE) :- LE='B'.
 colLetter(3, LE) :- LE='C'.
