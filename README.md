@@ -68,7 +68,7 @@ The current player is determined by a predicate gameLoop, that switches between 
 The board is displayed row by row, column by column, using printRow, printMatrix and printMap predicates. Letters (A-E) and numbers (1-5) are also displayed to aid references to spaces (Letter/Number coordinates).
 
 ##### Pieces Display
-Each space may have some simbols to represent what is on top of that space. An empty space is represented by __'.'__, rings with the first letter of their colour (__'W'__ and __'B'__), balls are similarly represented, but with parentheses around the letter (__'(W)'__ and __'(B)'__). The home spaces of each player are represented by __'WoW'__ (for white) and __'BoB'__ (for black).
+Each space may have some simbols to represent what is on top of that space. An empty space is represented by __' . '__, rings with the first letter of their colour (__' W '__ and __' B '__), balls are similarly represented, but with parentheses around the letter (__'(W)'__ and __'(B)'__). The home spaces of each player are represented by __'WoW'__ (for white) and __'BoB'__ (for black).
 
 ##### Initial state
 ![initial state](./docs/initial_state.png "Initial State Representation")
