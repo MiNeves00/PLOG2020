@@ -12,30 +12,30 @@ colLetter(3, LE) :- LE='C'.
 colLetter(4, LE) :- LE='D'.
 colLetter(5, LE) :- LE='E'.
 
-character(empty,C):- C='.'.
-character(whiteRing,C):- C='W'.
+character(empty,C):- C=' . '.
+character(whiteRing,C):- C=' W '.
 character(whiteBall,C):- C='(W)'.
 character(whiteBase,S):- S='WoW'.
-character(blackRing,C):- C='B'.
+character(blackRing,C):- C=' B '.
 character(blackBall,C):- C='(B)'.
 character(blackBase,S):- S='BoB'.
 
 printMap(X) :-
     nl,
-    write('     |  1  |  2  |  3  |  4  |  5  |\n'),
-    write('-----|-----|-----|-----|-----|-----|\n'),
+    write('       |   1   |   2   |   3   |   4   |   5   |\n'),
+    write('-------|-------|-------|-------|-------|-------|\n'),
     printMatrix(X, 1).
 
 printMatrix([],6).
 
 printMatrix([H|T],N):-
     colLetter(N,LE),
-    write(' '),
+    write('   '),
     write(LE),
     write('   |  '),
     N1 is N + 1,
     printRow(H),
-    write('\n-----|-----|-----|-----|-----|-----|\n'),
+    write('\n-------|-------|-------|-------|-------|-------|\n'),
     printMatrix(T,N1).
 
 printRow([]).

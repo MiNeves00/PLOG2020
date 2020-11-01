@@ -56,4 +56,15 @@ The board is displayed row by row, column by column, using printRow, printMatrix
 ##### Pieces Display
 Each space may have some simbols to represent what is on top of that space. An empty space is represented by __'.'__, rings with the first letter of their colour (__'W'__ and __'B'__), balls are similarly represented, but with parentheses around the letter (__'(W)'__ and __'(B)'__). The home spaces of each player are represented by __'WoW'__ (for white) and __'BoB'__ (for black).
 
+##### Initial state
 ![initial state](./docs/initial_state.png "Initial State Representation")
+
+##### Intermediate state
+![intermediate state](./docs/intermediate_state.png "Intermediate State Representation")
+
+##### End state
+![end state](./docs/end_state.png "End State Representation")
+
+### Image examples
+##### Menu
+![menu](./docs/menu.png "Menu")
