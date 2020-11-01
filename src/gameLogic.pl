@@ -1,5 +1,5 @@
 /**Start Game */
-gameStart('Player','Player'):-
+initial('Player','Player'):-
     write('Starting Player vs Player game...'),
     nl,
     initialMap(InitialMap),
@@ -9,7 +9,7 @@ gameStart('Player','Player'):-
     printMap(InitializedMap),
     gameLoop(InitializedMap,'Player','Player').
 
-gameStart('Player','Com'):- %To Do
+initial('Player','Com'):- %To Do
     write('Starting Player vs Com game...'),
     nl,
     initialMap(InitialMap),
@@ -17,7 +17,7 @@ gameStart('Player','Com'):- %To Do
     nl,
     printMap(InitialMap).
 
-gameStart('Com','Com'):- %To Do
+initial('Com','Com'):- %To Do
     write('Starting Com vs Com game...'),
     nl,
     initialMap(InitialMap),
