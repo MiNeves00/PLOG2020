@@ -3,8 +3,8 @@
 gameStart('Player','Player'):-
     write('Starting Player vs Player game...'),
     nl,
-    initial(InitialMap), %Gets initial game state
-    gameLoop(InitialMap,'Player','Player').
+    initial(GameState), %Gets initial game state
+    gameLoop(GameState,'Player','Player').
 
 /*
 gameStart('Player','Com'):- %To Do
@@ -26,14 +26,14 @@ gameStart('Com','Com'):- %To Do
 
 /**Game Loop*/
 %gameLoop(-GameState, +TypeOfPlayer1, +TypeOfPlayer2)
-gameLoop(Map,'Player','Player'):- %Each player has a turn in a loop
-    display_game(Map,'White'), %Displays game
-    checkIfWin(Map,HasWon),
+gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
+    display_game(GameState,'White'), %Displays game
+    checkIfWin(GameState,HasWon),
     (HasWon = 'None' ->  
-        display_game(Map,'Black'),
-        checkIfWin(Map,HasWon2),
+        display_game(GameState,'Black'),
+        checkIfWin(GameState,HasWon2),
         (HasWon2 = 'None' ->
-            gameLoop(Map,'Player','Player') %Recursive call to continue to next player turns
+            gameLoop(GameState,'Player','Player') %Recursive call to continue to next player turns
             ; 
             won(HasWon2)
         )
@@ -44,7 +44,7 @@ gameLoop(Map,'Player','Player'):- %Each player has a turn in a loop
 
 /**Check Win (for now not accurate) TO DO*/
 %checkIfWin(+GameState, -HasWon)
-checkIfWin(Map,HasWon):- %Updates HasWon If Someone Wins
+checkIfWin(GameState,HasWon):- %Updates HasWon If Someone Wins
     nl,
     write('Checking if win'),
     read(Input),

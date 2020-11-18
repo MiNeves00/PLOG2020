@@ -1,13 +1,22 @@
-%initial(-GameState)
-initial([
-[[],[],[],[blackBall | [blackRing | [blackBase | []]]],[blackBall | [blackRing | [blackBase | []]]]],
-[[],[],[],[],[blackBall | [blackRing | [blackBase | []]]]],
-[[],[],[],[],[]],
-[[whiteBall | [whiteRing | [whiteBase | []]]],[],[],[],[]],
-[[whiteBall | [whiteRing | [whiteBase | []]]],[whiteBall | [whiteRing | [whiteBase | []]]],[],[],[]]
-]).
+/**Initial Game State*/
+%initial(-GameState) GameState->Tabuleiro,PecasDeCadaJogador
+initial(
+    [
+        [ %Tabuleiro
+            [[],[],[],[blackBall | [blackRing | [blackBase | []]]],[blackBall | [blackRing | [blackBase | []]]]],
+            [[],[],[],[],[blackBall | [blackRing | [blackBase | []]]]],
+            [[],[],[],[],[]],
+            [[whiteBall | [whiteRing | [whiteBase | []]]],[],[],[],[]],
+            [[whiteBall | [whiteRing | [whiteBase | []]]],[whiteBall | [whiteRing | [whiteBase | []]]],[],[],[]]
+        ], 
+        [ %PecasDeCadaJogador
+            [whiteRing,whiteRing,whiteRing,whiteRing,whiteRing],%White
+            [blackRing,blackRing,blackRing,blackRing,blackRing] %Black
+        ]
+    ]
+).
 
-/**Intermediate game state example*/
+/**Game state examples TO DO*/
 intermediateMap([
 [[],[],[],blackBase,blackBall],
 [[],[],[],blackBall,blackBase],
@@ -16,7 +25,6 @@ intermediateMap([
 [whiteBase,whiteBall,[],[],[]]
 ]).
 
-/**End game state example*/
 endMap([
 [[],[],blackBall,whiteBall,whiteBall],
 [[],[],[],whiteRing,whiteBall],
@@ -25,7 +33,7 @@ endMap([
 [whiteBase,whiteBase,[],[],[]]
 ]).
 
-/**Atom to letter correspondence*/
+/**Atom to letter correspondence TO DO*/
 %character(+Atom, -Character)
 character(empty,C):- C=' . '.
 character([],C):- C=' . '.
@@ -44,10 +52,12 @@ character(5, C) :- C='E'.
 /**Display Game*/
 %display_game(+GameState,+Player) GameState->Tabuleiro,PecasDeCadaJogador Player->QuemJoga.ex:White
 display_game(GameState,Player) :-
+    getBoard(GameState,Board),
     nl,
     write('       |   1   |   2   |   3   |   4   |   5   |\n'), %Writes the column number for each column
     write('-------|-------|-------|-------|-------|-------|\n'),
-    printMatrix(GameState, 1),
+    %TO DO display pieces available to player
+    printMatrix(Board, 1),
     printAskNextMove(Player).
 
 %printAskNextMove(+Player)
@@ -56,6 +66,11 @@ printAskNextMove('White'):-
 
 printAskNextMove('Black'):-
     write('Black moves...').
+
+/**Print Board*/
+%getBoard(+GameState,-Board)
+getBoard([Board|T],Board).
+
 
 %printMatrix(-List, +N)
 printMatrix([],6).
