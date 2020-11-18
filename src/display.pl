@@ -59,16 +59,36 @@ display_game(GameState,Player) :-
     %TO DO display pieces available to player
     printMatrix(Board, 1),
     getPieces(GameState,Pieces),
-    printAskNextMove(Player,Pieces).
+    printPiecesOnHand(Pieces),
+    printAskNextMove(Player).
 
 /**Next Move*/
-%printAskNextMove(+Player,+Pieces)
-printAskNextMove('White',Pieces):-
-
+%printAskNextMove(+Player)
+printAskNextMove('White'):-
+    nl,
     write('White moves...').
 
-printAskNextMove('Black',Pieces):-
+printAskNextMove('Black'):-
+    nl,
     write('Black moves...').
+
+/**Print Pieces*/
+%printPiecesOnHand(+Pieces)
+printPiecesOnHand(Pieces):-
+    nl,
+    getPiecesByPlayer('White',Pieces,WhitePieces),
+    write('White Pieces: '),
+    printPlayerPiecesOnHand(WhitePieces),
+    nl,
+    getPiecesByPlayer('Black',Pieces,BlackPieces),
+    write('Black Pieces: '),
+    printPlayerPiecesOnHand(BlackPieces),
+    nl.
+
+%printPlayerPiecesOnHand(+PlayerPieces)
+printPlayerPiecesOnHand(PlayerPieces):-
+    printRow(PlayerPieces).
+
 
 
 /**GameState Utils*/
@@ -76,11 +96,11 @@ printAskNextMove('Black',Pieces):-
 getBoard([Board|T],Board).
 
 %getPieces(+GameState,-Pieces)
-getPieces([H|Pieces],Pieces).
+getPieces([H|[Pieces]],Pieces).
 
 %getPiecesByPlayer(+Player,+Pieces,-PlayerPieces)
 getPiecesByPlayer('White',[PlayerPieces|T],PlayerPieces).
-getPiecesByPlayer('Black',[H|PlayerPieces],PlayerPieces).
+getPiecesByPlayer('Black',[H|[PlayerPieces]],PlayerPieces).
 
 /**Print Board*/
 
@@ -93,20 +113,28 @@ printMatrix([H|T],N):-
     write(C), %Writes the row letter before each row
     write('   |  '),
     N1 is N + 1,
-    printRow(H),
+    printStackRow(H),
     write('\n-------|-------|-------|-------|-------|-------|\n'),
     printMatrix(T,N1).
 
-printRow([]).
+printStackRow([]).
 
-printRow([H|T]):-
+printStackRow([H|T]):-
     top(H, P),
     character(P, C),
     write(C), %Writes each character in its space
     write('  |  '),
-    printRow(T).
+    printStackRow(T).
 
 %top(+L, -H)
 top([], empty).
 
 top([H | T], H).
+
+printRow([]).
+
+printRow([Head|Tail]) :-
+    character(Head, C),
+    write(C),
+    write(' | '),
+    printRow(Tail).
