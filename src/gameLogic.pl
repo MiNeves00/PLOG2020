@@ -28,10 +28,12 @@ gameStart('Com','Com'):- %To Do
 %gameLoop(-GameState, +TypeOfPlayer1, +TypeOfPlayer2)
 gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
     display_game(GameState,'White'), %Displays game
-    checkIfWin(GameState,HasWon),
+    %player_move(GameState,'White',NewGameState),
+    checkIfWin(NewGameState,HasWon),
     (HasWon = 'None' ->  
         display_game(GameState,'Black'),
-        checkIfWin(GameState,HasWon2),
+        %player_move(GameState,'Black',NewGameState2),
+        checkIfWin(NewGameState2,HasWon2),
         (HasWon2 = 'None' ->
             gameLoop(GameState,'Player','Player') %Recursive call to continue to next player turns
             ; 
@@ -41,6 +43,15 @@ gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
         won(HasWon)
     )
     .
+
+/**Player Move*/
+Move([ActionType,ColIndex,RowIndex,PieceIndex]).
+
+%player_move(+GameState,+Player,-NewGameState)
+player_move(GameState,Player,NewGameState):-
+    insertMove(GameState,Player,Move),
+    handleMove(GameState,Move,NewGameState).
+
 
 /**Check Win (for now not accurate) TO DO*/
 %checkIfWin(+GameState, -HasWon)
@@ -64,9 +75,12 @@ won('B'):-
     nl,
     write('Black wins').
 
+/**Insert Move*/
+%insertMove(+GameState,+Player,-Move).
 
 /**Handle Move (for now not accurate) TO DO*/
-%handleMove(+Input) TO DO
-handleMove(_Input).
+%handleMove(+GameState,+Move,-NewGameState) TO DO
+handleMove(GameState,Move,NewGameState):-
+    player_move(GameState,Player,NewGameState). %deu borrada chama-se isto
 
 
