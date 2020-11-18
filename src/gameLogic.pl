@@ -45,7 +45,7 @@ gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
     .
 
 /**Player Move*/
-Move([ActionType,ColIndex,RowIndex,PieceIndex]).
+move([ActionType,ColIndex,RowIndex,PieceIndex]).
 
 %player_move(+GameState,+Player,-NewGameState)
 player_move(GameState,Player,NewGameState):-
@@ -76,7 +76,9 @@ won('B'):-
     write('Black wins').
 
 /**Insert Move*/
-%insertMove(+GameState,+Player,-Move).
+%insertMove(+GameState,+Player,-Move):-
+    nl,
+    write
 
 /**Handle Move (for now not accurate) TO DO*/
 %handleMove(+GameState,+Move,-NewGameState) TO DO

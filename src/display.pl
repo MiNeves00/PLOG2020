@@ -58,19 +58,31 @@ display_game(GameState,Player) :-
     write('-------|-------|-------|-------|-------|-------|\n'),
     %TO DO display pieces available to player
     printMatrix(Board, 1),
-    printAskNextMove(Player).
+    getPieces(GameState,Pieces),
+    printAskNextMove(Player,Pieces).
 
-%printAskNextMove(+Player)
-printAskNextMove('White'):-
+/**Next Move*/
+%printAskNextMove(+Player,+Pieces)
+printAskNextMove('White',Pieces):-
+
     write('White moves...').
 
-printAskNextMove('Black'):-
+printAskNextMove('Black',Pieces):-
     write('Black moves...').
 
-/**Print Board*/
+
+/**GameState Utils*/
 %getBoard(+GameState,-Board)
 getBoard([Board|T],Board).
 
+%getPieces(+GameState,-Pieces)
+getPieces([H|Pieces],Pieces).
+
+%getPiecesByPlayer(+Player,+Pieces,-PlayerPieces)
+getPiecesByPlayer('White',[PlayerPieces|T],PlayerPieces).
+getPiecesByPlayer('Black',[H|PlayerPieces],PlayerPieces).
+
+/**Print Board*/
 
 %printMatrix(-List, +N)
 printMatrix([],6).
