@@ -35,19 +35,19 @@ endMap([
 
 /**Atom to letter correspondence TO DO*/
 %character(+Atom, -Character)
-character(empty,C):- C=' . '.
-character([],C):- C=' . '.
-character(whiteRing,C):- C=' W '.
-character(whiteBall,C):- C='(W)'.
-character(whiteBase,S):- S='WoW'.
-character(blackRing,C):- C=' B '.
-character(blackBall,C):- C='(B)'.
-character(blackBase,S):- S='BoB'.
-character(1, C) :- C='A'.
-character(2, C) :- C='B'.
-character(3, C) :- C='C'.
-character(4, C) :- C='D'.
-character(5, C) :- C='E'.
+character(empty,' . ').
+character([],' . ').
+character(whiteRing,' W ').
+character(whiteBall,'(W)').
+character(whiteBase,'WoW').
+character(blackRing,' B ').
+character(blackBall,'(B)').
+character(blackBase,'BoB').
+character(1,'A').
+character(2,'B').
+character(3,'C').
+character(4,'D').
+character(5,'E').
 
 /**Display Game*/
 %display_game(+GameState,+Player) GameState->Tabuleiro,PecasDeCadaJogador Player->QuemJoga.ex:White
