@@ -4,9 +4,9 @@ gameStart('Player','Player'):-
     write('Starting Player vs Player game...'),
     nl,
     initial(InitialMap), %Gets initial game state
-    display_game(InitialMap), %Displays game
     gameLoop(InitialMap,'Player','Player').
 
+/*
 gameStart('Player','Com'):- %To Do
     write('Starting Player vs Com game...'),
     nl,
@@ -22,14 +22,15 @@ gameStart('Com','Com'):- %To Do
     write('Initialized...'),
     nl,
     display_game(InitialMap).
+*/
 
 /**Game Loop*/
 %gameLoop(-GameState, +TypeOfPlayer1, +TypeOfPlayer2)
 gameLoop(Map,'Player','Player'):- %Each player has a turn in a loop
-    whiteMoves(Map),
+    display_game(Map,'White'), %Displays game
     checkIfWin(Map,HasWon),
     (HasWon = 'None' ->  
-        blackMoves(Map),
+        display_game(Map,'Black'),
         checkIfWin(Map,HasWon2),
         (HasWon2 = 'None' ->
             gameLoop(Map,'Player','Player') %Recursive call to continue to next player turns
@@ -41,7 +42,7 @@ gameLoop(Map,'Player','Player'):- %Each player has a turn in a loop
     )
     .
 
-/**Check Win (for now not accurate)*/
+/**Check Win (for now not accurate) TO DO*/
 %checkIfWin(+GameState, -HasWon)
 checkIfWin(Map,HasWon):- %Updates HasWon If Someone Wins
     nl,
@@ -64,17 +65,8 @@ won('B'):-
     write('Black wins').
 
 
-/**Turn Move (for now not accurate)*/
-%whiteMoves(-GameState)
-whiteMoves(Map):-
-    write('White moves...').
-
-%blackMoves(-GameState)
-blackMoves(Map):-
-    write('Black moves...').
-
-/**Handle Move (for now not accurate)*/
-%handleMove(+Input)
+/**Handle Move (for now not accurate) TO DO*/
+%handleMove(+Input) TO DO
 handleMove(_Input).
 
 

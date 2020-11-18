@@ -42,12 +42,20 @@ character(4, C) :- C='D'.
 character(5, C) :- C='E'.
 
 /**Display Game*/
-%display_game(+GameState)
-display_game(X) :-
+%display_game(+GameState,+Player) GameState->Tabuleiro,PecasDeCadaJogador Player->QuemJoga.ex:White
+display_game(GameState,Player) :-
     nl,
     write('       |   1   |   2   |   3   |   4   |   5   |\n'), %Writes the column number for each column
     write('-------|-------|-------|-------|-------|-------|\n'),
-    printMatrix(X, 1).
+    printMatrix(GameState, 1),
+    printAskNextMove(Player).
+
+%printAskNextMove(+Player)
+printAskNextMove('White'):-
+    write('White moves...').
+
+printAskNextMove('Black'):-
+    write('Black moves...').
 
 %printMatrix(-List, +N)
 printMatrix([],6).
