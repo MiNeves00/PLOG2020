@@ -29,11 +29,11 @@ gameStart('Com','Com'):- %To Do
 gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
     display_game(GameState,'White'), %Displays game
     player_move(GameState,'White',NewGameState),
-    checkIfWin(NewGameState,HasWon),
+    checkIfWin(NewGameState,'White',HasWon),
     (HasWon = 'None' ->  
         display_game(GameState,'Black'),
         player_move(GameState,'Black',NewGameState2),
-        checkIfWin(NewGameState2,HasWon2),
+        checkIfWin(NewGameState2,'Black',HasWon2),
         (HasWon2 = 'None' ->
             gameLoop(GameState,'Player','Player') %Recursive call to continue to next player turns
             ; 
@@ -49,7 +49,8 @@ gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
 
 %player_move(+GameState,+Player,-NewGameState)
 player_move(GameState,Player,NewGameState):-
-    insertMove(Move).
+    insertMove(Move),
+    NewGameState = GameState.
     %handleMove(GameState,Move,NewGameState).
 
 
@@ -65,7 +66,7 @@ readMove(Move):-
     write('Insert the coordinates of the piece you want to move (1-5 for Row Col)'),
     nl,
     write('If the piece is not yet on the Board use the coordinates 0 for Row and Col'),
-    nl,
+    nl,nl,
     write('Insert Row of the piece to move'),
     readRowCoordinate(RowIndexBegin),
     nl,
@@ -83,6 +84,7 @@ readMove(Move):-
 
 %readCoordinate(-Coordinate)
 readRowCoordinate(Coordinate):-
+    nl,
     write('Row: '),
     read(NewCoordinate),
     (NewCoordinate < 0 -> write('Number cannot be smaller than 0'), nl,
@@ -118,7 +120,12 @@ readColCoordinate(Coordinate):-
 handleMove(GameState,Move,NewGameState):-
     player_move(GameState,Player,NewGameState). %deu borrada chama-se isto
 
-/**Check Win (for now not accurate) TO DO*/
+
+
+
+
+/**Check Win TO DO*/
+/**
 %checkIfWin(+GameState, -HasWon)
 checkIfWin(GameState,HasWon):- %Updates HasWon If Someone Wins
     nl,
@@ -130,6 +137,34 @@ checkIfWin(GameState,HasWon):- %Updates HasWon If Someone Wins
 winInput(0,HasWon):- HasWon='None'.
 winInput(1,HasWon):- HasWon='B'.
 winInput(2,HasWon):- HasWon='W'.
+*/
+
+%checkIfWin(+GameState,+Player,-HasWon)
+checkIfWin(GameState,Player,HasWon):-
+    nl,
+    write('Checking if its a win'),
+    getBoard(GameState,Board),
+    areBallsOnOpositeBase(Board,Player,Bool),
+    HasWon = 'None'.
+
+%areBallsOnOpositeBase(+Board,+Player,-Bool)
+areBallsOnOpositeBase(Board,'White',Bool):-
+    getOpponentBaseStack(Board,'White',Base1,Base2,Base3).
+
+areBallsOnOpositeBase(Board,'Black',Bool):-
+    getOpponentBaseStack(Board,'Black',Base1,Base2,Base3).  
+
+%getOpponentBaseStack(+Board,+Player,-Base1,-Base2,-Base3)
+getOpponentBaseStack(Board,'White',Base1,Base2,Base3):-
+    getValueInMapStackPosition(Board,0,3,Base1),
+    getValueInMapStackPosition(Board,0,4,Base2),
+    getValueInMapStackPosition(Board,1,4,Base3).
+    
+
+getOpponentBaseStack(Board,'Black',Base1,Base2,Base3):-
+    getValueInMapStackPosition(Board,4,0,Base1),
+    getValueInMapStackPosition(Board,4,1,Base2),
+    getValueInMapStackPosition(Board,3,1,Base3).
 
 %won(+WhoWon)
 won('W'):-
