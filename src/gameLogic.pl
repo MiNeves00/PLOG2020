@@ -65,7 +65,7 @@ readMove(Move):-
     write('Insert the coordinates of the piece you want to move (1-5 for Row Col)'),
     nl,
     write('If the piece is not yet on the Board use the coordinates 0 for Row and Col'),
-    nl,
+    nl,nl,
     write('Insert Row of the piece to move'),
     readRowCoordinate(RowIndexBegin),
     nl,
@@ -83,6 +83,7 @@ readMove(Move):-
 
 %readCoordinate(-Coordinate)
 readRowCoordinate(Coordinate):-
+    nl,
     write('Row: '),
     read(NewCoordinate),
     (NewCoordinate < 0 -> write('Number cannot be smaller than 0'), nl,
