@@ -25,13 +25,21 @@ intermediateMap([
 [whiteBase,whiteBall,[],[],[]]
 ]).
 
-endMap([
-[[],[],blackBall,whiteBall,whiteBall],
-[[],[],[],whiteRing,whiteBall],
-[[],[],whiteRing,blackBall,blackBall],
-[whiteBase,[],[],[],blackRing],
-[whiteBase,whiteBase,[],[],[]]
-]).
+endMap(
+    [
+        [ %Tabuleiro
+            [[],[],[],[blackBall | [blackRing | [blackBase | []]]],[blackBall | [blackRing | [blackBase | []]]]],
+            [[],[],[],[],[blackBall | [blackRing | [blackBase | []]]]],
+            [[],[],[],[],[]],
+            [[blackBall | [whiteRing | [whiteBase | []]]],[],[],[],[]],
+            [[blackBall | [whiteRing | [whiteBase | []]]],[blackBall | [whiteRing | [whiteBase | []]]],[],[],[]]
+        ], 
+        [ %PecasDeCadaJogador
+            [whiteRing,whiteRing,whiteRing,whiteRing,whiteRing],%White
+            [blackRing,blackRing,blackRing,blackRing,blackRing] %Black
+        ]
+    ]
+).
 
 /**Pieces*/
 piece(blackBall,1).
