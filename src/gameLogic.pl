@@ -62,9 +62,9 @@ insertMove(Move):-
 
 %readMove(-Move)
 readMove(Move):-
-    write('Insert the coordinates of the piece you want to move (1-5 for Row Col)'),
+    write('Insert the coordinates of the piece you want to move (0-4 for Row Col)'),
     nl,
-    write('If the piece is not yet on the Board use the coordinates 0 for Row and Col'),
+    write('If the piece is not yet on the Board use the coordinates -1 for Row and Col'),
     nl,nl,
     write('Insert Row of the piece to move'),
     readRowCoordinate(RowIndexBegin),
@@ -86,10 +86,10 @@ readRowCoordinate(Coordinate):-
     nl,
     write('Row: '),
     read(NewCoordinate),
-    (NewCoordinate < 0 -> write('Number cannot be smaller than 0'), nl,
+    (NewCoordinate < -1 -> write('Number cannot be smaller than -1'), nl,
         readRowCoordinate(Coordinate) 
         ;
-        (NewCoordinate > 5 -> write('Number cannot be bigger than 5'), nl,
+        (NewCoordinate > 4 -> write('Number cannot be bigger than 5'), nl,
             readRowCoordinate(Coordinate) 
             ;
             Coordinate = NewCoordinate
@@ -98,12 +98,13 @@ readRowCoordinate(Coordinate):-
     ).
 
 readColCoordinate(Coordinate):-
+    nl,
     write('Col: '),
     read(NewCoordinate),
-    (NewCoordinate < 0 -> write('Number cannot be smaller than 0'), nl,
+    (NewCoordinate < -1 -> write('Number cannot be smaller than 0'), nl,
         readRowCoordinate(Coordinate) 
         ;
-        (NewCoordinate > 5 -> write('Number cannot be bigger than 5'), nl,
+        (NewCoordinate > 4 -> write('Number cannot be bigger than 5'), nl,
             readRowCoordinate(Coordinate) 
             ;
             Coordinate = NewCoordinate
@@ -116,7 +117,7 @@ readColCoordinate(Coordinate):-
 
 /**Handle Move (for now not accurate) TO DO*/
 %handleMove(+GameState,+Move,+Player,-NewGameState) TO DO
-handleMove([Board, AllPieces],[0,0,ColIndexEnd,RowIndexEnd], Player,[NewBoard, NewAllPieces]):-
+handleMove([Board, AllPieces],[-1,-1,ColIndexEnd,RowIndexEnd], Player,[NewBoard, NewAllPieces]):-
     (Player = 'White' ->
         addValueInMap(Board, RowIndexEnd, ColIndexEnd, whiteRing, NewBoard),
         AllPieces = [[_Played|NewWhitePieces], BlackPieces],
@@ -148,19 +149,6 @@ handleMove([Board, AllPieces],[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexE
 
 
 /**Check Win TO DO*/
-/**
-%checkIfWin(+GameState, -HasWon)
-checkIfWin(GameState,HasWon):- %Updates HasWon If Someone Wins
-    nl,
-    write('Checking if win'),
-    read(Input),
-    winInput(Input,HasWon).
-
-%winInput(+Input, -HasWon)
-winInput(0,HasWon):- HasWon='None'.
-winInput(1,HasWon):- HasWon='B'.
-winInput(2,HasWon):- HasWon='W'.
-*/
 
 %checkIfWin(+GameState,+Player,-HasWon)
 checkIfWin(GameState,Player,HasWon):-

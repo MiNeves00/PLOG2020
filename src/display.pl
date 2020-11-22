@@ -3,11 +3,11 @@
 initial(
     [
         [ %Tabuleiro
-            [[],[],[],[blackBall | [blackRing | [blackBase | []]]],[blackBall | [blackRing | [blackBase | []]]]],
-            [[],[],[],[],[blackBall | [blackRing | [blackBase | []]]]],
-            [[],[],[],[],[]],
-            [[whiteBall | [whiteRing | [whiteBase | []]]],[],[],[],[]],
-            [[whiteBall | [whiteRing | [whiteBase | []]]],[whiteBall | [whiteRing | [whiteBase | []]]],[],[],[]]
+            [[empty],[empty],[empty],[blackBall | [blackRing | [blackBase | [empty]]]],[blackBall | [blackRing | [blackBase | [empty]]]]],
+            [[empty],[empty],[empty],[empty],[blackBall | [blackRing | [blackBase | [empty]]]]],
+            [[empty],[empty],[empty],[empty],[empty]],
+            [[whiteBall | [whiteRing | [whiteBase | [empty]]]],[empty],[empty],[empty],[empty]],
+            [[whiteBall | [whiteRing | [whiteBase | [empty]]]],[whiteBall | [whiteRing | [whiteBase | [empty]]]],[empty],[empty],[empty]]
         ], 
         [ %PecasDeCadaJogador
             [whiteRing,whiteRing,whiteRing,whiteRing,whiteRing],%White
@@ -41,32 +41,6 @@ endMap(
     ]
 ).
 
-/**Pieces*/
-piece(blackBall,1).
-piece(blackBall,2).
-piece(blackBall,3).
-
-piece(blackRing,1).
-piece(blackRing,2).
-piece(blackRing,3).
-piece(blackRing,4).
-piece(blackRing,5).
-piece(blackRing,6).
-piece(blackRing,7).
-piece(blackRing,8).
-
-piece(whiteBall,1).
-piece(whiteBall,2).
-piece(whiteBall,3).
-
-piece(whiteRing,1).
-piece(whiteRing,2).
-piece(whiteRing,3).
-piece(whiteRing,4).
-piece(whiteRing,5).
-piece(whiteRing,6).
-piece(whiteRing,7).
-piece(whiteRing,8).
 
 /**Atom to letter correspondence TO DO*/
 %character(+Atom, -Character)
@@ -78,18 +52,18 @@ character(whiteBase,'WoW').
 character(blackRing,' B ').
 character(blackBall,'(B)').
 character(blackBase,'BoB').
-character(1,'1').
-character(2,'2').
-character(3,'3').
-character(4,'4').
-character(5,'5').
+character(1,'0').
+character(2,'1').
+character(3,'2').
+character(4,'3').
+character(5,'4').
 
 /**Display Game*/
 %display_game(+GameState,+Player) GameState->Tabuleiro,PecasDeCadaJogador Player->QuemJoga.ex:White
 display_game(GameState,Player) :-
     getBoard(GameState,Board),
     nl,
-    write('       |   1   |   2   |   3   |   4   |   5   |\n'), %Writes the column number for each column
+    write('       |   0   |   1   |   2   |   3   |   4   |\n'), %Writes the column number for each column
     write('-------|-------|-------|-------|-------|-------|\n'),
     %TO DO display pieces available to player
     printMatrix(Board, 1),
