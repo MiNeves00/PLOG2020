@@ -1,5 +1,5 @@
 /**Add values in map*/
-%addValueInMap(+Board, +Row, +Column, +Value, -NewBoard) #receives the row and col -1
+%addValueInMap(+Board, +Row, +Column, +Value, -NewBoard)
 addValueInMap([Head|Tail], 0, Column,Value, [HNew|Tail]) :-
         addValueInList(Head, Column, Value, HNew).
 
@@ -17,7 +17,11 @@ addValueInList([Head|Tail], Index, Value, [Head|TNew]) :-
         addValueInList(Tail, Index1, Value, TNew).
 
 /**Remove values from map*/
-%removeValueFromMap(+Board, +Row, +Column, -NewBoard, -Removed) #receives the row and col -1
+%removeValueFromMapUsingGameState(+GameState, +Row, +Column, -NewGameState, -Removed)
+removeValueFromMapUsingGameState([Board|Pieces],Row,Col,[NewBoard|Pieces],Removed):-
+        removeValueFromMap(Board,Row,Col,NewBoard,Removed).
+
+%removeValueFromMap(+Board, +Row, +Column, -NewBoard, -Removed)
 removeValueFromMap([Head|Tail], 0, Column, [HNew|Tail], Removed) :-
         removeValueFromStackList(Head, Column, HNew, Removed).
 
@@ -39,7 +43,7 @@ removeValueFromStackList([Head|Tail], Index, [Head|TNew], Removed) :-
 
 
 /**Get Stack from map*/
-%getValueInMapStackPosition(+Board,+Row,+Col,-Value) #receives the row and col -1
+%getValueInMapStackPosition(+Board,+Row,+Col,-Value)
 getValueInMapStackPosition([Head|Tail],0,Col,Value):-
         getStackInListPosition(Head,Col,Value).
 

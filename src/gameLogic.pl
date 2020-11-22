@@ -50,11 +50,10 @@ gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
 %player_move(+GameState,+Player,-NewGameState)
 player_move(GameState,Player,NewGameState):-
     readRingMove(RingMove),
-    handleMove(GameState,RingMove,Player,NewGameState).
+    handleRingMove(GameState,RingMove,Player,NewGameState).
 
 
 /**Read Move*/
-
 %readMove(-Move)
 readRingMove(Move):-
     nl, write('Place or move one of your Rings'),
@@ -90,6 +89,8 @@ readBallMove(Move):-
     write('Insert Col of your move'),
     readColCoordinate(ColIndexEnd),
     Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd].
+
+
 
 %readCoordinate(-Coordinate)
 readRingRowCoordinate(Coordinate):-
@@ -155,7 +156,7 @@ readColCoordinate(Coordinate):-
 
 /**Handle Move (for now not accurate) TO DO*/
 %handleMove(+GameState,+Move,+Player,-NewGameState) TO DO
-handleMove([Board, AllPieces],[-1,-1,ColIndexEnd,RowIndexEnd], Player,[NewBoard, NewAllPieces]):-
+handleRingMove([Board, AllPieces],[-1,-1,ColIndexEnd,RowIndexEnd], Player,[NewBoard, NewAllPieces]):-
     (Player = 'White' ->
         addValueInMap(Board, RowIndexEnd, ColIndexEnd, whiteRing, NewBoard),
         AllPieces = [[_Played|NewWhitePieces], BlackPieces],
@@ -172,7 +173,7 @@ handleMove([Board, AllPieces],[-1,-1,ColIndexEnd,RowIndexEnd], Player,[NewBoard,
     ).
 
 /**
-handleMove([Board, AllPieces],[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd], Player,[NewBoard, AllPieces]):-
+handleRingMove([Board, AllPieces],[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd], Player,[NewBoard, AllPieces]):-
     removeValueFromMap(Board, RowIndexBegin, ColumnIndexBegin, IntermediateBoard, Removed),
     Player = 'White' ->
         Removed = 'WhiteRing' ->
