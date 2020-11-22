@@ -1,17 +1,35 @@
-/**Change values in map*/
-%changeValueInMap(+GameState1, +Row, +Column, +Value, -GameState2)
-changeValueInMap([Head|Tail], 0, Column,Value, [HNew|Tail]) :-
-        changeValueInList(Head, Column, Value, HNew).
+/**Add values in map*/
+%addValueInMap(+Board, +Row, +Column, +Value, -NewBoard)
+addValueInMap([Head|Tail], 0, Column,Value, [HNew|Tail]) :-
+        addValueInList(Head, Column, Value, HNew).
 
-changeValueInMap([Head|Tail], Row, Column, Value, [Head|TNew]) :-
+addValueInMap([Head|Tail], Row, Column, Value, [Head|TNew]) :-
         Row > 0,
         Row1 is Row - 1,
-        changeValueInMap(Tail, Row1, Column, Value, TNew).
+        addValueInMap(Tail, Row1, Column, Value, TNew).
 
-%changeValueInList(+List1, +Row, +Column, +Value, -List2)
-changeValueInList([_Head|Tail], 0, Value, [Value|Tail]).
+%addValueInList(+List1, +Index, +Value, -List2)
+addValueInList([Head|Tail], 0, Value, [[Value|Head]|Tail]).
 
-changeValueInList([Head|Tail], Index, Value, [Head|TNew]) :-
+addValueInList([Head|Tail], Index, Value, [Head|TNew]) :-
         Index > 0,
         Index1 is Index - 1,
-        changeValueInList(Tail, Index1, Value, TNew).
+        addValueInList(Tail, Index1, Value, TNew).
+
+/**Remove values from map*/
+%removeValueFromMap(+Board, +Row, +Column, -NewBoard, -Removed)
+removeValueFromMap([Head|Tail], 0, Column, [HNew|Tail], Removed) :-
+        removeValueFromStackList(Head, Column, HNew, Removed).
+
+removeValueFromMap([Head|Tail], Row, Column, [Head|TNew], Removed) :-
+        Row > 0,
+        Row1 is Row - 1,
+        removeValueFromMap(Tail, Row1, Column, TNew, Removed).       
+
+%removeValueFromStackList(+List1, +Index, -List2, -Removed)
+removeValueFromStackList([[Removed|T]|Tail], 0, [T|Tail], Removed).
+
+removeValueFromStackList([Head|Tail], Index, [Head|TNew], Removed) :-
+        Index > 0,
+        Index1 is Index - 1,
+        removeValueFromStackList(Tail, Index1, TNew, Removed).

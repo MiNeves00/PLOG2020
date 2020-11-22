@@ -31,11 +31,11 @@ gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
     player_move(GameState,'White',NewGameState),
     checkIfWin(NewGameState,HasWon),
     (HasWon = 'None' ->  
-        display_game(GameState,'Black'),
-        player_move(GameState,'Black',NewGameState2),
+        display_game(NewGameState,'Black'),
+        player_move(NewGameState,'Black',NewGameState2),
         checkIfWin(NewGameState2,HasWon2),
         (HasWon2 = 'None' ->
-            gameLoop(GameState,'Player','Player') %Recursive call to continue to next player turns
+            gameLoop(NewGameState2,'Player','Player') %Recursive call to continue to next player turns
             ; 
             won(HasWon2)
         )
@@ -49,8 +49,8 @@ gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
 
 %player_move(+GameState,+Player,-NewGameState)
 player_move(GameState,Player,NewGameState):-
-    insertMove(Move).
-    %handleMove(GameState,Move,NewGameState).
+    insertMove(Move),
+    handleMove(GameState,Move,Player,NewGameState).
 
 
 /**Insert Move*/
@@ -115,9 +115,33 @@ readColCoordinate(Coordinate):-
 
 
 /**Handle Move (for now not accurate) TO DO*/
-%handleMove(+GameState,+Move,-NewGameState) TO DO
-handleMove(GameState,Move,NewGameState):-
-    player_move(GameState,Player,NewGameState). %deu borrada chama-se isto
+%handleMove(+GameState,+Move,+Player,-NewGameState) TO DO
+handleMove([Board, AllPieces],[0,0,ColIndexEnd,RowIndexEnd], Player,[NewBoard, NewAllPieces]):-
+    (Player = 'White' ->
+        addValueInMap(Board, RowIndexEnd, ColIndexEnd, whiteRing, NewBoard),
+        AllPieces = [[_Played|NewWhitePieces], BlackPieces],
+        NewAllPieces = [NewWhitePieces, BlackPieces]
+        ;
+        (Player = 'Black' ->
+            addValueInMap(Board, RowIndexEnd, ColIndexEnd, blackRing, NewBoard),
+            AllPieces = [WhitePieces, [_Played|NewBlackPieces]],
+            NewAllPieces = [WhitePieces, NewBlackPieces]
+            ;
+            nl
+        ),
+        nl
+    ).
+
+/**
+handleMove([Board, AllPieces],[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd], Player,[NewBoard, AllPieces]):-
+    removeValueFromMap(Board, RowIndexBegin, ColumnIndexBegin, IntermediateBoard, Removed),
+    Player = 'White' ->
+        Removed = 'WhiteRing' ->
+            addValueInMap(IntermediateBoard, RowIndexEnd, ColIndexEnd, Removed, NewBoard),
+            !
+            ;
+            player_move(GameState,Player,NewGameState). %deu borrada chama-se isto
+*/
 
 /**Check Win (for now not accurate) TO DO*/
 %checkIfWin(+GameState, -HasWon)
