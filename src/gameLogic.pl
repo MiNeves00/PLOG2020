@@ -29,18 +29,18 @@ gameStart('Com','Com'):- %To Do
 gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
     display_game(GameState,'White'), %Displays game
     player_move(GameState,'White',NewGameState),
-    checkIfWin(NewGameState,HasWon),
-    (HasWon = 'None' ->  
+    checkIfWin(NewGameState,'White',HasWon),
+    (HasWon = 'False' ->  
         display_game(NewGameState,'Black'),
         player_move(NewGameState,'Black',NewGameState2),
-        checkIfWin(NewGameState2,HasWon2),
-        (HasWon2 = 'None' ->
+        checkIfWin(NewGameState2,'Black',HasWon2),
+        (HasWon2 = 'False' ->
             gameLoop(NewGameState2,'Player','Player') %Recursive call to continue to next player turns
             ; 
-            won(HasWon2)
+            won('Black')
         )
         ;
-        won(HasWon)
+        won('White')
     )
     .
 
@@ -143,7 +143,12 @@ handleMove([Board, AllPieces],[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexE
             player_move(GameState,Player,NewGameState). %deu borrada chama-se isto
 */
 
-/**Check Win (for now not accurate) TO DO*/
+
+
+
+
+/**Check Win TO DO*/
+/**
 %checkIfWin(+GameState, -HasWon)
 checkIfWin(GameState,HasWon):- %Updates HasWon If Someone Wins
     nl,
@@ -155,12 +160,71 @@ checkIfWin(GameState,HasWon):- %Updates HasWon If Someone Wins
 winInput(0,HasWon):- HasWon='None'.
 winInput(1,HasWon):- HasWon='B'.
 winInput(2,HasWon):- HasWon='W'.
+*/
+
+%checkIfWin(+GameState,+Player,-HasWon)
+checkIfWin(GameState,Player,HasWon):-
+    nl,
+    write('Checking if its a win'),
+    getBoard(GameState,Board),
+    areBallsOnOpositeBase(Board,Player,Bool),
+    HasWon = Bool.
+
+%areBallsOnOpositeBase(+Board,+Player,-Bool)
+areBallsOnOpositeBase(Board,'White',Bool):-
+    getOpponentBaseStack(Board,'White',Base1,Base2,Base3),
+    isBallOfColorOnTop(Base1,'White',Bool1),
+    isBallOfColorOnTop(Base2,'White',Bool2),
+    isBallOfColorOnTop(Base3,'White',Bool3),
+    arefirst3BoolsTrue(Bool1,Bool2,Bool3,Bool).
+
+
+
+areBallsOnOpositeBase(Board,'Black',Bool):-
+    getOpponentBaseStack(Board,'Black',Base1,Base2,Base3),
+    isBallOfColorOnTop(Base1,'Black',Bool1),
+    isBallOfColorOnTop(Base2,'Black',Bool2),
+    isBallOfColorOnTop(Base3,'Black',Bool3),
+    arefirst3BoolsTrue(Bool1,Bool2,Bool3,Bool).  
+
+
+
+
+%isBallOfColorOnTop(+Stack,+Player,-Bool)
+isBallOfColorOnTop([Head|_Tail],'White',Bool):-
+    (Head = whiteBall -> Bool = 'True' ; Bool = 'False').
+
+isBallOfColorOnTop([Head|_Tail],'Black',Bool):-
+    (Head = blackBall -> Bool = 'True' ; Bool = 'False').
+
+%arefirst3BoolsTrue(+Bool1,+Bool2,+Bool3,-Bool)
+arefirst3BoolsTrue(Bool1,Bool2,Bool3,Bool):-
+    Bool1 = 'True',
+    Bool2 = 'True',
+    Bool3 = 'True',
+    Bool = 'True'.
+
+arefirst3BoolsTrue(Bool1,Bool2,Bool3,Bool):-
+    Bool = 'False'.
+
+
+%getOpponentBaseStack(+Board,+Player,-Base1,-Base2,-Base3)
+getOpponentBaseStack(Board,'White',Base1,Base2,Base3):-
+    getValueInMapStackPosition(Board,0,3,Base1),
+    getValueInMapStackPosition(Board,0,4,Base2),
+    getValueInMapStackPosition(Board,1,4,Base3).
+    
+
+getOpponentBaseStack(Board,'Black',Base1,Base2,Base3):-
+    getValueInMapStackPosition(Board,4,0,Base1),
+    getValueInMapStackPosition(Board,4,1,Base2),
+    getValueInMapStackPosition(Board,3,0,Base3).
 
 %won(+WhoWon)
-won('W'):-
+won('White'):-
     nl,
-    write('White wins').
+    write('White wins'),nl.
 
-won('B'):-
+won('Black'):-
     nl,
-    write('Black wins').
+    write('Black wins'),nl.
