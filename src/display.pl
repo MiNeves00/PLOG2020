@@ -17,13 +17,21 @@ initial(
 ).
 
 /**Game state examples TO DO*/
-intermediateMap([
-[[],[],[],blackBase,blackBall],
-[[],[],[],blackBall,blackBase],
-[whiteBall,[],whiteRing,[],blackBall],
-[whiteBase,[],whiteBall,[],blackRing],
-[whiteBase,whiteBall,[],[],[]]
-]).
+intermediateMap(
+    [
+        [ %Tabuleiro
+            [[empty],[empty],[empty],[blackBall | [blackRing | [blackBase | [empty]]]],[blackBall | [blackRing | [blackBase | [empty]]]]],
+            [[whiteRing | [empty]],[empty],[empty],[empty],[blackBall | [blackRing | [blackBase | [empty]]]]],
+            [[whiteRing | [empty]],[empty],[empty],[empty],[blackRing | [empty]]],
+            [[whiteBall | [whiteRing | [whiteBase | [empty]]]],[empty],[empty],[empty],[empty]],
+            [[whiteBall | [whiteRing | [whiteBase | [empty]]]],[whiteBall | [whiteRing | [whiteBase | [empty]]]],[empty],[empty],[empty]]
+        ], 
+        [ %PecasDeCadaJogador
+            [whiteRing,whiteRing,whiteRing,whiteRing,whiteRing],%White
+            [blackRing,blackRing,blackRing,blackRing,blackRing] %Black
+        ]
+    ]
+).
 
 endMap(
     [

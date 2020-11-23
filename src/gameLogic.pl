@@ -3,7 +3,7 @@
 gameStart('Player','Player'):-
     write('Starting Player vs Player game...'),
     nl,
-    initial(GameState), %Gets initial game state
+    intermediateMap(GameState), %Gets initial game state
     gameLoop(GameState,'Player','Player').
 
 /*
@@ -50,6 +50,7 @@ gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
 %player_move(+GameState,+Player,-NewGameState)
 player_move(GameState,Player,NewGameState):-
     ringStep(GameState,Player,NewGameState).
+    %TO DO ballStep
 
 %ringStep(+GameState,+Player,-NewGameState)
 ringStep(GameState,Player,NewGameState):-
@@ -176,7 +177,7 @@ handleRingMove([Board, AllPieces],[-1,-1,ColIndexEnd,RowIndexEnd], Player,[NewBo
     ).
 
 
-handleRingMove(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd], Player,[NewBoard|[AllPieces]]):-
+handleRingMove(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd], Player, [NewBoard|[AllPieces]]):-
     getBoard(GameState,Board),
     getPieces(GameState,AllPieces),
     getValueInMapStackPosition(Board,RowIndexBegin,ColIndexBegin,[HeadValue|_TailValue]),
@@ -184,19 +185,27 @@ handleRingMove(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd], 
         (HeadValue = whiteRing -> 
             removeValueFromMapUsingGameState(GameState, RowIndexBegin, ColIndexBegin, IntermediateGameState, Removed),
             getBoard(IntermediateGameState,IntermediateBoard),
-            addValueInMap(IntermediateBoard, RowIndexEnd, ColIndexEnd, whiteRing, NewBoard)
-        ; write('The piece you choose to move is not a white ring! Be sure to select one'),nl
-        
+            addValueInMap(IntermediateBoard, RowIndexEnd, ColIndexEnd, whiteRing, NewBoard),
+            NewGameState = [NewBoard|[AllPieces]]
+        ; 
+        nl,write('Piece you choose to move is not a white ring!'),
+        nl,write('Be sure to select one'),nl,
+        ringStep(GameState,Player,NewGameState),
+        NewGameState = [NewBoard|[AllPieces]]
         ) 
     ; 
         (HeadValue = blackRing -> 
             removeValueFromMapUsingGameState(GameState, RowIndexBegin, ColIndexBegin, IntermediateGameState, Removed),
             getBoard(IntermediateGameState,IntermediateBoard),
-            addValueInMap(IntermediateBoard, RowIndexEnd, ColIndexEnd, blackRing, NewBoard)
-        ; write('The piece you choose to move is not a black ring! Be sure to select one'),nl
+            addValueInMap(IntermediateBoard, RowIndexEnd, ColIndexEnd, blackRing, NewBoard),
+            NewGameState = [NewBoard|[AllPieces]]
+        ; 
+        nl,write('Piece you choose to move is not a black ring!'),
+        nl,write('Be sure to select one'),nl,
+        ringStep(GameState,Player,NewGameState),
+        NewGameState = [NewBoard|[AllPieces]]
         ) 
     ).
-
 /*
     removeValueFromMapUsingGameState([Board, AllPieces], RowIndexBegin, ColumnIndexBegin, [IntermediateBoard|IntermediatePieces], Removed),
     Player = 'White' ->
