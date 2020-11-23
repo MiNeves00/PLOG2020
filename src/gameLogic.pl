@@ -49,9 +49,12 @@ gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
 
 %player_move(+GameState,+Player,-NewGameState)
 player_move(GameState,Player,NewGameState):-
+    ringStep(GameState,Player,NewGameState).
+
+%ringStep(+GameState,+Player,-NewGameState)
+ringStep(GameState,Player,NewGameState):-
     readRingMove(RingMove),
     handleRingMove(GameState,RingMove,Player,NewGameState).
-
 
 /**Read Move*/
 %readMove(-Move)
@@ -172,9 +175,30 @@ handleRingMove([Board, AllPieces],[-1,-1,ColIndexEnd,RowIndexEnd], Player,[NewBo
         nl
     ).
 
-/**
-handleRingMove([Board, AllPieces],[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd], Player,[NewBoard, AllPieces]):-
-    removeValueFromMap(Board, RowIndexBegin, ColumnIndexBegin, IntermediateBoard, Removed),
+
+handleRingMove(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd], Player,[NewBoard|[AllPieces]]):-
+    getBoard(GameState,Board),
+    getPieces(GameState,AllPieces),
+    getValueInMapStackPosition(Board,RowIndexBegin,ColIndexBegin,[HeadValue|_TailValue]),
+    (Player = 'White' -> 
+        (HeadValue = whiteRing -> 
+            removeValueFromMapUsingGameState(GameState, RowIndexBegin, ColIndexBegin, IntermediateGameState, Removed),
+            getBoard(IntermediateGameState,IntermediateBoard),
+            addValueInMap(IntermediateBoard, RowIndexEnd, ColIndexEnd, whiteRing, NewBoard)
+        ; write('The piece you choose to move is not a white ring! Be sure to select one'),nl
+        
+        ) 
+    ; 
+        (HeadValue = blackRing -> 
+            removeValueFromMapUsingGameState(GameState, RowIndexBegin, ColIndexBegin, IntermediateGameState, Removed),
+            getBoard(IntermediateGameState,IntermediateBoard),
+            addValueInMap(IntermediateBoard, RowIndexEnd, ColIndexEnd, blackRing, NewBoard)
+        ; write('The piece you choose to move is not a black ring! Be sure to select one'),nl
+        ) 
+    ).
+
+/*
+    removeValueFromMapUsingGameState([Board, AllPieces], RowIndexBegin, ColumnIndexBegin, [IntermediateBoard|IntermediatePieces], Removed),
     Player = 'White' ->
         Removed = 'WhiteRing' ->
             addValueInMap(IntermediateBoard, RowIndexEnd, ColIndexEnd, Removed, NewBoard),
