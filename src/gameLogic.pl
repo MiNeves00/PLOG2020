@@ -160,16 +160,15 @@ readColCoordinate(Coordinate):-
 
 /**Handle Move (for now not accurate) TO DO*/
 %handleMove(+GameState,+Move,+Player,-NewGameState) TO DO
-handleRingMove([Board, AllPieces],[-1,-1,ColIndexEnd,RowIndexEnd], Player,NewGameState):-
-    isRingMoveValid([Board, AllPieces],[-1,-1,ColIndexEnd,RowIndexEnd],Player,Valid),
-    (Valid = 'True' ->
-        move([Board, AllPieces],[-1,-1,ColIndexEnd,RowIndexEnd], Player,NewGameState)
-        ;
+handleRingMove(GameState,[-1,-1,ColIndexEnd,RowIndexEnd], Player, NewGameState):-
+    isRingMoveValid(GameState,[-1,-1,ColIndexEnd,RowIndexEnd], Player,Valid),
+    (Valid = 'True' -> 
+        move(GameState,[-1,-1,ColIndexEnd,RowIndexEnd], Player, NewGameState)
+    ; 
         nl,write('You dont have rings left in your hand!'),
         nl,write('Select a ring on the board'),nl,
-        ringStep(GameState,Player,NewGameState).
+        ringStep(GameState,Player,NewGameState)
     ).
-
 
 handleRingMove(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd], Player, NewGameState):-
     isRingMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd], Player,Valid),
@@ -192,6 +191,12 @@ handleRingMove(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd], 
 
 %isRingMoveValid(+GameState,+Move,+Player,-Valid)
 %TO DO
+isRingMoveValid([_Board, [[], _BlackPieces]],[-1,-1,ColIndexEnd,RowIndexEnd], 'White', Valid):-
+    Valid = 'False'.
+
+isRingMoveValid([_Board, [_WhitePieces, []]],[-1,-1,ColIndexEnd,RowIndexEnd], 'Black', Valid):-
+    Valid = 'False'.
+
 isRingMoveValid(GameState,[-1,-1,ColIndexEnd,RowIndexEnd], Player, Valid):-
     Valid = 'True'.
 
