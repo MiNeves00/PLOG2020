@@ -75,8 +75,22 @@ readRingMove(Move):-
     nl,
     write('Insert Col of your move'),
     readColCoordinate(ColIndexEnd),
-    Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd],
-    write('Ring Move has been read successfuly').
+    nl,
+    (RowIndexBegin = RowIndexEnd ->
+        (ColIndexBegin = ColIndexEnd ->
+            write('Selected start coordinates and destination coordinates are the same'), nl,
+            write('Cannot move piece to its own place'), nl,
+            write('Insert different start and destination spaces'), nl,
+            readRingMove(Move),
+            nl
+        ;
+            Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd],
+            write('Ring Move has been read successfuly').
+        )
+    ;
+        Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd],
+        write('Ring Move has been read successfuly').
+    ).
 
 readBallMove(Move):-
     nl, write('Insert the coordinates of the ball you want to move (0-4 for Row Col)'),
@@ -207,18 +221,36 @@ isRingMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd],
     getValueInMapStackPosition(Board,RowIndexBegin,ColIndexBegin,[HeadValue|_TailValue]),
     (Player = 'White' -> 
         (HeadValue = whiteRing -> 
-            Valid = 'True'
+            ValidStart = 'True'
         ; 
-            Valid = 'False'
+            ValidStart = 'False'
         ) 
     ; 
         (HeadValue = blackRing -> 
-            Valid = 'True'
+            ValidStart = 'True'
         ; 
+            ValidStart = 'False'
+        ) 
+    ),
+    getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[EndHeadValue|_TailValue]),
+    (EndHeadValue = whiteBall -> 
+        ValidEnd = 'False'
+    ; 
+        (EndHeadValue = blackBall -> 
+            ValidEnd = 'False'
+        ; 
+            ValidEnd = 'True'
+        ) 
+    ),
+    (ValidStart = 'False' -> 
+        Valid = 'False'
+    ; 
+        (ValidEnd = 'False' -> 
             Valid = 'False'
+        ; 
+            Valid = 'True'
         ) 
     ).
-
 
 
 

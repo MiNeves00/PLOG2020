@@ -49,7 +49,7 @@ handleInput(0):-
     write('Exiting Game... See you soon!').
 
 handleInput(_SomeOther):-
-    write('Input incorrect please insert you option again: '),
+    write('Input incorrect please insert your option again: '),
     read(Input),
     handleInput(Input).
 

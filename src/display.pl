@@ -20,7 +20,7 @@ initial(
 intermediateMap(
     [
         [ %Tabuleiro
-            [[empty],[empty],[empty],[blackBall | [blackRing | [blackBase | [empty]]]],[blackBall | [blackRing | [blackBase | [empty]]]]],
+            [[empty],[empty],[whiteBall | [empty]],[blackBall | [blackRing | [blackBase | [empty]]]],[blackBall | [blackRing | [blackBase | [empty]]]]],
             [[whiteRing | [empty]],[empty],[empty],[empty],[blackBall | [blackRing | [blackBase | [empty]]]]],
             [[whiteRing | [empty]],[empty],[empty],[empty],[blackRing | [empty]]],
             [[whiteBall | [whiteRing | [whiteBase | [empty]]]],[empty],[empty],[empty],[empty]],
