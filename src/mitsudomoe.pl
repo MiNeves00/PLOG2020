@@ -2,6 +2,7 @@
 :- consult('gameLogic.pl').
 :- consult('menu.pl').
 :- consult('utils.pl').
+:- consult('readmove.pl').
 :- use_module(library(system)).
 
 /**Play (main)*/
