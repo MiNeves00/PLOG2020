@@ -45,177 +45,73 @@ gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
     .
 
 /**Player Move*/
-%Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd]
+%Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece]
 
 %player_move(+GameState,+Player,-NewGameState)
 player_move(GameState,Player,NewGameState):-
-    ringStep(GameState,Player,NewGameState).
-    %TO DO ballStep
+    ringStep(GameState,Player,IntermediateGameState),
+    display_game(IntermediateGameState,Player),
+    ballStep(IntermediateGameState,Player,NewGameState).
 
 %ringStep(+GameState,+Player,-NewGameState)
 ringStep(GameState,Player,NewGameState):-
-    readRingMove(RingMove),
+    readRingMove(Player, RingMove),
     handleRingMove(GameState,RingMove,Player,NewGameState).
 
-/**Read Move TO DO posicao inicial nao pode ser a final*/
-%readMove(-Move)
-readRingMove(Move):-
-    nl, write('Place or move one of your Rings'),
-    nl, write('If the piece is not yet on the Board use the coordinates -1 for Row and Col'),
-    nl, write('Insert the coordinates of the piece you want to move (0-4 for Row Col)'),
-    nl,nl,
-    write('Insert Row of the piece to move'),
-    readRingRowCoordinate(RowIndexBegin),
-    nl,
-    write('Insert Col of the piece to move'),
-    readRingColCoordinate(ColIndexBegin),
-    nl,
-    write('Insert Row of your move'),
-    readRowCoordinate(RowIndexEnd),
-    nl,
-    write('Insert Col of your move'),
-    readColCoordinate(ColIndexEnd),
-    nl,
-    (RowIndexBegin = RowIndexEnd ->
-        (ColIndexBegin = ColIndexEnd ->
-            write('Selected start coordinates and destination coordinates are the same'), nl,
-            write('Cannot move piece to its own place'), nl,
-            write('Insert different start and destination spaces'), nl,
-            readRingMove(Move),
-            nl
-        ;
-            Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd],
-            write('Ring Move has been read successfuly').
-        )
-    ;
-        Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd],
-        write('Ring Move has been read successfuly').
-    ).
-
-readBallMove(Move):-
-    nl, write('Insert the coordinates of the ball you want to move (0-4 for Row Col)'),
-    nl,nl,
-    write('Insert Row of the piece to move'),
-    readRowCoordinate(RowIndexBegin),
-    nl,
-    write('Insert Col of the piece to move'),
-    readColCoordinate(ColIndexBegin),
-    nl,
-    write('Insert Row of your move'),
-    readRowCoordinate(RowIndexEnd),
-    nl,
-    write('Insert Col of your move'),
-    readColCoordinate(ColIndexEnd),
-    Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd].
-
-
-
-%readCoordinate(-Coordinate)
-readRingRowCoordinate(Coordinate):-
-    nl,
-    write('Row: '),
-    read(NewCoordinate),
-    (NewCoordinate < -1 -> write('Number cannot be smaller than -1'), nl,
-        readRowCoordinate(Coordinate) 
-        ;
-        (NewCoordinate > 4 -> write('Number cannot be bigger than 5'), nl,
-            readRowCoordinate(Coordinate) 
-            ;
-            Coordinate = NewCoordinate
-        ),
-        nl
-    ).
-
-readRingColCoordinate(Coordinate):-
-    nl,
-    write('Col: '),
-    read(NewCoordinate),
-    (NewCoordinate < -1 -> write('Number cannot be smaller than 0'), nl,
-        readRowCoordinate(Coordinate) 
-        ;
-        (NewCoordinate > 4 -> write('Number cannot be bigger than 5'), nl,
-            readRowCoordinate(Coordinate) 
-            ;
-            Coordinate = NewCoordinate
-        ),
-        nl
-    ).
-
-readRowCoordinate(Coordinate):-
-    nl,
-    write('Row: '),
-    read(NewCoordinate),
-    (NewCoordinate < 0 -> write('Number cannot be smaller than -1'), nl,
-        readRowCoordinate(Coordinate) 
-        ;
-        (NewCoordinate > 4 -> write('Number cannot be bigger than 5'), nl,
-            readRowCoordinate(Coordinate) 
-            ;
-            Coordinate = NewCoordinate
-        ),
-        nl
-    ).
-
-readColCoordinate(Coordinate):-
-    nl,
-    write('Col: '),
-    read(NewCoordinate),
-    (NewCoordinate < 0 -> write('Number cannot be smaller than 0'), nl,
-        readRowCoordinate(Coordinate) 
-        ;
-        (NewCoordinate > 4 -> write('Number cannot be bigger than 5'), nl,
-            readRowCoordinate(Coordinate) 
-            ;
-            Coordinate = NewCoordinate
-        ),
-        nl
-    ).
+%ballStep(+GameState, +Player, -NewGameState)
+ballStep(GameState, Player, NewGameState):-
+    readBallMove(Player, BallMove),
+    handleBallMove(GameState,BallMove,Player,NewGameState).
 
 
 /**Handle Move (for now not accurate) TO DO*/
-%handleMove(+GameState,+Move,+Player,-NewGameState) TO DO
-handleRingMove(GameState,[-1,-1,ColIndexEnd,RowIndexEnd], Player, NewGameState):-
-    isRingMoveValid(GameState,[-1,-1,ColIndexEnd,RowIndexEnd], Player,Valid),
+%handleRingMove(+GameState,+Move,+Player,-NewGameState) TO DO
+handleRingMove(GameState,[-1,-1,ColIndexEnd,RowIndexEnd,Piece], Player, NewGameState):-
+    isRingMoveValid(GameState,[-1,-1,ColIndexEnd,RowIndexEnd,Piece], Player,Valid),
     (Valid = 'True' -> 
-        move(GameState,[-1,-1,ColIndexEnd,RowIndexEnd], Player, NewGameState)
+        move(GameState,[-1,-1,ColIndexEnd,RowIndexEnd,Piece], Player, NewGameState)
     ; 
         nl,write('You dont have rings left in your hand!'),
         nl,write('Select a ring on the board'),nl,
         ringStep(GameState,Player,NewGameState)
     ).
 
-handleRingMove(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd], Player, NewGameState):-
-    isRingMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd], Player,Valid),
+handleRingMove(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, NewGameState):-
+    isRingMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player,Valid),
     (Valid = 'True' -> 
-        move(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd], Player, NewGameState)
+        move(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, NewGameState)
     ; 
         nl,write('Piece you choose to move is not a ring of your colour!'),
         nl,write('Be sure to select one'),nl,
         ringStep(GameState,Player,NewGameState)
     ).
-/*
-    removeValueFromMapUsingGameState([Board, AllPieces], RowIndexBegin, ColumnIndexBegin, [IntermediateBoard|IntermediatePieces], Removed),
-    Player = 'White' ->
-        Removed = 'WhiteRing' ->
-            addValueInMap(IntermediateBoard, RowIndexEnd, ColIndexEnd, Removed, NewBoard),
-            !
-            ;
-            player_move(GameState,Player,NewGameState). %deu borrada chama-se isto
-*/
+
+
+%handleBallMove(+GameState,+Move,+Player,-NewGameState) 
+handleBallMove(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,NewGameState):-
+    isBallMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,Valid),
+    (Valid = 'True' -> 
+        move(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, NewGameState)
+    ; 
+        nl,write('Piece you choose to move is not a Ball of your colour!'),
+        nl,write('Be sure to select one'),nl,
+        ballStep(GameState,Player,NewGameState)
+    ).
+
 
 %isRingMoveValid(+GameState,+Move,+Player,-Valid)
 %TO DO
-isRingMoveValid([_Board, [[], _BlackPieces]],[-1,-1,ColIndexEnd,RowIndexEnd], 'White', Valid):-
+isRingMoveValid([_Board, [[], _BlackPieces]],[-1,-1,ColIndexEnd,RowIndexEnd,Piece], 'White', Valid):-
     Valid = 'False'.
 
-isRingMoveValid([_Board, [_WhitePieces, []]],[-1,-1,ColIndexEnd,RowIndexEnd], 'Black', Valid):-
+isRingMoveValid([_Board, [_WhitePieces, []]],[-1,-1,ColIndexEnd,RowIndexEnd,Piece], 'Black', Valid):-
     Valid = 'False'.
 
-isRingMoveValid(GameState,[-1,-1,ColIndexEnd,RowIndexEnd], Player, Valid):-
+isRingMoveValid(GameState,[-1,-1,ColIndexEnd,RowIndexEnd,Piece], Player, Valid):-
     Valid = 'True'.
 
 
-isRingMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd], Player, Valid):-
+isRingMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, Valid):-
     getBoard(GameState,Board),
     getPieces(GameState,AllPieces),
     getValueInMapStackPosition(Board,RowIndexBegin,ColIndexBegin,[HeadValue|_TailValue]),
@@ -253,34 +149,38 @@ isRingMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd],
     ).
 
 
+%isBallMoveValid(+GameState,+Move,+Player,-Valid) %TODO
+isBallMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,Valid):-
+    getBoard(GameState,Board),
+    getPieces(GameState,AllPieces),
+    getValueInMapStackPosition(Board,RowIndexBegin,ColIndexBegin,[HeadValue|_TailValue]),
+    (HeadValue = Piece -> 
+        Valid = 'True'
+    ; 
+        Valid = 'False'
+    ).
+
 
 %move(+GameState, +Move, +Player ,-NewGameState)
-move([Board, AllPieces],[-1,-1,ColIndexEnd,RowIndexEnd], 'White',NewGameState):-
-    addValueInMap(Board, RowIndexEnd, ColIndexEnd, whiteRing, NewBoard),
+move([Board, AllPieces],[-1,-1,ColIndexEnd,RowIndexEnd,Piece], 'White',NewGameState):-
+    addValueInMap(Board, RowIndexEnd, ColIndexEnd, Piece, NewBoard),
     AllPieces = [[_Played|NewWhitePieces], BlackPieces],
     NewAllPieces = [NewWhitePieces, BlackPieces],
     NewGameState = [NewBoard, NewAllPieces].
 
 
-move([Board, AllPieces],[-1,-1,ColIndexEnd,RowIndexEnd],'Black',NewGameState):-
-    addValueInMap(Board, RowIndexEnd, ColIndexEnd, blackRing, NewBoard),
+move([Board, AllPieces],[-1,-1,ColIndexEnd,RowIndexEnd,Piece],'Black',NewGameState):-
+    addValueInMap(Board, RowIndexEnd, ColIndexEnd, Piece, NewBoard),
     AllPieces = [WhitePieces, [_Played|NewBlackPieces]],
     NewAllPieces = [WhitePieces, NewBlackPieces],
     NewGameState = [NewBoard, NewAllPieces].
 
 
-move(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd], 'White',NewGameState):-
+move(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, NewGameState):-
     removeValueFromMapUsingGameState(GameState, RowIndexBegin, ColIndexBegin, IntermediateGameState, Removed),
     getBoard(IntermediateGameState,IntermediateBoard),
     getPieces(IntermediateGameState,IntermediatePieces),
-    addValueInMap(IntermediateBoard, RowIndexEnd, ColIndexEnd, whiteRing, NewBoard),
-    NewGameState = [NewBoard|[IntermediatePieces]].
-
-move(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd], 'Black',NewGameState):-
-    removeValueFromMapUsingGameState(GameState, RowIndexBegin, ColIndexBegin, IntermediateGameState, Removed),
-    getBoard(IntermediateGameState,IntermediateBoard),
-    getPieces(IntermediateGameState,IntermediatePieces),
-    addValueInMap(IntermediateBoard, RowIndexEnd, ColIndexEnd, blackRing, NewBoard),
+    addValueInMap(IntermediateBoard, RowIndexEnd, ColIndexEnd, Piece, NewBoard),
     NewGameState = [NewBoard|[IntermediatePieces]].
 
 
