@@ -183,12 +183,28 @@ isBallMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,P
         ) 
     ),
     (EndHeadValue = whiteBall -> 
-        ValidEnd = 'False'
+        ValidEnd = 'False',
+        nl,write('Select a place with no ball on top')
     ; 
         (EndHeadValue = blackBall -> 
-            ValidEnd = 'False'
+            ValidEnd = 'False',
+            nl,write('Select a place with no ball on top')
         ; 
-            ValidEnd = 'True'
+            (Player = 'White' -> 
+                (EndHeadValue = whiteRing -> 
+                    ValidEnd = 'True' 
+                ; 
+                    ValidEnd = 'False',
+                    nl, write('Select a destination place with a ring of your colour on top!')
+                )
+            ;
+                (EndHeadValue = blackRing -> 
+                    ValidEnd = 'True' 
+                ; 
+                    ValidEnd = 'False',
+                    nl, write('Select a destination place with a ring of your colour on top!')
+                )
+            )
         ) 
     ),
     (ValidStart = 'False' -> 
@@ -198,8 +214,6 @@ isBallMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,P
     ; 
         (ValidEnd = 'False' -> 
             Valid = 'False',
-            nl,write('Destination space invalid!'),
-            nl,write('Select a place with no ball on top'),
             nl
         ; 
             Valid = 'True'
