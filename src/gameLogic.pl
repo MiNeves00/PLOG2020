@@ -80,9 +80,7 @@ handleRingMove(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Pi
     isRingMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player,Valid),
     (Valid = 'True' -> 
         move(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, NewGameState)
-    ; 
-        nl,write('Piece you choose to move is not a ring of your colour!'),
-        nl,write('Be sure to select one'),nl,
+    ;
         ringStep(GameState,Player,NewGameState)
     ).
 
@@ -108,13 +106,23 @@ isRingMoveValid([_Board, [_WhitePieces, []]],[-1,-1,ColIndexEnd,RowIndexEnd,Piec
     Valid = 'False'.
 
 isRingMoveValid(GameState,[-1,-1,ColIndexEnd,RowIndexEnd,Piece], Player, Valid):-
-    Valid = 'True'.
+    getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[EndHeadValue|_TailValue]),
+    (EndHeadValue = whiteBall -> 
+        Valid = 'False'
+    ; 
+        (EndHeadValue = blackBall -> 
+            Valid = 'False'
+        ; 
+            Valid = 'True'
+        ) 
+    ).
 
 
 isRingMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, Valid):-
     getBoard(GameState,Board),
     getPieces(GameState,AllPieces),
-    getValueInMapStackPosition(Board,RowIndexBegin,ColIndexBegin,[HeadValue|_TailValue]),
+    getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[EndHeadValue|_TailValue]),
+    getValueInMapStackPosition(Board,RowIndexBegin,ColIndexBegin,[HeadValue|_Tail]),
     (Player = 'White' -> 
         (HeadValue = whiteRing -> 
             ValidStart = 'True'
@@ -128,7 +136,6 @@ isRingMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,P
             ValidStart = 'False'
         ) 
     ),
-    getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[EndHeadValue|_TailValue]),
     (EndHeadValue = whiteBall -> 
         ValidEnd = 'False'
     ; 
@@ -139,25 +146,63 @@ isRingMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,P
         ) 
     ),
     (ValidStart = 'False' -> 
-        Valid = 'False'
+        Valid = 'False',
+        nl,write('Piece you choose to move is not a ring of your colour!'),
+        nl,write('Be sure to select one'),
+        nl
     ; 
         (ValidEnd = 'False' -> 
-            Valid = 'False'
+            Valid = 'False',
+            nl,write('Destination space invalid!'),
+            nl,write('Select a place with no ball on top'),
+            nl
         ; 
             Valid = 'True'
         ) 
     ).
 
-
 %isBallMoveValid(+GameState,+Move,+Player,-Valid) %TODO
 isBallMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,Valid):-
     getBoard(GameState,Board),
     getPieces(GameState,AllPieces),
-    getValueInMapStackPosition(Board,RowIndexBegin,ColIndexBegin,[HeadValue|_TailValue]),
-    (HeadValue = Piece -> 
-        Valid = 'True'
+    getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[EndHeadValue|_TailValue]),
+    getValueInMapStackPosition(Board,RowIndexBegin,ColIndexBegin,[HeadValue|_Tail]),
+    (Player = 'White' -> 
+        (HeadValue = whiteBall -> 
+            ValidStart = 'True'
+        ; 
+            ValidStart = 'False'
+        ) 
     ; 
-        Valid = 'False'
+        (HeadValue = blackBall -> 
+            ValidStart = 'True'
+        ; 
+            ValidStart = 'False'
+        ) 
+    ),
+    (EndHeadValue = whiteBall -> 
+        ValidEnd = 'False'
+    ; 
+        (EndHeadValue = blackBall -> 
+            ValidEnd = 'False'
+        ; 
+            ValidEnd = 'True'
+        ) 
+    ),
+    (ValidStart = 'False' -> 
+        Valid = 'False',
+        nl,write('Piece you choose to move is not a ball of your colour!'),
+        nl,write('Be sure to select one'),
+        nl
+    ; 
+        (ValidEnd = 'False' -> 
+            Valid = 'False',
+            nl,write('Destination space invalid!'),
+            nl,write('Select a place with no ball on top'),
+            nl
+        ; 
+            Valid = 'True'
+        ) 
     ).
 
 

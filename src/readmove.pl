@@ -21,7 +21,7 @@ readRingMove(Player ,Move):-
             write('Selected start coordinates and destination coordinates are the same'), nl,
             write('Cannot move piece to its own place'), nl,
             write('Insert different start and destination spaces'), nl,
-            readRingMove(Move),
+            readRingMove(Player, Move),
             nl
         ;
             (Player = 'White' ->
@@ -29,7 +29,7 @@ readRingMove(Player ,Move):-
                 ;
                 Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, blackRing]
             ),
-            write('Ring Move has been read successfuly').
+            write('Ring Move has been read successfuly')
         )
     ;
         (Player = 'White' -> 
@@ -37,7 +37,7 @@ readRingMove(Player ,Move):-
             ;
             Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, blackRing]
         ),
-        write('Ring Move has been read successfuly').
+        write('Ring Move has been read successfuly')
     ).
 
 
@@ -55,10 +55,29 @@ readBallMove(Player, Move):-
     nl,
     write('Insert Col of your move'),
     readColCoordinate(ColIndexEnd),
-    (Player = 'White' -> Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, whiteBall]
-    ; Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, blackBall]
-    ),
-    write('Ball Move has been read successfully').
+    (RowIndexBegin = RowIndexEnd ->
+        (ColIndexBegin = ColIndexEnd ->
+            write('Selected start coordinates and destination coordinates are the same'), nl,
+            write('Cannot move piece to its own place'), nl,
+            write('Insert different start and destination spaces'), nl,
+            readBallMove(Player, Move),
+            nl
+        ;
+            (Player = 'White' ->
+                Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, whiteBall]
+                ;
+                Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, blackBall]
+            ),
+            write('Ball Move has been read successfuly')
+        )
+    ;
+        (Player = 'White' -> 
+            Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, whiteBall]
+            ;
+            Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, blackBall]
+        ),
+        write('Ball Move has been read successfuly')
+    ).
 
 
 

@@ -54,7 +54,8 @@ getValueInMapStackPosition([Head|Tail],Row,Col,Value):-
         getValueInMapStackPosition(Tail,Row1,Col,Value).
 
 %getStackInListPosition(+BoardRow,+Col,-Value)
-getStackInListPosition([Head|Tail],0,Head).
+getStackInListPosition([Head|Tail],0,Value) :-
+        Value = Head.
 
 getStackInListPosition([Head|Tail],Col,Value):-
         Col > 0,
