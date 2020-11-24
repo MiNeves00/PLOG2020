@@ -244,6 +244,43 @@ move(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Play
     NewGameState = [NewBoard|[IntermediatePieces]].
 
 
+
+/**Valid Moves*/
+
+%valid_moves(+GameState, +Player, -ListOfMoves)
+valid_moves(GameState, 'WhiteRing', ListOfMoves):-
+    ringValidMoves(GameState, 'WhiteRing', 4, 4, ListOfMoves).
+
+valid_moves(GameState, 'BlackRing', ListOfMoves):-
+    ringValidMoves(GameState, 'BlackRing', 4, 4, ListOfMoves).
+
+valid_moves(GameState, 'WhiteBall', ListOfMoves):-
+    ballValidMoves(GameState, 'WhiteBall', 4, 4, ListOfMoves).
+
+valid_moves(GameState, 'BlackBall', ListOfMoves):-
+    ballValidMoves(GameState, 'BlackBall', 4, 4, ListOfMoves).
+
+
+
+%ringValidMoves(+GameState, +Player, +Coord1, +Coord2, -ListOfMoves) %TODO
+ringValidMoves(GameState, 'WhiteRing', Coord1, Coord2, ListOfMoves):-
+    isRingMoveValid(GameState, Move, 'White', Valid).
+
+
+ringValidMoves(GameState, 'BlackRing', Coord1, Coord2, ListOfMoves):-
+    isRingMoveValid(GameState, Move, 'Black', Valid).
+
+
+
+%ballValidMoves(+GameState, +Player, +Coord1, +Coord2, -ListOfMoves) %TODO
+ballValidMoves(GameState, 'WhiteBall', Coord1, Coord2, ListOfMoves):-
+    isBallMoveValid(GameState, Move, 'White', Valid).
+
+
+ballValidMoves(GameState, 'BlackBall', Coord1, Coord2, ListOfMoves):-
+    isBallMoveValid(GameState, Move, 'Black', Valid).
+
+
 /**Check Win TO DO*/
 
 %checkIfWin(+GameState,+Player,-HasWon)
