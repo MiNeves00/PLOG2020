@@ -45,7 +45,7 @@ gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
     .
 
 /**Player Move*/
-%Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd]
+%Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece]
 
 %player_move(+GameState,+Player,-NewGameState)
 player_move(GameState,Player,NewGameState):-
@@ -54,56 +54,63 @@ player_move(GameState,Player,NewGameState):-
 
 %ringStep(+GameState,+Player,-NewGameState)
 ringStep(GameState,Player,NewGameState):-
-    readRingMove(RingMove),
+    readRingMove(Player, RingMove),
     handleRingMove(GameState,RingMove,Player,NewGameState).
 
-
+%ballStep(+GameState, +Player, -NewGameState)
+ballStep(GameState, Player, NewGameState):-
+    readBallMove(BallMove),
+    handleBallMove(GameState,BallMove,Player,NewGameState).
 
 
 /**Handle Move (for now not accurate) TO DO*/
-%handleMove(+GameState,+Move,+Player,-NewGameState) TO DO
-handleRingMove(GameState,[-1,-1,ColIndexEnd,RowIndexEnd], Player, NewGameState):-
-    isRingMoveValid(GameState,[-1,-1,ColIndexEnd,RowIndexEnd], Player,Valid),
+%handleRingMove(+GameState,+Move,+Player,-NewGameState) TO DO
+handleRingMove(GameState,[-1,-1,ColIndexEnd,RowIndexEnd,Piece], Player, NewGameState):-
+    isRingMoveValid(GameState,[-1,-1,ColIndexEnd,RowIndexEnd,Piece], Player,Valid),
     (Valid = 'True' -> 
-        move(GameState,[-1,-1,ColIndexEnd,RowIndexEnd], Player, NewGameState)
+        move(GameState,[-1,-1,ColIndexEnd,RowIndexEnd,Piece], Player, NewGameState)
     ; 
         nl,write('You dont have rings left in your hand!'),
         nl,write('Select a ring on the board'),nl,
         ringStep(GameState,Player,NewGameState)
     ).
 
-handleRingMove(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd], Player, NewGameState):-
-    isRingMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd], Player,Valid),
+handleRingMove(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, NewGameState):-
+    isRingMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player,Valid),
     (Valid = 'True' -> 
-        move(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd], Player, NewGameState)
+        move(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, NewGameState)
     ; 
         nl,write('Piece you choose to move is not a ring of your colour!'),
         nl,write('Be sure to select one'),nl,
         ringStep(GameState,Player,NewGameState)
     ).
-/*
-    removeValueFromMapUsingGameState([Board, AllPieces], RowIndexBegin, ColumnIndexBegin, [IntermediateBoard|IntermediatePieces], Removed),
-    Player = 'White' ->
-        Removed = 'WhiteRing' ->
-            addValueInMap(IntermediateBoard, RowIndexEnd, ColIndexEnd, Removed, NewBoard),
-            !
-            ;
-            player_move(GameState,Player,NewGameState). %deu borrada chama-se isto
-*/
+
+
+%handleBallMove(+GameState,+Move,+Player,-NewGameState) 
+handleBallMove(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,NewGameState):-
+    isBallMoveValid(),
+    (Valid = 'True' -> 
+        move(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, NewGameState)
+    ; 
+        nl,write('Piece you choose to move is not a ring of your colour!'),
+        nl,write('Be sure to select one'),nl,
+        ringStep(GameState,Player,NewGameState)
+    ).
+
 
 %isRingMoveValid(+GameState,+Move,+Player,-Valid)
 %TO DO
-isRingMoveValid([_Board, [[], _BlackPieces]],[-1,-1,ColIndexEnd,RowIndexEnd], 'White', Valid):-
+isRingMoveValid([_Board, [[], _BlackPieces]],[-1,-1,ColIndexEnd,RowIndexEnd,Piece], 'White', Valid):-
     Valid = 'False'.
 
-isRingMoveValid([_Board, [_WhitePieces, []]],[-1,-1,ColIndexEnd,RowIndexEnd], 'Black', Valid):-
+isRingMoveValid([_Board, [_WhitePieces, []]],[-1,-1,ColIndexEnd,RowIndexEnd,Piece], 'Black', Valid):-
     Valid = 'False'.
 
-isRingMoveValid(GameState,[-1,-1,ColIndexEnd,RowIndexEnd], Player, Valid):-
+isRingMoveValid(GameState,[-1,-1,ColIndexEnd,RowIndexEnd,Piece], Player, Valid):-
     Valid = 'True'.
 
 
-isRingMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd], Player, Valid):-
+isRingMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, Valid):-
     getBoard(GameState,Board),
     getPieces(GameState,AllPieces),
     getValueInMapStackPosition(Board,RowIndexBegin,ColIndexBegin,[HeadValue|_TailValue]),
@@ -122,35 +129,32 @@ isRingMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd],
     ).
 
 
+%isBallMoveValid(+GameState,+Move,+Player,-Valid) %TODO
+isBallMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,Valid):-
+    Valid = 'True'.
+
 
 
 %move(+GameState, +Move, +Player ,-NewGameState)
-move([Board, AllPieces],[-1,-1,ColIndexEnd,RowIndexEnd], 'White',NewGameState):-
+move([Board, AllPieces],[-1,-1,ColIndexEnd,RowIndexEnd,Piece], 'White',NewGameState):-
     addValueInMap(Board, RowIndexEnd, ColIndexEnd, whiteRing, NewBoard),
     AllPieces = [[_Played|NewWhitePieces], BlackPieces],
     NewAllPieces = [NewWhitePieces, BlackPieces],
     NewGameState = [NewBoard, NewAllPieces].
 
 
-move([Board, AllPieces],[-1,-1,ColIndexEnd,RowIndexEnd],'Black',NewGameState):-
+move([Board, AllPieces],[-1,-1,ColIndexEnd,RowIndexEnd,Piece],'Black',NewGameState):-
     addValueInMap(Board, RowIndexEnd, ColIndexEnd, blackRing, NewBoard),
     AllPieces = [WhitePieces, [_Played|NewBlackPieces]],
     NewAllPieces = [WhitePieces, NewBlackPieces],
     NewGameState = [NewBoard, NewAllPieces].
 
 
-move(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd], 'White',NewGameState):-
+move(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, NewGameState):-
     removeValueFromMapUsingGameState(GameState, RowIndexBegin, ColIndexBegin, IntermediateGameState, Removed),
     getBoard(IntermediateGameState,IntermediateBoard),
     getPieces(IntermediateGameState,IntermediatePieces),
-    addValueInMap(IntermediateBoard, RowIndexEnd, ColIndexEnd, whiteRing, NewBoard),
-    NewGameState = [NewBoard|[IntermediatePieces]].
-
-move(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd], 'Black',NewGameState):-
-    removeValueFromMapUsingGameState(GameState, RowIndexBegin, ColIndexBegin, IntermediateGameState, Removed),
-    getBoard(IntermediateGameState,IntermediateBoard),
-    getPieces(IntermediateGameState,IntermediatePieces),
-    addValueInMap(IntermediateBoard, RowIndexEnd, ColIndexEnd, blackRing, NewBoard),
+    addValueInMap(IntermediateBoard, RowIndexEnd, ColIndexEnd, Piece, NewBoard),
     NewGameState = [NewBoard|[IntermediatePieces]].
 
 
