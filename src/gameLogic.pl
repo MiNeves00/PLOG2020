@@ -71,8 +71,7 @@ handleRingMove(GameState,[-1,-1,ColIndexEnd,RowIndexEnd,Piece], Player, NewGameS
     (Valid = 'True' -> 
         move(GameState,[-1,-1,ColIndexEnd,RowIndexEnd,Piece], Player, NewGameState)
     ; 
-        nl,write('You dont have rings left in your hand!'),
-        nl,write('Select a ring on the board'),nl,
+        nl,write('Select a ring to move'),nl,nl,
         ringStep(GameState,Player,NewGameState)
     ).
 
@@ -81,6 +80,7 @@ handleRingMove(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Pi
     (Valid = 'True' -> 
         move(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, NewGameState)
     ;
+        nl,write('Select a ring to move'),nl,nl,
         ringStep(GameState,Player,NewGameState)
     ).
 
@@ -91,8 +91,7 @@ handleBallMove(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Pi
     (Valid = 'True' -> 
         move(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, NewGameState)
     ; 
-        nl,write('Piece you choose to move is not a Ball of your colour!'),
-        nl,write('Be sure to select one'),nl,
+        nl,write('Select a ball to move'),nl,nl,
         ballStep(GameState,Player,NewGameState)
     ).
 
@@ -100,18 +99,22 @@ handleBallMove(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Pi
 %isRingMoveValid(+GameState,+Move,+Player,-Valid)
 %TO DO
 isRingMoveValid([_Board, [[], _BlackPieces]],[-1,-1,ColIndexEnd,RowIndexEnd,Piece], 'White', Valid):-
-    Valid = 'False'.
+    Valid = 'False',
+    nl,write('You dont have rings left in your hand!').
 
 isRingMoveValid([_Board, [_WhitePieces, []]],[-1,-1,ColIndexEnd,RowIndexEnd,Piece], 'Black', Valid):-
-    Valid = 'False'.
+    Valid = 'False',
+    nl,write('You dont have rings left in your hand!').
 
 isRingMoveValid(GameState,[-1,-1,ColIndexEnd,RowIndexEnd,Piece], Player, Valid):-
     getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[EndHeadValue|_TailValue]),
     (EndHeadValue = whiteBall -> 
-        Valid = 'False'
+        Valid = 'False',
+        nl,write('There is a ball in the position your trying to put a ring!')
     ; 
         (EndHeadValue = blackBall -> 
-            Valid = 'False'
+            Valid = 'False',
+            nl,write('There is a ball in the position your trying to put a ring!')
         ; 
             Valid = 'True'
         ) 
@@ -148,7 +151,6 @@ isRingMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,P
     (ValidStart = 'False' -> 
         Valid = 'False',
         nl,write('Piece you choose to move is not a ring of your colour!'),
-        nl,write('Be sure to select one'),
         nl
     ; 
         (ValidEnd = 'False' -> 
@@ -192,7 +194,6 @@ isBallMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,P
     (ValidStart = 'False' -> 
         Valid = 'False',
         nl,write('Piece you choose to move is not a ball of your colour!'),
-        nl,write('Be sure to select one'),
         nl
     ; 
         (ValidEnd = 'False' -> 
