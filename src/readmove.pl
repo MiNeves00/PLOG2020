@@ -5,10 +5,10 @@ readRingMove(Player ,Move):-
     nl, write('If the piece is not yet on the Board use the coordinates -1 for Row and Col'),
     nl, write('Insert the coordinates of the piece you want to move (0-4 for Row Col)'),
     nl,nl,
-    write('Insert Row of the piece to move'),
+    write('Insert Row of the ring to move'),
     readRingRowCoordinate(RowIndexBegin),
     nl,
-    write('Insert Col of the piece to move'),
+    write('Insert Col of the ring to move'),
     readRingColCoordinate(ColIndexBegin),
     nl,
     write('Insert Row of your move'),
@@ -22,7 +22,7 @@ readRingMove(Player ,Move):-
     write('Ring Move has been read successfuly').
 
 
-readBallMove(Move):-
+readBallMove(Player, Move):-
     nl, write('Insert the coordinates of the ball you want to move (0-4 for Row Col)'),
     nl,nl,
     write('Insert Row of the ball to move'),
@@ -36,7 +36,10 @@ readBallMove(Move):-
     nl,
     write('Insert Col of your move'),
     readColCoordinate(ColIndexEnd),
-    Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece].
+    (Player = 'White' -> Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, whiteBall]
+    ; Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, blackBall]
+    ),
+    write('Ball Move has been read successfully').
 
 
 
