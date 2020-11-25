@@ -191,6 +191,15 @@ isBallMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,P
         ) 
     ).
 
+/** TODO Add error messages */
+
+isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,3,0,Piece],'White','False').
+isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,4,0,Piece],'White','False').
+isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,4,1,Piece],'White','False').
+
+isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,0,3,Piece],'Black','False').
+isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,0,4,Piece],'Black','False').
+isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,1,4,Piece],'Black','False').
 
 isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,_ColIndexEnd,_RowIndexEnd,Piece],Player,ValidStart):-
     getBoard(GameState,Board),
@@ -211,34 +220,56 @@ isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,_ColIndexEnd,_RowInd
     ).
 
 
-isBallMoveEndValid(GameState,[_ColIndexBegin,_RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidEnd):-
-    getBoard(GameState,Board),
-    getPieces(GameState,AllPieces),
-    getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[EndHeadValue|_TailValue]),
-    (EndHeadValue = whiteBall -> 
-        ValidEnd = 'False',
-        nl,write('Select a place with no ball on top')
-    ; 
-        (EndHeadValue = blackBall -> 
-            ValidEnd = 'False',
-            nl,write('Select a place with no ball on top')
-        ; 
-            (Player = 'White' -> 
-                (EndHeadValue = whiteRing -> 
-                    ValidEnd = 'True' 
-                ; 
+isBallMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidEnd):-
+    (ColIndexEnd < ColIndexBegin + 2 ->
+        (ColIndexEnd > ColIndexBegin - 2 ->
+            (RowIndexEnd < RowIndexBegin + 2 ->
+                (RowIndexEnd > RowIndexBegin - 2 ->
+                    (
+                        getBoard(GameState,Board),
+                        getPieces(GameState,AllPieces),
+                        getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[EndHeadValue|_TailValue]),
+                            (EndHeadValue = whiteBall -> 
+                                ValidEnd = 'False',
+                                nl,write('Select a place with no ball on top')
+                            ; 
+                                (EndHeadValue = blackBall -> 
+                                    ValidEnd = 'False',
+                                    nl,write('Select a place with no ball on top')
+                                ; 
+                                    (Player = 'White' -> 
+                                        (EndHeadValue = whiteRing -> 
+                                            ValidEnd = 'True' 
+                                        ; 
+                                            ValidEnd = 'False',
+                                            nl, write('Select a destination place with a ring of your colour on top!')
+                                        )
+                                    ;
+                                        (EndHeadValue = blackRing -> 
+                                            ValidEnd = 'True' 
+                                        ; 
+                                            ValidEnd = 'False',
+                                            nl, write('Select a destination place with a ring of your colour on top!')
+                                        )
+                                    )
+                                ) 
+                            )
+                    )
+                ;
                     ValidEnd = 'False',
-                    nl, write('Select a destination place with a ring of your colour on top!')
+                    nl, write('Select a destination place adjacent to your starting space!')
                 )
             ;
-                (EndHeadValue = blackRing -> 
-                    ValidEnd = 'True' 
-                ; 
-                    ValidEnd = 'False',
-                    nl, write('Select a destination place with a ring of your colour on top!')
-                )
+                ValidEnd = 'False',
+                nl, write('Select a destination place adjacent to your starting space!')
             )
-        ) 
+        ;
+            ValidEnd = 'False',
+            nl, write('Select a destination place adjacent to your starting space!')
+        )
+    ;
+        ValidEnd = 'False',
+        nl, write('Select a destination place adjacent to your starting space!')
     ).
 
 
