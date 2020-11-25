@@ -268,6 +268,8 @@ move(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Play
 
 
 
+
+
 /**Valid Moves*/
 
 %valid_moves(+GameState, +Player, -ListOfMoves)
@@ -302,8 +304,14 @@ ballValidMoves(GameState, 'BlackBall', ListOfMoves):-
 
 
 %ballStartValidMoves(+GameState, +Player, +Col, +Row, ListOfStartMoves, -NewListOfStartMoves) [Col,Row]
-ballStartValidMoves(GameState, Player, 0, 0, ListOfStartMoves ,NewListOfStartMoves):-
-    nl,write(' ').
+ballStartValidMoves(GameState, Player, 0, 0, ListOfStartMoves, NewListOfStartMoves):-
+    isBallMoveStartValid(GameState,[0,0,0,0,whiteBall],Player,ValidStart),
+    (ValidStart = 'True' -> 
+        NewListOfStartMoves = [ [0,0] | ListOfStartMoves]
+    ;
+        NewListOfStartMoves = ListOfStartMoves
+    ).
+
 
 
 
@@ -314,9 +322,10 @@ ballStartValidMoves(GameState, Player, Col, Row, ListOfStartMoves ,NewListOfStar
         isBallMoveStartValid(GameState,[Col,Row,0,0,blackBall],Player,ValidStart)
     ),
     (ValidStart = 'True' ->
+        write('||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||'),
         IntermediteListOfStartMoves = [ [Col,Row] | ListOfStartMoves]
     ;
-        UselessVar = 0
+        IntermediteListOfStartMoves = ListOfStartMoves
     ), 
     Col1 is Col-1 ,
     (Col1 = -1 -> 
@@ -398,3 +407,8 @@ won('White'):-
 won('Black'):-
     nl,
     write('Black wins'),nl.
+
+
+
+test(Num):- Nothing = 0.
+
