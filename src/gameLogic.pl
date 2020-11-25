@@ -169,6 +169,27 @@ isBallMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,P
     getPieces(GameState,AllPieces),
     getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[EndHeadValue|_TailValue]),
     getValueInMapStackPosition(Board,RowIndexBegin,ColIndexBegin,[HeadValue|_Tail]),
+    
+    isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidStart),
+    isBallMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidEnd),
+    (ValidStart = 'False' -> 
+        Valid = 'False',
+        nl,write('Piece you choose to move is not a ball of your colour!'),
+        nl
+    ; 
+        (ValidEnd = 'False' -> 
+            Valid = 'False',
+            nl
+        ; 
+            Valid = 'True'
+        ) 
+    ).
+
+
+isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,_ColIndexEnd,_RowIndexEnd,Piece],Player,ValidStart):-
+    getBoard(GameState,Board),
+    getPieces(GameState,AllPieces),
+    getValueInMapStackPosition(Board,RowIndexBegin,ColIndexBegin,[HeadValue|_Tail]),
     (Player = 'White' -> 
         (HeadValue = whiteBall -> 
             ValidStart = 'True'
@@ -181,7 +202,13 @@ isBallMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,P
         ; 
             ValidStart = 'False'
         ) 
-    ),
+    ).
+
+
+isBallMoveEndValid(GameState,[_ColIndexBegin,_RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidEnd):-
+    getBoard(GameState,Board),
+    getPieces(GameState,AllPieces),
+    getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[EndHeadValue|_TailValue]),
     (EndHeadValue = whiteBall -> 
         ValidEnd = 'False',
         nl,write('Select a place with no ball on top')
@@ -206,19 +233,9 @@ isBallMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,P
                 )
             )
         ) 
-    ),
-    (ValidStart = 'False' -> 
-        Valid = 'False',
-        nl,write('Piece you choose to move is not a ball of your colour!'),
-        nl
-    ; 
-        (ValidEnd = 'False' -> 
-            Valid = 'False',
-            nl
-        ; 
-            Valid = 'True'
-        ) 
     ).
+
+
 
 
 %move(+GameState, +Move, +Player ,-NewGameState)
@@ -249,35 +266,41 @@ move(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Play
 
 %valid_moves(+GameState, +Player, -ListOfMoves)
 valid_moves(GameState, 'WhiteRing', ListOfMoves):-
-    ringValidMoves(GameState, 'WhiteRing', 4, 4, ListOfMoves).
+    ringValidMoves(GameState, 'WhiteRing', [4, 4, 4, 4,whiteRing], ListOfMoves).
 
 valid_moves(GameState, 'BlackRing', ListOfMoves):-
-    ringValidMoves(GameState, 'BlackRing', 4, 4, ListOfMoves).
+    ringValidMoves(GameState, 'BlackRing', [4, 4, 4, 4,blackRing], ListOfMoves).
 
 valid_moves(GameState, 'WhiteBall', ListOfMoves):-
-    ballValidMoves(GameState, 'WhiteBall', 4, 4, ListOfMoves).
+    ballValidMoves(GameState, 'WhiteBall', [4, 4, 4, 4,whiteBall], ListOfMoves).
 
 valid_moves(GameState, 'BlackBall', ListOfMoves):-
-    ballValidMoves(GameState, 'BlackBall', 4, 4, ListOfMoves).
+    ballValidMoves(GameState, 'BlackBall', [4, 4, 4, 4,blackBall], ListOfMoves).
 
 
 
-%ringValidMoves(+GameState, +Player, +Coord1, +Coord2, -ListOfMoves) %TODO
-ringValidMoves(GameState, 'WhiteRing', Coord1, Coord2, ListOfMoves):-
+%ringValidMoves(+GameState, +Player, +Move, -ListOfMoves) %TODO
+ringValidMoves(GameState, 'WhiteRing', [ColBegin,RowBegin,ColEnd,RowEnd,Piece], ListOfMoves):-
     isRingMoveValid(GameState, Move, 'White', Valid).
 
 
-ringValidMoves(GameState, 'BlackRing', Coord1, Coord2, ListOfMoves):-
+ringValidMoves(GameState, 'BlackRing', [ColBegin,RowBegin,ColEnd,RowEnd,Piece], ListOfMoves):-
     isRingMoveValid(GameState, Move, 'Black', Valid).
 
 
 
-%ballValidMoves(+GameState, +Player, +Coord1, +Coord2, -ListOfMoves) %TODO
-ballValidMoves(GameState, 'WhiteBall', Coord1, Coord2, ListOfMoves):-
-    isBallMoveValid(GameState, Move, 'White', Valid).
+%ballValidMoves(+GameState, +Player, +Move, -ListOfMoves) %TODO
+ballValidMoves(GameState, 'WhiteBall', [ColBegin,RowBegin,ColEnd,RowEnd,Piece], ListOfMoves):-
+    isBallMoveValid(GameState, [ColBegin,RowBegin,ColEnd,RowEnd,Piece], 'White', Valid),
+    (Valid = 'True' -> 
+        [[ColBegin,RowBegin,ColEnd,RowEnd,Piece] | ListOfMoves]
+    ;
+        UselessVar = 0
+    ).
 
 
-ballValidMoves(GameState, 'BlackBall', Coord1, Coord2, ListOfMoves):-
+
+ballValidMoves(GameState, 'BlackBall', [ColBegin,RowBegin,ColEnd,RowEnd,Piece], ListOfMoves):-
     isBallMoveValid(GameState, Move, 'Black', Valid).
 
 
