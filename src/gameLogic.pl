@@ -303,12 +303,11 @@ ballValidMoves(GameState, 'BlackBall', ListOfMoves):-
 
 %ballStartValidMoves(+GameState, +Player, +Col, +Row, ListOfStartMoves, -NewListOfStartMoves) [Col,Row]
 ballStartValidMoves(GameState, Player, 0, 0, ListOfStartMoves ,NewListOfStartMoves):-
-    nl,write('Worked').
+    nl,write(' ').
 
 
 
 ballStartValidMoves(GameState, Player, Col, Row, ListOfStartMoves ,NewListOfStartMoves):-
-    nl,write(Col), write(' | '), write(Row),nl,
     (Player = 'White' ->
         isBallMoveStartValid(GameState,[Col,Row,0,0,whiteBall],Player,ValidStart)
     ;
