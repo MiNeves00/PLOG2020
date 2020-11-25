@@ -107,6 +107,7 @@ isRingMoveValid([_Board, [_WhitePieces, []]],[-1,-1,ColIndexEnd,RowIndexEnd,Piec
     nl,write('You dont have rings left in your hand!').
 
 isRingMoveValid(GameState,[-1,-1,ColIndexEnd,RowIndexEnd,Piece], Player, Valid):-
+    getBoard(GameState,Board),
     getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[EndHeadValue|_TailValue]),
     (EndHeadValue = whiteBall -> 
         Valid = 'False',
