@@ -329,11 +329,15 @@ ringValidMoves(GameState, 'BlackRing', ListOfMoves).
 %ballValidMoves(+GameState, +Player, -ListOfMoves) %TODO
 ballValidMoves(GameState, 'WhiteBall', ListOfMoves):-
     ballStartValidMoves(GameState, 'White', 4, 4, [], ListOfStartMoves),
-    ballEndValidMovesWraper(GameState, 'White', ListOfStartMoves, [], ListOfEndMoves).
+    ballEndValidMovesWraper(GameState, 'White', ListOfStartMoves, [], ListOfEndMoves),
+    ListOfMoves = ListOfEndMoves,
+    nl,nl,write('||||||LIST OF MOVES COL,ROW|||||'),nl,write(ListOfMoves),nl. 
 
 ballValidMoves(GameState, 'BlackBall', ListOfMoves):-
     ballStartValidMoves(GameState, 'Black', 4, 4, [], ListOfStartMoves),
-    ballEndValidMovesWraper(GameState, 'Black', ListOfStartMoves, [], ListOfEndMoves).
+    ballEndValidMovesWraper(GameState, 'Black', ListOfStartMoves, [], ListOfEndMoves),
+    ListOfMoves = ListOfEndMoves,
+    nl,nl,write('||||||LIST OF MOVES COL,ROW|||||'),nl,write(ListOfMoves),nl.   
 
 
 %ballStartValidMoves(+GameState, +Player, +Col, +Row, ListOfStartMoves, -NewListOfStartMoves) [Col,Row]
@@ -373,13 +377,16 @@ ballStartValidMoves(GameState, Player, Col, Row, ListOfStartMoves ,NewListOfStar
 
 
 %ballEndValidMovesWraper(+GameState, +Player, +ListOfStartMoves, +ListOfEndMoves, -NewListOfEndMoves)
-ballEndValidMovesWraper(GameState, Player, ListOfStartMoves, ListOfEndMoves, NewListOfEndMoves):-
-    ballEndValidMoves(GameState, Player, 1,4, 4,4, ListOfEndMoves, NewListOfEndMoves).
+ballEndValidMovesWraper(GameState, Player, [], ListOfEndMoves, NewListOfEndMoves):-
+    NewListOfEndMoves = ListOfEndMoves.
+
+ballEndValidMovesWraper(GameState, Player, [ [ColStart, RowStart] | ListOfStartMoves], ListOfEndMoves, NewListOfEndMoves):-
+    ballEndValidMoves(GameState, Player, ColStart, RowStart, 4,4, ListOfEndMoves, IntermediaryListOfEndMoves),
+    ballEndValidMovesWraper(GameState, Player, ListOfStartMoves, IntermediaryListOfEndMoves, NewListOfEndMoves).
 
 
 %ballEndValidMoves(+GameState, +Player, +ColStart, +RowStart, +Col, +Row, +ListOfEndMoves, -NewListOfEndMoves) [Col,Row]
 ballEndValidMoves(GameState, Player, ColStart, RowStart, 0, 0, ListOfEndMoves, NewListOfEndMoves):- 
-    test(0),
     (Player = 'White' -> 
         isBallMoveEndValid(GameState,[ColStart, RowStart,0,0,whiteBall],Player,ValidEnd)
     ; 
