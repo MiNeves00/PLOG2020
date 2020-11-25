@@ -336,7 +336,8 @@ ballStartValidMoves(GameState, Player, Col, Row, ListOfStartMoves ,NewListOfStar
     ).
 
 
-
+%ballEndValidMoves(+GameState, +Player, +Col, +Row, ListOfEndMoves, -NewListOfEndtMoves) [Col,Row]
+ballEndValidMoves(GameState, Player, 0, 0, ListOfEndMoves, NewListOfEndtMoves):- Nothing = 0.
 
 
 /**Check Win TO DO*/
