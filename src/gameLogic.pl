@@ -51,6 +51,11 @@ gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
 player_move(GameState,Player,NewGameState):-
     ringStep(GameState,Player,IntermediateGameState),
     display_game(IntermediateGameState,Player),
+    (Player = 'White' -> 
+        valid_moves(GameState,'WhiteBall',IntermediateGameState)
+    ;
+        valid_moves(GameState,'BlackBall',IntermediateGameState)
+    ),
     ballStep(IntermediateGameState,Player,NewGameState).
 
 %ringStep(+GameState,+Player,-NewGameState)
@@ -266,42 +271,63 @@ move(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Play
 
 %valid_moves(+GameState, +Player, -ListOfMoves)
 valid_moves(GameState, 'WhiteRing', ListOfMoves):-
-    ringValidMoves(GameState, 'WhiteRing', [4, 4, 4, 4,whiteRing], ListOfMoves).
+    ringValidMoves(GameState, 'WhiteRing', ListOfMoves).
 
 valid_moves(GameState, 'BlackRing', ListOfMoves):-
-    ringValidMoves(GameState, 'BlackRing', [4, 4, 4, 4,blackRing], ListOfMoves).
+    ringValidMoves(GameState, 'BlackRing', ListOfMoves).
 
 valid_moves(GameState, 'WhiteBall', ListOfMoves):-
-    ballValidMoves(GameState, 'WhiteBall', [4, 4, 4, 4,whiteBall], ListOfMoves).
+    ballValidMoves(GameState, 'WhiteBall', ListOfMoves).
 
 valid_moves(GameState, 'BlackBall', ListOfMoves):-
-    ballValidMoves(GameState, 'BlackBall', [4, 4, 4, 4,blackBall], ListOfMoves).
+    ballValidMoves(GameState, 'BlackBall', ListOfMoves).
 
 
 
-%ringValidMoves(+GameState, +Player, +Move, -ListOfMoves) %TODO
-ringValidMoves(GameState, 'WhiteRing', [ColBegin,RowBegin,ColEnd,RowEnd,Piece], ListOfMoves):-
-    isRingMoveValid(GameState, Move, 'White', Valid).
+%ringValidMoves(+GameState, +Player, -ListOfMoves) %TODO
+ringValidMoves(GameState, 'WhiteRing', ListOfMoves).
 
 
-ringValidMoves(GameState, 'BlackRing', [ColBegin,RowBegin,ColEnd,RowEnd,Piece], ListOfMoves):-
-    isRingMoveValid(GameState, Move, 'Black', Valid).
+ringValidMoves(GameState, 'BlackRing', ListOfMoves).
 
 
 
-%ballValidMoves(+GameState, +Player, +Move, -ListOfMoves) %TODO
-ballValidMoves(GameState, 'WhiteBall', [ColBegin,RowBegin,ColEnd,RowEnd,Piece], ListOfMoves):-
-    isBallMoveValid(GameState, [ColBegin,RowBegin,ColEnd,RowEnd,Piece], 'White', Valid),
-    (Valid = 'True' -> 
-        [[ColBegin,RowBegin,ColEnd,RowEnd,Piece] | ListOfMoves]
+%ballValidMoves(+GameState, +Player, -ListOfMoves) %TODO
+ballValidMoves(GameState, 'WhiteBall', ListOfMoves):-
+    ballStartValidMoves(GameState, 'White', 4, 4, [], ListOfStartMoves).
+
+ballValidMoves(GameState, 'BlackBall', ListOfMoves):-
+    ballStartValidMoves(GameState, 'Black', 4, 4, [], ListOfStartMoves).
+
+
+%ballStartValidMoves(+GameState, +Player, +Col, +Row, ListOfStartMoves, -NewListOfStartMoves) [Col,Row]
+ballStartValidMoves(GameState, Player, 0, 0, ListOfStartMoves ,NewListOfStartMoves):-
+    nl,write('Worked').
+
+
+
+ballStartValidMoves(GameState, Player, Col, Row, ListOfStartMoves ,NewListOfStartMoves):-
+    nl,write(Col), write(' | '), write(Row),nl,
+    (Player = 'White' ->
+        isBallMoveStartValid(GameState,[Col,Row,0,0,whiteBall],Player,ValidStart)
+    ;
+        isBallMoveStartValid(GameState,[Col,Row,0,0,blackBall],Player,ValidStart)
+    ),
+    (ValidStart = 'True' ->
+        IntermediteListOfStartMoves = [ [Col,Row] | ListOfStartMoves]
     ;
         UselessVar = 0
+    ), 
+    Col1 is Col-1 ,
+    (Col1 = -1 -> 
+        Col2 = 4, Row1 is Row - 1,
+        ballStartValidMoves(GameState, Player, Col2, Row1, IntermediteListOfStartMoves, NewListOfStartMoves)
+    ;
+        ballStartValidMoves(GameState, Player, Col1, Row, IntermediteListOfStartMoves, NewListOfStartMoves)
     ).
 
 
 
-ballValidMoves(GameState, 'BlackBall', [ColBegin,RowBegin,ColEnd,RowEnd,Piece], ListOfMoves):-
-    isBallMoveValid(GameState, Move, 'Black', Valid).
 
 
 /**Check Win TO DO*/
