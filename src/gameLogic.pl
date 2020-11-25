@@ -353,7 +353,6 @@ ballStartValidMoves(GameState, Player, Col, Row, ListOfStartMoves ,NewListOfStar
         isBallMoveStartValid(GameState,[Col,Row,0,0,blackBall],Player,ValidStart)
     ),
     (ValidStart = 'True' ->
-        write('||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||'),
         IntermediteListOfStartMoves = [ [Col,Row] | ListOfStartMoves]
     ;
         IntermediteListOfStartMoves = ListOfStartMoves
