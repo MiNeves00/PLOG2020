@@ -50,22 +50,18 @@ gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
 %player_move(+GameState,+Player,-NewGameState)
 player_move(GameState,Player,NewGameState):-
     nl,
-    /**
     (Player = 'White' -> 
         valid_moves(GameState,'WhiteRing',ListOfRingMoves)
     ;
         valid_moves(GameState,'BlackRing',ListOfRingMoves)
     ),
-    */
     ringStep(GameState,Player,IntermediateGameState),
     display_game(IntermediateGameState,Player),
-    /**
     (Player = 'White' -> 
         valid_moves(IntermediateGameState,'WhiteBall',ListOfBallMoves)
     ;
         valid_moves(IntermediateGameState,'BlackBall',ListOfBallMoves)
     ),
-    */
     ballStep(IntermediateGameState,Player,NewGameState).
 
 %ringStep(+GameState,+Player,-NewGameState)
@@ -295,29 +291,49 @@ isBallMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEn
                             )
                     )
                 ;
-                    isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidEnd,OpponentBalls)
+                    isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls),
+                    (ValidVault = 'True' ->
+                        ValidEnd = 'True'
+                    ;
+                        ValidEnd = 'False'
+                    )
                 )
             ;
-                isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidEnd,OpponentBalls)
+                isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls)
+                (ValidVault = 'True' ->
+                    ValidEnd = 'True'
+                ;
+                    ValidEnd = 'False'
+                )     
             )
         ;
-            isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidEnd,OpponentBalls)
+            isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls)
+            (ValidVault = 'True' ->
+                ValidEnd = 'True'
+            ;
+                ValidEnd = 'False'
+            )      
         )
     ;
-        isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidEnd,OpponentBalls)
+        isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls)
+        (ValidVault = 'True' ->
+            ValidEnd = 'True'
+        ;
+            ValidEnd = 'False'
+        )
     ).
 
 
-%isBallVaultValid(+GameState,+Move,+Player,-ValidEnd)
+%isBallVaultValid(+GameState,+Move,+Player,-ValidEnd, -OpponentBalls)
 isBallVaultValid([Board, _Pieces],[ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],'White',ValidEnd,OpponentBalls) :-
     getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[EndHeadValue|_TailValue]),
     (EndHeadValue = whiteRing ->
         (RowIndexEnd > RowIndexBegin ->
             RowIndexEnd1 is RowIndexEnd - 1,
-            checkValidVerticalVault(Board,[ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd1,Piece],'White',ValidEnd,OpponentBalls)
+            checkValidVerticalVault(Board,[ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd1,Piece],'White',ValidEnd,OpponentBalls,_NewOpponentBalls)
         ;
             RowIndexBegin1 is RowIndexBegin - 1,
-            checkValidVerticalVault(Board,[ColIndexEnd,RowIndexEnd,ColIndexEnd,RowIndexBegin1,Piece],'White',ValidEnd,OpponentBalls)
+            checkValidVerticalVault(Board,[ColIndexEnd,RowIndexEnd,ColIndexEnd,RowIndexBegin1,Piece],'White',ValidEnd,OpponentBalls,_NewOpponentBalls)
         )
     ;
         ValidEnd = 'False'
@@ -328,10 +344,10 @@ isBallVaultValid([Board, _Pieces],[ColIndexEnd,RowIndexBegin,ColIndexEnd,RowInde
     (EndHeadValue = blackRing ->
         (RowIndexEnd > RowIndexBegin ->
             RowIndexEnd1 is RowIndexEnd - 1,
-            checkValidVerticalVault(Board,[ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd1,Piece],'Black',ValidEnd,OpponentBalls)
+            checkValidVerticalVault(Board,[ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd1,Piece],'Black',ValidEnd,OpponentBalls,_NewOpponentBalls)
         ;
             RowIndexBegin1 is RowIndexBegin - 1,
-            checkValidVerticalVault(Board,[ColIndexEnd,RowIndexEnd,ColIndexEnd,RowIndexBegin1,Piece],'Black',ValidEnd,OpponentBalls)
+            checkValidVerticalVault(Board,[ColIndexEnd,RowIndexEnd,ColIndexEnd,RowIndexBegin1,Piece],'Black',ValidEnd,OpponentBalls,_NewOpponentBalls)
         )
     ;
         ValidEnd = 'False'
@@ -342,10 +358,10 @@ isBallVaultValid([Board, _Pieces],[ColIndexBegin,RowIndexEnd,ColIndexEnd,RowInde
     (EndHeadValue = whiteRing ->
         (ColIndexEnd > ColIndexBegin ->
             ColIndexEnd1 is ColIndexEnd - 1,
-            checkValidHorizontalVault(Board,[ColIndexBegin,RowIndexEnd,ColIndexEnd1,RowIndexEnd,Piece],'White',ValidEnd,OpponentBalls)
+            checkValidHorizontalVault(Board,[ColIndexBegin,RowIndexEnd,ColIndexEnd1,RowIndexEnd,Piece],'White',ValidEnd,OpponentBalls,_NewOpponentBalls)
         ;
             ColIndexBegin1 is ColIndexBegin - 1,
-            checkValidHorizontalVault(Board,[ColIndexEnd,RowIndexEnd,ColIndexBegin1,RowIndexEnd,Piece],'White',ValidEnd,OpponentBalls)
+            checkValidHorizontalVault(Board,[ColIndexEnd,RowIndexEnd,ColIndexBegin1,RowIndexEnd,Piece],'White',ValidEnd,OpponentBalls,_NewOpponentBalls)
         )
     ;
         ValidEnd = 'False'
@@ -356,89 +372,91 @@ isBallVaultValid([Board, _Pieces],[ColIndexBegin,RowIndexEnd,ColIndexEnd,RowInde
     (EndHeadValue = blackRing ->
         (ColIndexEnd > ColIndexBegin ->
             ColIndexEnd1 is ColIndexEnd - 1,
-            checkValidHorizontalVault(Board,[ColIndexBegin,RowIndexEnd,ColIndexEnd1,RowIndexEnd,Piece],'Black',ValidEnd,OpponentBalls)
+            checkValidHorizontalVault(Board,[ColIndexBegin,RowIndexEnd,ColIndexEnd1,RowIndexEnd,Piece],'Black',ValidEnd,OpponentBalls,_NewOpponentBalls)
         ;
             ColIndexBegin1 is ColIndexBegin - 1,
-            checkValidHorizontalVault(Board,[ColIndexEnd,RowIndexEnd,ColIndexBegin1,RowIndexEnd,Piece],'Black',ValidEnd,OpponentBalls)
+            checkValidHorizontalVault(Board,[ColIndexEnd,RowIndexEnd,ColIndexBegin1,RowIndexEnd,Piece],'Black',ValidEnd,OpponentBalls,_NewOpponentBalls)
         )
     ;
         ValidEnd = 'False'
     ).
 
-%checkValidVerticalVault(+Board,+Move,+Player,-ValidEnd,-OpponentBalls)
-checkValidVerticalVault(Board,[ColIndexBegin,RowIndexEnd,ColIndexEnd,RowIndexEnd,Piece],Player,'True',OpponentBalls).
+isBallVaultValid(_GameState,_Move,_Player,'False',_OpponentBalls).
 
-checkValidVerticalVault(Board,[ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],'White',ValidEnd,OpponentBalls) :-
+%checkValidVerticalVault(+Board,+Move,+Player,-ValidEnd,+OldOpponentBalls,-NewOpponentBalls)
+checkValidVerticalVault(Board,[ColIndexBegin,RowIndexEnd,ColIndexEnd,RowIndexEnd,Piece],Player,'True',OldOpponentBalls,NewOpponentBalls).
+
+checkValidVerticalVault(Board,[ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],'White',ValidEnd,OldOpponentBalls,NewOpponentBalls) :-
     getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[HeadValue|_TailValue]),
     (HeadValue = blackBall ->
         RowIndexEnd1 is RowIndexEnd - 1,
-        NewOpponentBalls = [[RowIndexEnd, ColIndexEnd], OpponentBalls],
-        checkValidVerticalVault(Board, [ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd1,Piece], 'White', ValidEnd,NewOpponentBalls)
+        IntermediateOpponentBalls = [[RowIndexEnd, ColIndexEnd], OldOpponentBalls],
+        checkValidVerticalVault(Board, [ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd1,Piece], 'White', ValidEnd,IntermediateOpponentBalls,NewOpponentBalls)
 
     ;
         (HeadValue = whiteBall ->
             RowIndexEnd1 is RowIndexEnd - 1,
-            checkValidVerticalVault(Board, [ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd1,Piece], 'White', ValidEnd,OpponentBalls)
+            checkValidVerticalVault(Board, [ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd1,Piece], 'White', ValidEnd,OldOpponentBalls, NewOpponentBalls)
         ;
             ValidEnd = 'False',
-            OpponentBalls = [],
+            OldOpponentBalls = [],
             !
         )
     ).
 
-checkValidVerticalVault(Board,[ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],'Black',ValidEnd,OpponentBalls) :-
+checkValidVerticalVault(Board,[ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],'Black',ValidEnd,OldOpponentBalls,NewOpponentBalls) :-
     getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[HeadValue|_TailValue]),
     (HeadValue = whiteBall ->
         RowIndexEnd1 is RowIndexEnd - 1,
-        NewOpponentBalls = [[RowIndexEnd, ColIndexEnd], OpponentBalls],
-        checkValidVerticalVault(Board, [ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd1,Piece], 'Black', ValidEnd,NewOpponentBalls)
+        IntermediateOpponentBalls = [[RowIndexEnd, ColIndexEnd], OpponentBalls],
+        checkValidVerticalVault(Board, [ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd1,Piece], 'Black', ValidEnd,IntermediateOpponentBalls,NewOpponentBalls)
 
     ;
         (HeadValue = blackBall ->
             RowIndexEnd1 is RowIndexEnd - 1,
-            checkValidVerticalVault(Board, [ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd1,Piece], 'Black', ValidEnd, OpponentBalls)
+            checkValidVerticalVault(Board, [ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd1,Piece], 'Black', ValidEnd,OldOpponentBalls,NewOpponentBalls)
         ;
             ValidEnd = 'False',
-            OpponentBalls = [],
+            OldOpponentBalls = [],
             !
         )
     ).
 
-%checkValidHorizontalVault(+Board,+Move,+Player,-ValidEnd,-OpponentBalls)
-checkValidHorizontalVault(Board,[ColIndexBegin,RowIndexBegin,ColIndexBegin,RowIndexEnd,Piece],Player,'True',OpponentBalls).
+%checkValidHorizontalVault(+Board,+Move,+Player,-ValidEnd,-OldOpponentBalls,+NewOpponentBalls)
+checkValidHorizontalVault(Board,[ColIndexBegin,RowIndexBegin,ColIndexBegin,RowIndexEnd,Piece],Player,'True',OldOpponentBalls,NewOpponentBalls).
 
-checkValidHorizontalVault(Board,[ColIndexBegin,RowIndexEnd,ColIndexEnd,RowIndexEnd,Piece],'White',ValidEnd,OpponentBalls) :-
+checkValidHorizontalVault(Board,[ColIndexBegin,RowIndexEnd,ColIndexEnd,RowIndexEnd,Piece],'White',ValidEnd,OldOpponentBalls,NewOpponentBalls) :-
     getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[HeadValue|_TailValue]),
     (HeadValue = blackBall ->
         ColIndexEnd1 is ColIndexEnd - 1,
-        NewOpponentBalls = [[RowIndexEnd, ColIndexEnd], OpponentBalls],
-        checkValidHorizontalVault(Board, [ColIndexBegin,RowIndexBegin,ColIndexEnd1,RowIndexEnd,Piece], 'White', ValidEnd,NewOpponentBalls)
+        IntermediateOpponentBalls = [[RowIndexEnd, ColIndexEnd], OldOpponentBalls],
+        checkValidHorizontalVault(Board, [ColIndexBegin,RowIndexBegin,ColIndexEnd1,RowIndexEnd,Piece], 'White', ValidEnd,IntermediateOpponentBalls,NewOpponentBalls)
 
     ;
         (HeadValue = whiteBall ->
             ColIndexEnd1 is ColIndexEnd - 1,
-            checkValidHorizontalVault(Board, [ColIndexBegin,RowIndexBegin,ColIndexEnd1,RowIndexEnd,Piece], 'White', ValidEnd, OpponentBalls)
+            checkValidHorizontalVault(Board, [ColIndexBegin,RowIndexBegin,ColIndexEnd1,RowIndexEnd,Piece], 'White', ValidEnd,OldOpponentBalls,NewOpponentBalls)
         ;
             ValidEnd = 'False',
-            OpponentBalls = [],
+            OldOpponentBalls = [],
             !
         )
     ).
 
-checkValidHorizontalVault(Board,[ColIndexBegin,RowIndexEnd,ColIndexEnd,RowIndexEnd,Piece],'Black',ValidEnd,OpponentBalls) :-
+checkValidHorizontalVault(Board,[ColIndexBegin,RowIndexEnd,ColIndexEnd,RowIndexEnd,Piece],'Black',ValidEnd,OldOpponentBalls,NewOpponentBalls) :-
     getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[HeadValue|_TailValue]),
     (HeadValue = whiteBall ->
         ColIndexEnd1 is ColIndexEnd - 1,
-        NewOpponentBalls = [[RowIndexEnd, ColIndexEnd], OpponentBalls],
-        checkValidHorizontalVault(Board, [ColIndexBegin,RowIndexBegin,ColIndexEnd1,RowIndexEnd,Piece], 'Black', ValidEnd,NewOpponentBalls)
+        IntermediateOpponentBalls = [[RowIndexEnd, ColIndexEnd], OldOpponentBalls],
+        checkValidHorizontalVault(Board, [ColIndexBegin,RowIndexBegin,ColIndexEnd1,RowIndexEnd,Piece], 'Black', ValidEnd,IntermediateOpponentBalls,NewOpponentBalls)
 
     ;
         (HeadValue = blackBall ->
             ColIndexEnd1 is ColIndexEnd - 1,
-            checkValidHorizontalVault(Board, [ColIndexBegin,RowIndexBegin,ColIndexEnd1,RowIndexEnd,Piece], 'Black', ValidEnd, OpponentBalls)
+            checkValidHorizontalVault(Board, [ColIndexBegin,RowIndexBegin,ColIndexEnd1,RowIndexEnd,Piece], 'Black', ValidEnd, OldOpponentBalls,NewOpponentBalls)
         ;
             ValidEnd = 'False',
-            OpponentBalls = [],
+            OldOpponentBalls = [],
             !
         )
     ).
