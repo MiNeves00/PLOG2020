@@ -189,7 +189,7 @@ isRingMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,_ColIndexEnd,_RowInd
         ) 
     ).
 
-isRingMoveEndValid(GameState,[_ColIndexBegin,_RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, ValidEnd):-
+isRingMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, ValidEnd):-
     getBoard(GameState,Board),
     getPieces(GameState,AllPieces),
     getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[EndHeadValue|_TailValue]),
@@ -199,7 +199,15 @@ isRingMoveEndValid(GameState,[_ColIndexBegin,_RowIndexBegin,ColIndexEnd,RowIndex
         (EndHeadValue = blackBall -> 
             ValidEnd = 'False'
         ; 
-            ValidEnd = 'True'
+            (RowIndexBegin = RowIndexEnd ->
+                (ColIndexBegin = ColIndexEnd ->
+                    ValidEnd = 'False'
+                ;
+                    ValidEnd = 'True'
+                )
+            ;
+                ValidEnd = 'True'
+            )
         ) 
     ).
 
