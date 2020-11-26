@@ -103,6 +103,9 @@ handleBallMove(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Pi
 
 %isRingMoveValid(+GameState,+Move,+Player,-Valid)
 %TO DO
+%isRingMoveValid(GameState,[-1,-1,ColIndexEnd,RowIndexEnd,Piece], Player, Valid):-
+
+
 isRingMoveValid([_Board, [[], _BlackPieces]],[-1,-1,ColIndexEnd,RowIndexEnd,Piece], 'White', Valid):-
     Valid = 'False',
     nl,write('You dont have rings left in your hand!').
@@ -128,32 +131,8 @@ isRingMoveValid(GameState,[-1,-1,ColIndexEnd,RowIndexEnd,Piece], Player, Valid):
 
 
 isRingMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, Valid):-
-    getBoard(GameState,Board),
-    getPieces(GameState,AllPieces),
-    getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[EndHeadValue|_TailValue]),
-    getValueInMapStackPosition(Board,RowIndexBegin,ColIndexBegin,[HeadValue|_Tail]),
-    (Player = 'White' -> 
-        (HeadValue = whiteRing -> 
-            ValidStart = 'True'
-        ; 
-            ValidStart = 'False'
-        ) 
-    ; 
-        (HeadValue = blackRing -> 
-            ValidStart = 'True'
-        ; 
-            ValidStart = 'False'
-        ) 
-    ),
-    (EndHeadValue = whiteBall -> 
-        ValidEnd = 'False'
-    ; 
-        (EndHeadValue = blackBall -> 
-            ValidEnd = 'False'
-        ; 
-            ValidEnd = 'True'
-        ) 
-    ),
+    isRingMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, ValidStart),
+    isRingMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, ValidEnd),
     (ValidStart = 'False' -> 
         Valid = 'False',
         nl,write('Piece you choose to move is not a ring of your colour!'),
@@ -169,13 +148,43 @@ isRingMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,P
         ) 
     ).
 
-%isBallMoveValid(+GameState,+Move,+Player,-Valid) %TODO
-isBallMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,Valid):-
+
+isRingMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,_ColIndexEnd,_RowIndexEnd,Piece], Player, ValidStart):-
+    getBoard(GameState,Board),
+    getPieces(GameState,AllPieces),
+    getValueInMapStackPosition(Board,RowIndexBegin,ColIndexBegin,[HeadValue|_Tail]),
+    (Player = 'White' -> 
+        (HeadValue = whiteRing -> 
+            ValidStart = 'True'
+        ; 
+            ValidStart = 'False'
+        ) 
+    ; 
+        (HeadValue = blackRing -> 
+            ValidStart = 'True'
+        ; 
+            ValidStart = 'False'
+        ) 
+    ).
+
+isRingMoveEndValid(GameState,[_ColIndexBegin,_RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, ValidEnd):-
     getBoard(GameState,Board),
     getPieces(GameState,AllPieces),
     getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[EndHeadValue|_TailValue]),
-    getValueInMapStackPosition(Board,RowIndexBegin,ColIndexBegin,[HeadValue|_Tail]),
-    
+    (EndHeadValue = whiteBall -> 
+        ValidEnd = 'False'
+    ; 
+        (EndHeadValue = blackBall -> 
+            ValidEnd = 'False'
+        ; 
+            ValidEnd = 'True'
+        ) 
+    ).
+
+
+%isBallMoveValid(+GameState,+Move,+Player,-Valid) %TODO
+isBallMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,Valid):-
+
     isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidStart),
     isBallMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidEnd),
     (ValidStart = 'False' -> 
@@ -425,7 +434,6 @@ ballEndValidMoves(GameState, Player, ColStart, RowStart, Col, Row, ListOfEndMove
     ;
         ballEndValidMoves(GameState, Player, ColStart, RowStart, Col1, Row, IntermediteListOfEndMoves, NewListOfEndMoves)
     ).
-
 
 /**Check Win TO DO*/
 
