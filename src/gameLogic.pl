@@ -379,10 +379,24 @@ ringStartValidMoves(GameState, Player, 0, 0, ListOfStartMoves, NewListOfStartMov
         isRingMoveStartValid(GameState,[0,0,0,0,blackRing],Player,ValidStart)
     ),
     (ValidStart = 'True' -> 
-        NewListOfStartMoves = [ [0,0] | ListOfStartMoves]
+        IntermidiateListOfStartMoves = [ [0,0] | ListOfStartMoves]
+    ;
+        IntermidiateListOfStartMoves = ListOfStartMoves
+    ),
+    ringStartValidMoves(GameState, Player, -1, -1, IntermidiateListOfStartMoves, NewListOfStartMoves).
+
+
+ringStartValidMoves(GameState, Player, -1, -1, ListOfStartMoves, NewListOfStartMoves):-
+    (Player = 'White' -> 
+        isRingMoveStartValid(GameState,[-1,-1,0,0,whiteRing],Player,ValidStart)
+    ; 
+        isRingMoveStartValid(GameState,[-1,-1,0,0,blackRing],Player,ValidStart)
+    ),
+    (ValidStart = 'True' -> 
+        NewListOfStartMoves = [ [-1,-1] | ListOfStartMoves]
     ;
         NewListOfStartMoves = ListOfStartMoves
-    ). %TODO
+    ).
 
 
 ringStartValidMoves(GameState, Player, Col, Row, ListOfStartMoves ,NewListOfStartMoves):-
