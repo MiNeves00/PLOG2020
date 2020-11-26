@@ -20,10 +20,10 @@ initial(
 intermediateMap(
     [
         [ %Tabuleiro
-            [[empty],[empty],[whiteBall | [empty]],[blackBall | [blackRing | [blackBase | [empty]]]],[blackBall | [blackRing | [blackBase | [empty]]]]],
-            [[whiteRing | [empty]],[empty],[empty],[empty],[blackBall | [blackRing | [blackBase | [empty]]]]],
-            [[whiteRing | [empty]],[empty],[empty],[empty],[blackRing | [empty]]],
-            [[whiteBall | [whiteRing | [whiteBase | [empty]]]],[whiteRing | [empty]],[empty],[empty],[empty]],
+            [[empty],[blackRing],[whiteRing | [empty]],[blackBall | [blackRing | [blackBase | [empty]]]],[blackBall | [blackRing | [blackBase | [empty]]]]],
+            [[whiteRing | [empty]],[empty],[blackBall],[empty],[blackBall | [blackRing | [blackBase | [empty]]]]],
+            [[whiteRing | [empty]],[empty],[whiteBall],[empty],[blackRing | [empty]]],
+            [[whiteBall | [whiteRing | [whiteBase | [empty]]]],[whiteRing | [empty]],[whiteBall],[empty],[empty]],
             [[whiteBall | [whiteRing | [whiteBase | [empty]]]],[whiteBall | [whiteRing | [whiteBase | [empty]]]],[empty],[empty],[empty]]
         ], 
         [ %PecasDeCadaJogador
