@@ -102,28 +102,44 @@ handleBallMove(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Pi
 
 
 %isRingMoveValid(+GameState,+Move,+Player,-Valid)
-%TO DO
-%isRingMoveValid(GameState,[-1,-1,ColIndexEnd,RowIndexEnd,Piece], Player, Valid):-
-
-
-isRingMoveValid([_Board, [[], _BlackPieces]],[-1,-1,ColIndexEnd,RowIndexEnd,Piece], 'White', Valid):-
-    Valid = 'False',
-    nl,write('You dont have rings left in your hand!').
-
-isRingMoveValid([_Board, [_WhitePieces, []]],[-1,-1,ColIndexEnd,RowIndexEnd,Piece], 'Black', Valid):-
-    Valid = 'False',
-    nl,write('You dont have rings left in your hand!').
-
 isRingMoveValid(GameState,[-1,-1,ColIndexEnd,RowIndexEnd,Piece], Player, Valid):-
+    isRingMoveStartValid(GameState,[-1,-1,ColIndexEnd,RowIndexEnd,Piece], Player, ValidStart),
+    isRingMoveEndValid(GameState,[-1,-1,ColIndexEnd,RowIndexEnd,Piece], Player, ValidEnd),
+    (ValidStart = 'False' -> 
+        Valid = 'False',
+        nl,write('You dont have rings left in your hand!'),
+        nl
+    ; 
+        (ValidEnd = 'False' -> 
+            Valid = 'False',
+            nl,write('Destination space invalid!'),
+            nl,write('There is a ball in the position your trying to put a ring!'),nl
+        ; 
+            Valid = 'True'
+        ) 
+    ).
+
+
+isRingMoveStartValid([_Board, [[], _BlackPieces]],[-1,-1,ColIndexEnd,RowIndexEnd,Piece], 'White', Valid):-
+    Valid = 'False'.
+
+isRingMoveStartValid([_Board, [_WhitePieces, []]],[-1,-1,ColIndexEnd,RowIndexEnd,Piece], 'Black', Valid):-
+    Valid = 'False'.
+
+isRingMoveStartValid([_Board, [WhitePieces, _BlackPieces]],[-1,-1,ColIndexEnd,RowIndexEnd,Piece], 'White', Valid):-
+    Valid = 'True'.
+
+isRingMoveStartValid([_Board, [_WhitePieces, BlackPieces]],[-1,-1,ColIndexEnd,RowIndexEnd,Piece], 'Black', Valid):-
+    Valid = 'True'.
+
+isRingMoveEndValid(GameState,[-1,-1,ColIndexEnd,RowIndexEnd,Piece], Player, Valid):-
     getBoard(GameState,Board),
     getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[EndHeadValue|_TailValue]),
     (EndHeadValue = whiteBall -> 
-        Valid = 'False',
-        nl,write('There is a ball in the position your trying to put a ring!')
+        Valid = 'False'
     ; 
         (EndHeadValue = blackBall -> 
-            Valid = 'False',
-            nl,write('There is a ball in the position your trying to put a ring!')
+            Valid = 'False'
         ; 
             Valid = 'True'
         ) 

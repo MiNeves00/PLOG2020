@@ -27,8 +27,8 @@ intermediateMap(
             [[whiteBall | [whiteRing | [whiteBase | [empty]]]],[whiteBall | [whiteRing | [whiteBase | [empty]]]],[empty],[empty],[empty]]
         ], 
         [ %PecasDeCadaJogador
-            [whiteRing,whiteRing,whiteRing,whiteRing,whiteRing],%White
-            [blackRing,blackRing,blackRing,blackRing,blackRing] %Black
+            [whiteRing],%White
+            [blackRing,blackRing,blackRing] %Black
         ]
     ]
 ).
