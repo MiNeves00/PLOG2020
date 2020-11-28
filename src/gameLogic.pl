@@ -98,14 +98,75 @@ handleRingMove(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Pi
 
 %handleBallMove(+GameState,+Move,+Player,-NewGameState) 
 handleBallMove(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,NewGameState):-
-    isBallMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,Valid),
+    isBallMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,Valid,ValidRelocateMoves),
     (Valid = 'True' -> 
-        move(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, NewGameState)
+        move(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, IntermediateGameState),
+        (Player = 'White' ->
+            relocateStep(IntermediateGameState,ValidRelocateMoves,'Black',NewGameState)
+        ;
+            relocateStep(IntermediateGameState,ValidRelocateMoves, 'White',NewGameState)
+        )
     ; 
         nl,write('Select a ball to move'),nl,nl,
         ballStep(GameState,Player,NewGameState)
     ).
 
+%relocateStep(+GameState,+Moves,+Player,-NewGameState)
+relocateStep(GameState, [], _Player, NewGameState) :-
+    NewGameState = GameState.
+
+relocateStep(GameState, Moves, Player, NewGameState) :-
+    nl,
+    write('Opponent balls must be relocated'),
+    write('Insert relocating moves'),
+    nl,
+    readBallMove(Player, Move),
+    removeMoves(Moves, Move, [], NewMoves),
+    isBallRelocateEndValid(GameState,Move,Player,ValidEnd),
+    (ValidEnd = 'True' ->
+        move(GameState, Move, Player, IntermediateGameState),
+        relocateStep(IntermediateGameState, NewMoves, Player, NewGameState)
+    ;
+        relocateStep(GameState, Moves, Player, NewGameState)
+    ).
+
+
+removeMoves([], _Move, OldMoves, NewMoves) :-
+    NewMoves = OldMoves.
+
+removeMoves([[Col1, Row1, Col2, Row2, Piece] | T], [PCol, PRow, PCol1, PRow1, PPiece], OldMoves, NewMoves) :-
+    (Col1 = PCol ->
+        (Row1 = PRow ->
+            removeMoves(T, [PCol, PRow, PCol1, PRow1, PPiece], OldMoves, NewMoves)
+        ;
+            (Col2 = PCol1 ->
+                (Row2 = PRow1 ->
+                    removeMoves(T, [PCol, PRow, PCol1, PRow1, PPiece], OldMoves, NewMoves)
+                ;
+                    IntermediateMoves = [[Col1, Row1, Col2, Row2, Piece] | OldMoves],
+                    removeMoves(T, [PCol, PRow, PCol, PRow, PPiece], IntermediateMoves, NewMoves)
+                )
+            ;
+                IntermediateMoves = [[Col1, Row1, Col2, Row2, Piece] | OldMoves],
+                removeMoves(T, [PCol, PRow, PCol, PRow, PPiece], IntermediateMoves, NewMoves)
+            )
+        )
+    ;
+        (Col2 = PCol1 ->
+            (Row2 = PRow1 ->
+                removeMoves(T, [PCol, PRow, PCol1, PRow1, PPiece], OldMoves, NewMoves)
+            ;
+                IntermediateMoves = [[Col1, Row1, Col2, Row2, Piece] | OldMoves],
+                removeMoves(T, [PCol, PRow, PCol, PRow, PPiece], IntermediateMoves, NewMoves)
+            )
+        ;
+            IntermediateMoves = [[Col1, Row1, Col2, Row2, Piece] | OldMoves],
+            removeMoves(T, [PCol, PRow, PCol, PRow, PPiece], IntermediateMoves, NewMoves)
+        )
+    ).
+
+    
+    
 
 %isRingMoveValid(+GameState,+Move,+Player,-Valid)
 isRingMoveValid(GameState,[-1,-1,ColIndexEnd,RowIndexEnd,Piece], Player, Valid):-
@@ -213,10 +274,10 @@ isRingMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEn
 
 
 %isBallMoveValid(+GameState,+Move,+Player,-Valid) %TODO
-isBallMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,Valid):-
+isBallMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,Valid,ValidRelocateMoves):-
 
     isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidStart),
-    isBallMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidEnd),
+    isBallMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidEnd,ValidRelocateMoves),
     (ValidStart = 'False' -> 
         Valid = 'False',
         nl,write('Piece you choose to move is not a ball of your colour!'),
@@ -259,7 +320,7 @@ isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,_ColIndexEnd,_RowInd
     ).
 
 
-isBallMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidEnd):-
+isBallMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidEnd, ValidRelocateMoves):-
     (ColIndexEnd < ColIndexBegin + 2 ->
         (ColIndexEnd > ColIndexBegin - 2 ->
             (RowIndexEnd < RowIndexBegin + 2 ->
@@ -291,7 +352,7 @@ isBallMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEn
                             )
                     )
                 ;
-                    isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls),
+                    isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls,ValidRelocateMoves),
                     (ValidVault = 'True' ->
                         ValidEnd = 'True'
                     ;
@@ -299,7 +360,7 @@ isBallMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEn
                     )
                 )
             ;
-                isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls)
+                isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls,ValidRelocateMoves),
                 (ValidVault = 'True' ->
                     ValidEnd = 'True'
                 ;
@@ -307,7 +368,7 @@ isBallMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEn
                 )     
             )
         ;
-            isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls)
+            isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls,ValidRelocateMoves),
             (ValidVault = 'True' ->
                 ValidEnd = 'True'
             ;
@@ -315,7 +376,7 @@ isBallMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEn
             )      
         )
     ;
-        isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls)
+        isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls,ValidRelocateMoves),
         (ValidVault = 'True' ->
             ValidEnd = 'True'
         ;
@@ -323,74 +384,186 @@ isBallMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEn
         )
     ).
 
+isBallRelocateEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidEnd):-
+    (
+    getBoard(GameState,Board),
+    getPieces(GameState,AllPieces),
+    getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[EndHeadValue|_TailValue]),
+        (EndHeadValue = whiteBall -> 
+            ValidEnd = 'False'
+        ; 
+            (EndHeadValue = blackBall -> 
+                ValidEnd = 'False'
+            ; 
+                (Player = 'White' -> 
+                    (EndHeadValue = whiteRing -> 
+                        ValidEnd = 'True' 
+                    ; 
+                        ValidEnd = 'False'
+                    )
+                ;
+                    (EndHeadValue = blackRing -> 
+                        ValidEnd = 'True' 
+                    ; 
+                        ValidEnd = 'False'
+                    )
+                )
+            ) 
+        )
+    ).
+
 
 %isBallVaultValid(+GameState,+Move,+Player,-ValidEnd, -OpponentBalls)
-isBallVaultValid([Board, _Pieces],[ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],'White',ValidEnd,OpponentBalls) :-
+isBallVaultValid(GameState,[ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],'White',ValidEnd,OpponentBalls, ValidRelocateMoves) :-
+    getBoard(GameState, Board),
     getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[EndHeadValue|_TailValue]),
     (EndHeadValue = whiteRing ->
         (RowIndexEnd > RowIndexBegin ->
             RowIndexEnd1 is RowIndexEnd - 1,
-            checkValidVerticalVault(Board,[ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd1,Piece],'White',ValidEnd,OpponentBalls,_NewOpponentBalls)
+            checkValidVerticalVault(Board,[ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd1,Piece],'White',ValidVault,[],OpponentBalls),
+            checkIfCanRelocate(GameState, 'Black', OpponentBalls, ValidRelocateMoves, ValidRelocate),
+            (ValidVault = 'True' ->
+                (ValidRelocate = 'True' ->
+                    ValidEnd = 'True'
+                ;
+                    ValidEnd = 'False'
+                )
+            ;
+                ValidEnd = 'False'
+            )
         ;
             RowIndexBegin1 is RowIndexBegin - 1,
-            checkValidVerticalVault(Board,[ColIndexEnd,RowIndexEnd,ColIndexEnd,RowIndexBegin1,Piece],'White',ValidEnd,OpponentBalls,_NewOpponentBalls)
+            checkValidVerticalVault(Board,[ColIndexEnd,RowIndexEnd,ColIndexEnd,RowIndexBegin1,Piece],'White',ValidVault,[],OpponentBalls),
+            checkIfCanRelocate(GameState, 'Black', OpponentBalls, ValidRelocateMoves, ValidRelocate),
+            (ValidVault = 'True' ->
+                (ValidRelocate = 'True' ->
+                    ValidEnd = 'True'
+                ;
+                    ValidEnd = 'False'
+                )
+            ;
+                ValidEnd = 'False'
+            )
         )
     ;
         ValidEnd = 'False'
     ).
 
-isBallVaultValid([Board, _Pieces],[ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],'Black',ValidEnd,OpponentBalls) :-
+isBallVaultValid(GameState,[ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],'Black',ValidEnd,OpponentBalls, ValidRelocateMoves) :-
+    getBoard(GameState, Board),
     getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[EndHeadValue|_TailValue]),
     (EndHeadValue = blackRing ->
         (RowIndexEnd > RowIndexBegin ->
             RowIndexEnd1 is RowIndexEnd - 1,
-            checkValidVerticalVault(Board,[ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd1,Piece],'Black',ValidEnd,OpponentBalls,_NewOpponentBalls)
+            checkValidVerticalVault(Board,[ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd1,Piece],'Black',ValidVault,[],OpponentBalls),
+            checkIfCanRelocate(GameState, 'White', OpponentBalls, ValidRelocateMoves, ValidRelocate),
+            (ValidVault = 'True' ->
+                (ValidRelocate = 'True' ->
+                    ValidEnd = 'True'
+                ;
+                    ValidEnd = 'False'
+                )
+            ;
+                ValidEnd = 'False'
+            )
         ;
             RowIndexBegin1 is RowIndexBegin - 1,
-            checkValidVerticalVault(Board,[ColIndexEnd,RowIndexEnd,ColIndexEnd,RowIndexBegin1,Piece],'Black',ValidEnd,OpponentBalls,_NewOpponentBalls)
+            checkValidVerticalVault(Board,[ColIndexEnd,RowIndexEnd,ColIndexEnd,RowIndexBegin1,Piece],'Black',ValidVault,[],OpponentBalls),
+            checkIfCanRelocate(GameState, 'White', OpponentBalls, ValidRelocateMoves, ValidRelocate),
+            (ValidVault = 'True' ->
+                (ValidRelocate = 'True' ->
+                    ValidEnd = 'True'
+                ;
+                    ValidEnd = 'False'
+                )
+            ;
+                ValidEnd = 'False'
+            )
         )
     ;
         ValidEnd = 'False'
     ).
 
-isBallVaultValid([Board, _Pieces],[ColIndexBegin,RowIndexEnd,ColIndexEnd,RowIndexEnd,Piece],'White',ValidEnd,OpponentBalls) :-
+isBallVaultValid(GameState,[ColIndexBegin,RowIndexEnd,ColIndexEnd,RowIndexEnd,Piece],'White',ValidEnd,OpponentBalls, ValidRelocateMoves) :-
+    getBoard(GameState, Board),
     getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[EndHeadValue|_TailValue]),
     (EndHeadValue = whiteRing ->
         (ColIndexEnd > ColIndexBegin ->
             ColIndexEnd1 is ColIndexEnd - 1,
-            checkValidHorizontalVault(Board,[ColIndexBegin,RowIndexEnd,ColIndexEnd1,RowIndexEnd,Piece],'White',ValidEnd,OpponentBalls,_NewOpponentBalls)
+            checkValidHorizontalVault(Board,[ColIndexBegin,RowIndexEnd,ColIndexEnd1,RowIndexEnd,Piece],'White',ValVaultnd,[],OpponentBalls),
+            checkIfCanRelocate(GameState, 'Black', OpponentBalls, ValidRelocateMoves, ValidRelocate),
+            (ValidVault = 'True' ->
+                (ValidRelocate = 'True' ->
+                    ValidEnd = 'True'
+                ;
+                    ValidEnd = 'False'
+                )
+            ;
+                ValidEnd = 'False'
+            )
         ;
             ColIndexBegin1 is ColIndexBegin - 1,
-            checkValidHorizontalVault(Board,[ColIndexEnd,RowIndexEnd,ColIndexBegin1,RowIndexEnd,Piece],'White',ValidEnd,OpponentBalls,_NewOpponentBalls)
+            checkValidHorizontalVault(Board,[ColIndexEnd,RowIndexEnd,ColIndexBegin1,RowIndexEnd,Piece],'White',ValVaultnd,[],OpponentBalls),
+            checkIfCanRelocate(GameState, 'Black', OpponentBalls, ValidRelocateMoves, ValidRelocate),
+            (ValidVault = 'True' ->
+                (ValidRelocate = 'True' ->
+                    ValidEnd = 'True'
+                ;
+                    ValidEnd = 'False'
+                )
+            ;
+                ValidEnd = 'False'
+            )
         )
     ;
         ValidEnd = 'False'
     ).
 
-isBallVaultValid([Board, _Pieces],[ColIndexBegin,RowIndexEnd,ColIndexEnd,RowIndexEnd,Piece],'Black',ValidEnd,OpponentBalls) :-
+isBallVaultValid(GameState,[ColIndexBegin,RowIndexEnd,ColIndexEnd,RowIndexEnd,Piece],'Black',ValidEnd,OpponentBalls, ValidRelocateMoves) :-
+    getBoard(GameState, Board),
     getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[EndHeadValue|_TailValue]),
     (EndHeadValue = blackRing ->
         (ColIndexEnd > ColIndexBegin ->
             ColIndexEnd1 is ColIndexEnd - 1,
-            checkValidHorizontalVault(Board,[ColIndexBegin,RowIndexEnd,ColIndexEnd1,RowIndexEnd,Piece],'Black',ValidEnd,OpponentBalls,_NewOpponentBalls)
+            checkValidHorizontalVault(Board,[ColIndexBegin,RowIndexEnd,ColIndexEnd1,RowIndexEnd,Piece],'Black',ValVaultnd,[],OpponentBalls),
+            checkIfCanRelocate(GameState, 'White', OpponentBalls, ValidRelocateMoves, ValidRelocate),
+            (ValidVault = 'True' ->
+                (ValidRelocate = 'True' ->
+                    ValidEnd = 'True'
+                ;
+                    ValidEnd = 'False'
+                )
+            ;
+                ValidEnd = 'False'
+            )
         ;
             ColIndexBegin1 is ColIndexBegin - 1,
-            checkValidHorizontalVault(Board,[ColIndexEnd,RowIndexEnd,ColIndexBegin1,RowIndexEnd,Piece],'Black',ValidEnd,OpponentBalls,_NewOpponentBalls)
+            checkValidHorizontalVault(Board,[ColIndexEnd,RowIndexEnd,ColIndexBegin1,RowIndexEnd,Piece],'Black',ValVaultnd,[],OpponentBalls),
+            checkIfCanRelocate(GameState, 'White', OpponentBalls, ValidRelocateMoves, ValidRelocate),
+            (ValidVault = 'True' ->
+                (ValidRelocate = 'True' ->
+                    ValidEnd = 'True'
+                ;
+                    ValidEnd = 'False'
+                )
+            ;
+                ValidEnd = 'False'
+            )
         )
     ;
         ValidEnd = 'False'
     ).
 
-isBallVaultValid(_GameState,_Move,_Player,'False',_OpponentBalls).
+isBallVaultValid(_GameState,_Move,_Player,'False',_OpponentBalls,_ValidRelocateMoves).
 
 %checkValidVerticalVault(+Board,+Move,+Player,-ValidEnd,+OldOpponentBalls,-NewOpponentBalls)
-checkValidVerticalVault(Board,[ColIndexBegin,RowIndexEnd,ColIndexEnd,RowIndexEnd,Piece],Player,'True',OldOpponentBalls,NewOpponentBalls).
+checkValidVerticalVault(Board,[ColIndexBegin,RowIndexEnd,ColIndexEnd,RowIndexEnd,Piece],Player,'True',OpponentBalls,OpponentBalls).
 
 checkValidVerticalVault(Board,[ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],'White',ValidEnd,OldOpponentBalls,NewOpponentBalls) :-
     getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[HeadValue|_TailValue]),
     (HeadValue = blackBall ->
         RowIndexEnd1 is RowIndexEnd - 1,
-        IntermediateOpponentBalls = [[RowIndexEnd, ColIndexEnd], OldOpponentBalls],
+        IntermediateOpponentBalls = [[ColIndexEnd, RowIndexEnd] | OldOpponentBalls],
         checkValidVerticalVault(Board, [ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd1,Piece], 'White', ValidEnd,IntermediateOpponentBalls,NewOpponentBalls)
 
     ;
@@ -408,7 +581,7 @@ checkValidVerticalVault(Board,[ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd
     getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[HeadValue|_TailValue]),
     (HeadValue = whiteBall ->
         RowIndexEnd1 is RowIndexEnd - 1,
-        IntermediateOpponentBalls = [[RowIndexEnd, ColIndexEnd], OpponentBalls],
+        IntermediateOpponentBalls = [[ColIndexEnd, RowIndexEnd] | OpponentBalls],
         checkValidVerticalVault(Board, [ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd1,Piece], 'Black', ValidEnd,IntermediateOpponentBalls,NewOpponentBalls)
 
     ;
@@ -423,13 +596,13 @@ checkValidVerticalVault(Board,[ColIndexEnd,RowIndexBegin,ColIndexEnd,RowIndexEnd
     ).
 
 %checkValidHorizontalVault(+Board,+Move,+Player,-ValidEnd,-OldOpponentBalls,+NewOpponentBalls)
-checkValidHorizontalVault(Board,[ColIndexBegin,RowIndexBegin,ColIndexBegin,RowIndexEnd,Piece],Player,'True',OldOpponentBalls,NewOpponentBalls).
+checkValidHorizontalVault(Board,[ColIndexBegin,RowIndexBegin,ColIndexBegin,RowIndexEnd,Piece],Player,'True',OpponentBalls,OpponentBalls).
 
 checkValidHorizontalVault(Board,[ColIndexBegin,RowIndexEnd,ColIndexEnd,RowIndexEnd,Piece],'White',ValidEnd,OldOpponentBalls,NewOpponentBalls) :-
     getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[HeadValue|_TailValue]),
     (HeadValue = blackBall ->
         ColIndexEnd1 is ColIndexEnd - 1,
-        IntermediateOpponentBalls = [[RowIndexEnd, ColIndexEnd], OldOpponentBalls],
+        IntermediateOpponentBalls = [[ColIndexEnd, RowIndexEnd] | OldOpponentBalls],
         checkValidHorizontalVault(Board, [ColIndexBegin,RowIndexBegin,ColIndexEnd1,RowIndexEnd,Piece], 'White', ValidEnd,IntermediateOpponentBalls,NewOpponentBalls)
 
     ;
@@ -447,7 +620,7 @@ checkValidHorizontalVault(Board,[ColIndexBegin,RowIndexEnd,ColIndexEnd,RowIndexE
     getValueInMapStackPosition(Board,RowIndexEnd,ColIndexEnd,[HeadValue|_TailValue]),
     (HeadValue = whiteBall ->
         ColIndexEnd1 is ColIndexEnd - 1,
-        IntermediateOpponentBalls = [[RowIndexEnd, ColIndexEnd], OldOpponentBalls],
+        IntermediateOpponentBalls = [[ColIndexEnd, RowIndexEnd] | OldOpponentBalls],
         checkValidHorizontalVault(Board, [ColIndexBegin,RowIndexBegin,ColIndexEnd1,RowIndexEnd,Piece], 'Black', ValidEnd,IntermediateOpponentBalls,NewOpponentBalls)
 
     ;
@@ -460,6 +633,21 @@ checkValidHorizontalVault(Board,[ColIndexBegin,RowIndexEnd,ColIndexEnd,RowIndexE
             !
         )
     ).
+
+%checkIfCanRelocate(+GameState, +Player, +OpponentBalls, -ValidRelocateMoves, -ValidRelocate)
+checkIfCanRelocate(_GameState, _Player, []).
+
+checkIfCanRelocate(GameState, Player, OpponentBalls, List, ValidRelocate) :-
+    ballRelocateMovesWraper(GameState, Player, OpponentBalls, OldList, List),
+    length(OpponentBalls, OpB),
+    length(List, N),
+    OpB2 is (OpB*OpB),
+    (N >= OpB2 ->
+        ValidRelocate = 'True'
+    ;
+        ValidRelocate = 'False'
+    ).
+
 
 
 %move(+GameState, +Move, +Player ,-NewGameState)
@@ -672,6 +860,8 @@ ballStartValidMoves(GameState, Player, Col, Row, ListOfStartMoves ,NewListOfStar
 
 
 %ballEndValidMovesWraper(+GameState, +Player, +ListOfStartMoves, +ListOfEndMoves, -NewListOfEndMoves)
+ballEndValidMovesWraper(GameState, Player, [[]], ListOfEndMoves, NewListOfEndMoves):-
+    NewListOfEndMoves = ListOfEndMoves.
 ballEndValidMovesWraper(GameState, Player, [], ListOfEndMoves, NewListOfEndMoves):-
     NewListOfEndMoves = ListOfEndMoves.
 
@@ -683,9 +873,9 @@ ballEndValidMovesWraper(GameState, Player, [ [ColStart, RowStart] | ListOfStartM
 %ballEndValidMoves(+GameState, +Player, +ColStart, +RowStart, +Col, +Row, +ListOfEndMoves, -NewListOfEndMoves) [Col,Row]
 ballEndValidMoves(GameState, Player, ColStart, RowStart, 0, 0, ListOfEndMoves, NewListOfEndMoves):- 
     (Player = 'White' -> 
-        isBallMoveEndValid(GameState,[ColStart, RowStart,0,0,whiteBall],Player,ValidEnd)
+        isBallMoveEndValid(GameState,[ColStart, RowStart,0,0,whiteBall],Player,ValidEnd,_)
     ; 
-        isBallMoveEndValid(GameState,[ColStart, RowStart,0,0,blackBall],Player,ValidEnd)
+        isBallMoveEndValid(GameState,[ColStart, RowStart,0,0,blackBall],Player,ValidEnd,_)
     ),
     (ValidEnd = 'True' -> 
         (Player = 'White' -> 
@@ -700,9 +890,9 @@ ballEndValidMoves(GameState, Player, ColStart, RowStart, 0, 0, ListOfEndMoves, N
 
 ballEndValidMoves(GameState, Player, ColStart, RowStart, Col, Row, ListOfEndMoves ,NewListOfEndMoves):-
     (Player = 'White' ->
-        isBallMoveEndValid(GameState,[ColStart, RowStart,Col,Row,whiteBall],Player,ValidEnd)
+        isBallMoveEndValid(GameState,[ColStart, RowStart,Col,Row,whiteBall],Player,ValidEnd,_)
     ;
-        isBallMoveEndValid(GameState,[ ColStart, RowStart,Col,Row,blackBall],Player,ValidEnd)
+        isBallMoveEndValid(GameState,[ ColStart, RowStart,Col,Row,blackBall],Player,ValidEnd,_)
     ),
     (ValidEnd = 'True' ->
         (Player = 'White' -> 
@@ -719,6 +909,76 @@ ballEndValidMoves(GameState, Player, ColStart, RowStart, Col, Row, ListOfEndMove
         ballEndValidMoves(GameState, Player, ColStart, RowStart, Col2, Row1, IntermediteListOfEndMoves, NewListOfEndMoves)
     ;
         ballEndValidMoves(GameState, Player, ColStart, RowStart, Col1, Row, IntermediteListOfEndMoves, NewListOfEndMoves)
+    ).
+
+%ballRelocateMovesWraper(+GameState, +Player, +ListOfStartMoves, +ListOfEndMoves, -NewListOfEndMoves)
+ballRelocateMovesWraper(GameState, Player, [[]], ListOfEndMoves, NewListOfEndMoves):-
+    NewListOfEndMoves = ListOfEndMoves.
+ballRelocateMovesWraper(GameState, Player, [], ListOfEndMoves, NewListOfEndMoves):-
+    NewListOfEndMoves = ListOfEndMoves.
+
+ballRelocateMovesWraper(GameState, Player, [ [ColStart, RowStart] | ListOfStartMoves], ListOfEndMoves, NewListOfEndMoves):-
+    ballRelocateMoves(GameState, Player, ColStart, RowStart, 4,4, ListOfEndMoves, IntermediaryListOfEndMoves),
+    ballRelocateMovesWraper(GameState, Player, ListOfStartMoves, IntermediaryListOfEndMoves, NewListOfEndMoves).
+
+
+%ballRelocateMoves(+GameState, +Player, +ColStart, +RowStart, +Col, +Row, +ListOfEndMoves, -NewListOfEndMoves) [Col,Row]
+ballRelocateMoves(GameState, Player, ColStart, RowStart, 0, 0, ListOfEndMoves, NewListOfEndMoves):- 
+    (Player = 'White' -> 
+        isBallRelocateValid(GameState,[ColStart, RowStart,0,0,whiteBall],Player,ValidEnd)
+    ; 
+        isBallRelocateValid(GameState,[ColStart, RowStart,0,0,blackBall],Player,ValidEnd)
+    ),
+    (ValidEnd = 'True' -> 
+        (Player = 'White' -> 
+            NewListOfEndMoves = [ [ColStart, RowStart, 0, 0, whiteBall] | ListOfEndMoves]
+        ;
+            NewListOfEndMoves = [ [ColStart, RowStart, 0, 0, blackBall] | ListOfEndMoves]
+        )
+        
+    ;
+        NewListOfEndMoves = ListOfEndMoves
+    ).
+
+ballRelocateMoves(GameState, Player, ColStart, RowStart, Col, Row, ListOfEndMoves ,NewListOfEndMoves):-
+    (Player = 'White' ->
+        isBallRelocateValid(GameState,[ColStart, RowStart,Col,Row,whiteBall],Player,ValidEnd)
+    ;
+        isBallRelocateValid(GameState,[ ColStart, RowStart,Col,Row,blackBall],Player,ValidEnd)
+    ),
+    (ValidEnd = 'True' ->
+        (Player = 'White' -> 
+            IntermediteListOfEndMoves = [ [ColStart, RowStart, Col, Row, whiteBall] | ListOfEndMoves]
+        ;
+            IntermediteListOfEndMoves = [ [ColStart, RowStart, Col, Row, blackBall] | ListOfEndMoves]
+        )
+    ;
+        IntermediteListOfEndMoves = ListOfEndMoves
+    ), 
+    Col1 is Col-1 ,
+    (Col1 = -1 -> 
+        Col2 = 4, Row1 is Row - 1,
+        ballRelocateMoves(GameState, Player, ColStart, RowStart, Col2, Row1, IntermediteListOfEndMoves, NewListOfEndMoves)
+    ;
+        ballRelocateMoves(GameState, Player, ColStart, RowStart, Col1, Row, IntermediteListOfEndMoves, NewListOfEndMoves)
+    ).
+
+isBallRelocateValid(GameState,[ColStart, RowStart,ColEnd,RowEnd,whiteBall],'White',ValidEnd) :-
+    getBoard(GameState, Board),
+    getValueInMapStackPosition(Board,RowEnd,ColEnd,[EndHeadValue|_TailValue]),
+    (EndHeadValue = whiteRing ->
+        ValidEnd = 'True'
+    ;
+        ValidEnd = 'False'
+    ).
+
+isBallRelocateValid(GameState,[ColStart, RowStart,ColEnd,RowEnd,blackBall],'Black',ValidEnd) :-
+    getBoard(GameState, Board),
+    getValueInMapStackPosition(Board,RowEnd,ColEnd,[EndHeadValue|_TailValue]),
+    (EndHeadValue = blackRing ->
+        ValidEnd = 'True'
+    ;
+        ValidEnd = 'False'
     ).
 
 /**Check Win TO DO*/

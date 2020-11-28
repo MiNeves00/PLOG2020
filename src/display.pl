@@ -23,8 +23,8 @@ intermediateMap(
             [[empty],[blackRing | [empty]],[whiteRing | [empty]],[blackBall | [blackRing | [blackBase | [empty]]]],[blackBall | [blackRing | [blackBase | [empty]]]]],
             [[whiteRing | [empty]],[empty],[blackBall | [blackRing | [empty]]],[empty],[blackBall | [blackRing | [blackBase | [empty]]]]],
             [[whiteRing | [empty]],[empty],[whiteBall | [whiteRing | [empty]]],[empty],[blackRing | [empty]]],
-            [[whiteBall | [whiteRing | [whiteBase | [empty]]]],[whiteRing | [empty]],[whiteBall | [whiteRing | [empty]]],[empty],[empty]],
-            [[whiteBall | [whiteRing | [whiteBase | [empty]]]],[whiteBall | [whiteRing | [whiteBase | [empty]]]],[empty],[empty],[empty]]
+            [[whiteBall | [whiteRing | [whiteBase | [empty]]]],[whiteRing | [empty]],[blackBall | [blackRing | [empty]]],[empty],[empty]],
+            [[whiteBall | [whiteRing | [whiteBase | [empty]]]],[whiteBall | [whiteRing | [whiteBase | [empty]]]],[whiteBall | [whiteRing | [empty]]],[empty],[empty]]
         ], 
         [ %PecasDeCadaJogador
             [whiteRing],%White
