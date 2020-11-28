@@ -29,11 +29,11 @@ gameStart('Com','Com'):- %To Do
 gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
     display_game(GameState,'White'), %Displays game
     player_moveWrapped(GameState,'White',NewGameState,Won1),
-    (Won1 = 'True' -> HasWon = 'True', Winner1 = 'Black' ; checkIfWin(NewGameState,'White',HasWon), Winner1 = 'White'),
+    (Won1 = 'True' -> HasWon = 'True', Winner1 = 'Black' ; game_over(NewGameState,'White',HasWon), Winner1 = 'White'),
     (HasWon = 'False' ->  
         display_game(NewGameState,'Black'),
         player_moveWrapped(NewGameState,'Black',NewGameState2,Won2),
-        (Won2 = 'True' -> HasWon2 = 'True', Winner1 = 'White' ; checkIfWin(NewGameState2,'Black',HasWon2), Winner1 = 'Black'),
+        (Won2 = 'True' -> HasWon2 = 'True', Winner1 = 'White' ; game_over(NewGameState2,'Black',HasWon2), Winner1 = 'Black'),
         (HasWon2 = 'False' ->
             gameLoop(NewGameState2,'Player','Player') %Recursive call to continue to next player turns
             ; 
@@ -585,8 +585,8 @@ ballEndValidMoves(GameState, Player, ColStart, RowStart, Col, Row, ListOfEndMove
 
 /**Check Win TO DO*/
 
-%checkIfWin(+GameState,+Player,-HasWon)
-checkIfWin(GameState,Player,HasWon):-
+%game_over(+GameState,+Player,-HasWon)
+game_over(GameState,Player,HasWon):-
     nl,
     write('Checking if its a win'),
     getBoard(GameState,Board),
