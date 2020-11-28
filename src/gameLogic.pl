@@ -72,7 +72,7 @@ player_move(GameState,Player,NewGameState):-
     ),!,
     (ListOfBallMoves = [] -> fail; UselessVar2 = 0),
     ballStep(IntermediateGameState,Player,NewGameState),
-    value(NewGameState,Player,Value).
+    value(NewGameState,Player,NewValue).
 
 
 
