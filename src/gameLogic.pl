@@ -372,11 +372,7 @@ isBallMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEn
                     )
                 )
             ;
-<<<<<<< HEAD
                 isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls,ValidRelocateMoves),
-=======
-                isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls),
->>>>>>> fe3a79433a71cb1fa7c07e3042c5b32bd1aa1de7
                 (ValidVault = 'True' ->
                     ValidEnd = 'True'
                 ;
@@ -384,11 +380,7 @@ isBallMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEn
                 )     
             )
         ;
-<<<<<<< HEAD
             isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls,ValidRelocateMoves),
-=======
-            isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls),
->>>>>>> fe3a79433a71cb1fa7c07e3042c5b32bd1aa1de7
             (ValidVault = 'True' ->
                 ValidEnd = 'True'
             ;
@@ -396,11 +388,7 @@ isBallMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEn
             )      
         )
     ;
-<<<<<<< HEAD
         isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls,ValidRelocateMoves),
-=======
-        isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls),
->>>>>>> fe3a79433a71cb1fa7c07e3042c5b32bd1aa1de7
         (ValidVault = 'True' ->
             ValidEnd = 'True'
         ;
