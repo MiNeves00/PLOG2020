@@ -28,24 +28,30 @@ gameStart('Com','Com'):- %To Do
 %gameLoop(-GameState, +TypeOfPlayer1, +TypeOfPlayer2)
 gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
     display_game(GameState,'White'), %Displays game
-    player_move(GameState,'White',NewGameState),
-    checkIfWin(NewGameState,'White',HasWon),
+    player_moveWrapped(GameState,'White',NewGameState,Won1),
+    (Won1 = 'True' -> HasWon = 'True', Winner1 = 'Black' ; game_over(NewGameState,'White',HasWon), Winner1 = 'White'),
     (HasWon = 'False' ->  
         display_game(NewGameState,'Black'),
-        player_move(NewGameState,'Black',NewGameState2),
-        checkIfWin(NewGameState2,'Black',HasWon2),
+        player_moveWrapped(NewGameState,'Black',NewGameState2,Won2),
+        (Won2 = 'True' -> HasWon2 = 'True', Winner2 = 'White' ; game_over(NewGameState2,'Black',HasWon2), Winner2 = 'Black'),
         (HasWon2 = 'False' ->
             gameLoop(NewGameState2,'Player','Player') %Recursive call to continue to next player turns
             ; 
-            won('Black')
+            won(Winner2)
         )
         ;
-        won('White')
+        won(Winner1)
     )
     .
 
 /**Player Move*/
 %Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece]
+
+%player_moveWrapped(+GameState,+Player,-NewGameState,-Won)
+player_moveWrapped(GameState,Player,NewGameState,Won):-
+    player_move(GameState,Player,NewGameState), Won = 'False'.
+
+player_moveWrapped(GameState,Player,NewGameState,Won):- Won = 'True'.
 
 %player_move(+GameState,+Player,-NewGameState)
 player_move(GameState,Player,NewGameState):-
@@ -54,15 +60,21 @@ player_move(GameState,Player,NewGameState):-
         valid_moves(GameState,'WhiteRing',ListOfRingMoves)
     ;
         valid_moves(GameState,'BlackRing',ListOfRingMoves)
-    ),
+    ),!,
+    (ListOfRingMoves = [] -> fail; UselessVar = 0),
+    value(GameState,Player,Value),
     ringStep(GameState,Player,IntermediateGameState),
     display_game(IntermediateGameState,Player),
     (Player = 'White' -> 
         valid_moves(IntermediateGameState,'WhiteBall',ListOfBallMoves)
     ;
         valid_moves(IntermediateGameState,'BlackBall',ListOfBallMoves)
-    ),
-    ballStep(IntermediateGameState,Player,NewGameState).
+    ),!,
+    (ListOfBallMoves = [] -> fail; UselessVar2 = 0),
+    ballStep(IntermediateGameState,Player,NewGameState),
+    value(NewGameState,Player,NewValue).
+
+
 
 %ringStep(+GameState,+Player,-NewGameState)
 ringStep(GameState,Player,NewGameState):-
@@ -360,7 +372,11 @@ isBallMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEn
                     )
                 )
             ;
+<<<<<<< HEAD
                 isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls,ValidRelocateMoves),
+=======
+                isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls),
+>>>>>>> fe3a79433a71cb1fa7c07e3042c5b32bd1aa1de7
                 (ValidVault = 'True' ->
                     ValidEnd = 'True'
                 ;
@@ -368,7 +384,11 @@ isBallMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEn
                 )     
             )
         ;
+<<<<<<< HEAD
             isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls,ValidRelocateMoves),
+=======
+            isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls),
+>>>>>>> fe3a79433a71cb1fa7c07e3042c5b32bd1aa1de7
             (ValidVault = 'True' ->
                 ValidEnd = 'True'
             ;
@@ -376,7 +396,11 @@ isBallMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEn
             )      
         )
     ;
+<<<<<<< HEAD
         isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls,ValidRelocateMoves),
+=======
+        isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls),
+>>>>>>> fe3a79433a71cb1fa7c07e3042c5b32bd1aa1de7
         (ValidVault = 'True' ->
             ValidEnd = 'True'
         ;
@@ -983,8 +1007,8 @@ isBallRelocateValid(GameState,[ColStart, RowStart,ColEnd,RowEnd,blackBall],'Blac
 
 /**Check Win TO DO*/
 
-%checkIfWin(+GameState,+Player,-HasWon)
-checkIfWin(GameState,Player,HasWon):-
+%game_over(+GameState,+Player,-HasWon)
+game_over(GameState,Player,HasWon):-
     nl,
     write('Checking if its a win'),
     getBoard(GameState,Board),
