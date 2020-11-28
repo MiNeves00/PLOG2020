@@ -33,7 +33,7 @@ gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
     (HasWon = 'False' ->  
         display_game(NewGameState,'Black'),
         player_moveWrapped(NewGameState,'Black',NewGameState2,Won2),
-        (Won2 = 'True' -> HasWon2 = 'True', Winner1 = 'White' ; game_over(NewGameState2,'Black',HasWon2), Winner1 = 'Black'),
+        (Won2 = 'True' -> HasWon2 = 'True', Winner2 = 'White' ; game_over(NewGameState2,'Black',HasWon2), Winner2 = 'Black'),
         (HasWon2 = 'False' ->
             gameLoop(NewGameState2,'Player','Player') %Recursive call to continue to next player turns
             ; 
@@ -69,7 +69,7 @@ player_move(GameState,Player,NewGameState):-
     ;
         valid_moves(IntermediateGameState,'BlackBall',ListOfBallMoves)
     ),!,
-    (ListOfBallMoves = [] -> fail; UselessVar = 0),
+    (ListOfBallMoves = [] -> fail; UselessVar2 = 0),
     ballStep(IntermediateGameState,Player,NewGameState).
 
 
@@ -309,7 +309,7 @@ isBallMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEn
                     )
                 )
             ;
-                isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls)
+                isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls),
                 (ValidVault = 'True' ->
                     ValidEnd = 'True'
                 ;
@@ -317,7 +317,7 @@ isBallMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEn
                 )     
             )
         ;
-            isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls)
+            isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls),
             (ValidVault = 'True' ->
                 ValidEnd = 'True'
             ;
@@ -325,7 +325,7 @@ isBallMoveEndValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEn
             )      
         )
     ;
-        isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls)
+        isBallVaultValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,ValidVault,OpponentBalls),
         (ValidVault = 'True' ->
             ValidEnd = 'True'
         ;
