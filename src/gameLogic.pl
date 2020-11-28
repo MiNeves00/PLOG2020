@@ -28,24 +28,30 @@ gameStart('Com','Com'):- %To Do
 %gameLoop(-GameState, +TypeOfPlayer1, +TypeOfPlayer2)
 gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
     display_game(GameState,'White'), %Displays game
-    player_move(GameState,'White',NewGameState),
-    checkIfWin(NewGameState,'White',HasWon),
+    player_moveWrapped(GameState,'White',NewGameState,Won1),
+    (Won1 = 'True' -> HasWon = 'True', Winner1 = 'Black' ; checkIfWin(NewGameState,'White',HasWon), Winner1 = 'White'),
     (HasWon = 'False' ->  
         display_game(NewGameState,'Black'),
-        player_move(NewGameState,'Black',NewGameState2),
-        checkIfWin(NewGameState2,'Black',HasWon2),
+        player_moveWrapped(NewGameState,'Black',NewGameState2,Won2),
+        (Won2 = 'True' -> HasWon2 = 'True', Winner1 = 'White' ; checkIfWin(NewGameState2,'Black',HasWon2), Winner1 = 'Black'),
         (HasWon2 = 'False' ->
             gameLoop(NewGameState2,'Player','Player') %Recursive call to continue to next player turns
             ; 
-            won('Black')
+            won(Winner2)
         )
         ;
-        won('White')
+        won(Winner1)
     )
     .
 
 /**Player Move*/
 %Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece]
+
+%player_moveWrapped(+GameState,+Player,-NewGameState,-Won)
+player_moveWrapped(GameState,Player,NewGameState,Won):-
+    player_move(GameState,Player,NewGameState), Won = 'False'.
+
+player_moveWrapped(GameState,Player,NewGameState,Won):- Won = 'True'.
 
 %player_move(+GameState,+Player,-NewGameState)
 player_move(GameState,Player,NewGameState):-
@@ -54,15 +60,19 @@ player_move(GameState,Player,NewGameState):-
         valid_moves(GameState,'WhiteRing',ListOfRingMoves)
     ;
         valid_moves(GameState,'BlackRing',ListOfRingMoves)
-    ),
+    ),!,
+    (ListOfRingMoves = [] -> fail; UselessVar = 0),
     ringStep(GameState,Player,IntermediateGameState),
     display_game(IntermediateGameState,Player),
     (Player = 'White' -> 
         valid_moves(IntermediateGameState,'WhiteBall',ListOfBallMoves)
     ;
         valid_moves(IntermediateGameState,'BlackBall',ListOfBallMoves)
-    ),
+    ),!,
+    (ListOfBallMoves = [] -> fail; UselessVar = 0),
     ballStep(IntermediateGameState,Player,NewGameState).
+
+
 
 %ringStep(+GameState,+Player,-NewGameState)
 ringStep(GameState,Player,NewGameState):-
