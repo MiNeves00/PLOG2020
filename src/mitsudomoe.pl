@@ -3,6 +3,7 @@
 :- consult('menu.pl').
 :- consult('utils.pl').
 :- consult('readmove.pl').
+:- consult('bot.pl').
 :- use_module(library(system)).
 
 /**Play (main)*/

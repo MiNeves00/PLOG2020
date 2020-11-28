@@ -62,6 +62,7 @@ player_move(GameState,Player,NewGameState):-
         valid_moves(GameState,'BlackRing',ListOfRingMoves)
     ),!,
     (ListOfRingMoves = [] -> fail; UselessVar = 0),
+    value(GameState,Player,Value),
     ringStep(GameState,Player,IntermediateGameState),
     display_game(IntermediateGameState,Player),
     (Player = 'White' -> 
@@ -70,7 +71,8 @@ player_move(GameState,Player,NewGameState):-
         valid_moves(IntermediateGameState,'BlackBall',ListOfBallMoves)
     ),!,
     (ListOfBallMoves = [] -> fail; UselessVar2 = 0),
-    ballStep(IntermediateGameState,Player,NewGameState).
+    ballStep(IntermediateGameState,Player,NewGameState),
+    value(NewGameState,Player,Value).
 
 
 
