@@ -27,9 +27,9 @@ readRingMove(Player ,Move):-
             (ColIndexBegin = -1 ->
                 (RowIndexBegin = -1 ->
                     (Player = 'White' ->
-                        Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, whiteBall]
+                        Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, whiteRing]
                     ;
-                        Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, blackBall]
+                        Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, blackRing]
                     ),
                     write('Ring Move has been read successfuly')
                 ;
@@ -44,9 +44,9 @@ readRingMove(Player ,Move):-
                     nl
                 ;
                     (Player = 'White' ->
-                        Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, whiteBall]
+                        Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, whiteRing]
                     ;
-                        Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, blackBall]
+                        Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, blackRing]
                     ),
                     write('Ring Move has been read successfuly')
                 )
@@ -56,9 +56,9 @@ readRingMove(Player ,Move):-
         (ColIndexBegin = -1 ->
             (RowIndexBegin = -1 ->
                 (Player = 'White' ->
-                    Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, whiteBall]
+                    Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, whiteRing]
                 ;
-                    Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, blackBall]
+                    Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, blackRing]
                 ),
                 write('Ring Move has been read successfuly')
             ;
@@ -73,9 +73,9 @@ readRingMove(Player ,Move):-
                 nl
             ;
                 (Player = 'White' ->
-                    Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, whiteBall]
+                    Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, whiteRing]
                 ;
-                    Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, blackBall]
+                    Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, blackRing]
                 ),
                 write('Ring Move has been read successfuly')
             )

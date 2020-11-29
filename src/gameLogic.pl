@@ -46,7 +46,7 @@ gameLoop(GameState,'Player','Com',Level):- %Each player has a turn in a loop
         com_moveWrapped(NewGameState,'Black',Level,NewGameState2,Won2),
         (Won2 = 'True' -> HasWon2 = 'True', Winner2 = 'White' ; game_over(NewGameState2,'Black',HasWon2), Winner2 = 'Black'),
         (HasWon2 = 'False' ->
-            gameLoop(NewGameState2,'Player','Com') %Recursive call to continue to next player turns
+            gameLoop(NewGameState2,'Player','Com',Level) %Recursive call to continue to next player turns
             ; 
             won(Winner2)
         )
@@ -63,7 +63,7 @@ gameLoop(GameState,'Com','Player',Level):- %Each player has a turn in a loop
         player_moveWrapped(NewGameState,'Black',NewGameState2,Won2),
         (Won2 = 'True' -> HasWon2 = 'True', Winner2 = 'White' ; game_over(NewGameState2,'Black',HasWon2), Winner2 = 'Black'),
         (HasWon2 = 'False' ->
-            gameLoop(NewGameState2,'Player','Com') %Recursive call to continue to next player turns
+            gameLoop(NewGameState2,'Com','Player',Level) %Recursive call to continue to next player turns
             ; 
             won(Winner2)
         )

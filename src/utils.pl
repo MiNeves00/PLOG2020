@@ -120,3 +120,15 @@ nth0(Index, [H | List], Elem) :-
   NextIndex is Index - 1,
   nth0(NextIndex, List, Elem).
 
+
+indexOf([Element|_], Element, 0):- !.
+indexOf([_|Tail], Element, Index):-
+  indexOf(Tail, Element, Index1),
+  !,
+  Index is Index1+1.
+
+
+ reverseL([],Z,Z).
+
+ reverseL([H|T],Z,Acc) :- reverseL(T,Z,[H|Acc]).
+
