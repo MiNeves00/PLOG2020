@@ -141,3 +141,50 @@ readColCoordinate(Coordinate):-
         ),
         nl
     ).
+
+
+%readLevel(-Level)
+readLevel(Level):-
+    nl,nl,write('|| Difficulty Level ||'),nl,nl,
+    write('1. Easy      2. Meddium      3. Hard'),nl,nl,
+    readLevelAux(Level).
+
+readLevelAux(Level):-
+    nl,write('Choose Number of Com Level of Difficulty:'),nl,
+    read(NewLevel),
+    (NewLevel < 1 -> write('Number cannot be smaller than 1'), nl,
+        readLevelAux(Level)
+    ;
+        (NewLevel > 3 -> write('Number cannot be bigger than 3'),nl,
+            readLevelAux(Level)
+        ;
+            Level = NewLevel
+        ),
+        nl
+    ).
+
+%readWhosWho(-White,-Black)
+readWhosWho(White, Black):-
+    nl,nl,write('|| Who Moves First? White always moves first ||'),nl,nl,
+    write('1. Player              2. Com'),nl,nl,
+    readWhosWhite(WhiteNum),
+    (WhiteNum = 1 -> White = 'Player', Black = 'Com' 
+    ; White = 'Com', Black = 'Player').
+
+%readWhosWhite(-WhiteNum)
+readWhosWhite(White):-
+    nl,write('Choose Number:'),nl,
+    read(NewWhite),
+    (NewWhite < 1 -> write('Number cannot be smaller than 1'), nl,
+        readWhosWhite(White)
+    ;
+        (NewWhite > 2 -> write('Number cannot be bigger than 2'),nl,
+            readWhosWhite(White)
+        ;
+            White = NewWhite
+        ),
+        nl
+    ).
+
+
+
