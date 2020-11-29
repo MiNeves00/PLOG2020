@@ -24,20 +24,62 @@ readRingMove(Player ,Move):-
             readRingMove(Player, Move),
             nl
         ;
-            (Player = 'White' ->
-                Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, whiteRing]
+            (ColIndexBegin = -1 ->
+                (RowIndexBegin = -1 ->
+                    (Player = 'White' ->
+                        Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, whiteBall]
+                    ;
+                        Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, blackBall]
+                    ),
+                    write('Ring Move has been read successfuly')
                 ;
-                Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, blackRing]
-            ),
-            write('Ring Move has been read successfuly')
+                    write('Wrong input'), nl,
+                    readRingMove(Player, Move),
+                    nl
+                )
+            ;
+                (RowIndexBegin = -1 ->
+                    write('Wrong input'), nl,
+                    readRingMove(Player, Move),
+                    nl
+                ;
+                    (Player = 'White' ->
+                        Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, whiteBall]
+                    ;
+                        Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, blackBall]
+                    ),
+                    write('Ring Move has been read successfuly')
+                )
+            )
         )
     ;
-        (Player = 'White' -> 
-            Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, whiteRing]
+        (ColIndexBegin = -1 ->
+            (RowIndexBegin = -1 ->
+                (Player = 'White' ->
+                    Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, whiteBall]
+                ;
+                    Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, blackBall]
+                ),
+                write('Ring Move has been read successfuly')
             ;
-            Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, blackRing]
-        ),
-        write('Ring Move has been read successfuly')
+                write('Wrong input'), nl,
+                readRingMove(Player, Move),
+                nl
+            )
+        ;
+            (RowIndexBegin = -1 ->
+                write('Wrong input'), nl,
+                readRingMove(Player, Move),
+                nl
+            ;
+                (Player = 'White' ->
+                    Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, whiteBall]
+                ;
+                    Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd, blackBall]
+                ),
+                write('Ring Move has been read successfuly')
+            )
+        )
     ).
 
 
