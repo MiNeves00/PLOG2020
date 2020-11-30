@@ -3,7 +3,7 @@
 menu:-
     printMenu,
     write('>>> Insert your Game Mode or Exit the Game: '),
-    read(Input), %TO DO
+    read(Input),
     handleInput(Input).
 
 /**Print Menu*/
@@ -35,7 +35,9 @@ printMenu:-
     write('___________________________________________________________________________'),nl,nl,nl.
 
 /**Handle input for type of game*/
-%handleInput(+Input)
+/**Game type can be Player v Player, Player v Computer or Computer v Computer*/
+/**Always calls gameStart, to start the game, with attributes depending on user input*/
+%handleInput(+Input) Input-> Choice of type of game
 handleInput(1):-
     gameStart('Player','Player').
 
