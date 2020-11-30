@@ -49,7 +49,7 @@ choose_moveRing(GameState,Player,1,ListOfValidMoves,Move):-
 Hard Level
 
 Calculates the game state value of each move from the list of Valid Moves and tries to
-max this value, first return a list of values indexed the same way as the ListOfValidMoves (after reversing the ListOfValidMoves).
+max this value, first returns a list of values indexed the same way as the ListOfValidMoves (after reversing the ListOfValidMoves).
 Then it returns the move which has the highest value. In case of a tie it returns the first one on the ListOfValidMoves.
 */
 %choose_moveBall(+GameState, +Player, +Level, +ListOfValidMoves, -Move)​
@@ -90,8 +90,9 @@ choose_moveBall(GameState,Player,1,ListOfValidMoves,Move):-
 /**
 Hard Level
 
-Calculates the game state value of each move from the list of Valid Moves and tries to
-max this value, returns a move which maxes this
+Simillar to choose_MoveBall however instead of trying to max the value of the GameState after the move,
+it tries to minimize this value because this functions is called only to relocate the opponents balls so
+it is in the players best interest to give its opponent the worst GameState possible
 */
 %choose_moveBallRelocate(+GameState, +Player, +Level, +ListOfValidMoves, -Move)​
 choose_moveBallRelocate(GameState,Player,3,ListOfValidMoves,Move):-
@@ -118,8 +119,8 @@ choose_moveBallRelocate(GameState,Player,2,ListOfValidMoves,Move):-
 Easy Level
 
 Simillar to Hard in its flow.
-However instead of returning the best move it randomly returns a move to play from the list of Valid Moves.
-Actually its randomness is simply choosing always the move before the best one exept if its the move in position 0, 
+However instead of returning the worst move it randomly returns a move to play from the list of Valid Moves.
+Actually its randomness is simply choosing always the move before the worst one exept if its the move in position 0, 
 in which case it returns it
 */
 choose_moveBallRelocate(GameState,Player,1,ListOfValidMoves,Move):-

@@ -165,7 +165,7 @@ A initial menu was created to let the user choose the game mode.
 ![menu](./docs/menu.png  "Menu")
 
 ## Valid Moves List
-To determine the valid moves list at any given time, it is necessary to know the current player and wether it is a ring move or a ball move. With that information, the board is scanned searching for pieces that can be moved, using the predicates ```isRingMoveStartValid``` and ```isBallMoveStartValid```, which assess if at the starting position for a hypothetical move is a correct piece that should be moved, and scanned again searching for valid destinations using ```isRingMoveEndValid``` and ```isBallMoveEndValid```, this last one assessing if the destination space of said move has a ring of the correct color, if the destionation position is adjacent to the starting position and, in case of a vault, if the opponent balls vaulted over can be relocated.
+To determine the valid moves list at any given time, it is necessary to know the current player and whether it is a ring move or a ball move. With that information, the board is scanned searching for pieces that can be moved, using the predicates ```isRingMoveStartValid``` and ```isBallMoveStartValid```, which assess if at the starting position for a hypothetical move is a correct piece that should be moved, and scanned again searching for valid destinations using ```isRingMoveEndValid``` and ```isBallMoveEndValid```, this last one assessing if the destination space of said move has a ring of the correct color, if the destionation position is adjacent to the starting position and, in case of a vault, if the opponent balls vaulted over can be relocated.
 
 A move is represented by a list of the starting and ending coordinates and the piece to be moved, as so:
 ```[StartingColumn, StartingRow, DestinationColumn, DestinationRow, Piece]```.
@@ -235,9 +235,156 @@ After every move, the predicate ```game_over``` is called, to check if the curre
 Besides that, ```player_moveWrapper``` could also end the game immediately if there are no valid moves.
 
 ## Board Evaluation
-After every move, the game state is evaluated in order to attribute a value to each player. 
+This function is mainly used by the computer when its choosing a move, whether a ball or ring move, in order to understand which move would give himself the best advantage.
+
+Based on a GameState and on the player which is moving next calculates the value of this GameState,
+which simply means it calculates just how good is a GameState for said player. The higger this value the better for this player.
+
+This value increases based on proximity to the enemy base positions and in case a ball is on the enemy base it increases by 20 for each ball there,
+this is done in order to motivate playing the balls into the enemy base.
+
 
 ## Computer Play
+The Computer has 3 difficulties: *Easy, Meddium, Hard*.
+
+The computer always plays the move which he thinks is the best. But based on the diffuclty it will think diferently on which is the best move.
+
+### Hard difficulty :
+
+```Ring Step``` : 
+
+Calls valueOfEachValidMoveRing to get a ListOfValues of the best possible value of the game (after a consequent ball move) for each ring move. This is a simple yet cleaver way of atribuiting a value to each ring move without actually evaluating ring positions only by themselves.
+
+Finally using all of these values now in ListOfValues 
+(which correspond to the best GameState value possible in case of a ring move of the index the same as the index in this ListOfValues after reversing ListOfValidMoves),
+it finds the ring move which maxes this value after the ring move followed by a ballmove and returns this ring move.
+
+```
+%choose_moveRing(+GameState, +Player, +Level, +ListOfValidMoves, -Move)​
+choose_moveRing(GameState,Player,3,ListOfValidMoves,Move):-
+    valueOfEachValidMoveRing(GameState,Player,3,ListOfValidMoves,[],ListOfValues),
+    max_list(ListOfValues,MaxValue),
+    indexOf(ListOfValues,MaxValue,Position),
+    reverseL(ListOfValidMoves,RListOfValidMoves,[]),
+    nth0(Position,RListOfValidMoves,Move).
+```
+
+```Ball Step``` :
+
+In order to choose a ball move a function called choose_moveBall is called it calculates the game state value of each move from the list of Valid Moves and tries to
+max this value, first returns a list of values indexed the same way as the ListOfValidMoves (after reversing the ListOfValidMoves).
+
+Then it returns the move which has the highest value. In case of a tie it returns the first one on the ListOfValidMoves.
+
+```
+%choose_moveBall(+GameState, +Player, +Level, +ListOfValidMoves, -Move)​
+choose_moveBall(GameState,Player,3,ListOfValidMoves,Move):-
+    valueOfEachValidMoveBall(GameState,Player,ListOfValidMoves,[],ListOfValues),
+    max_list(ListOfValues,MaxValue),
+    indexOf(ListOfValues,MaxValue,Position),
+    reverseL(ListOfValidMoves,RListOfValidMoves,[]),
+    nth0(Position,RListOfValidMoves,Move).
+```
+
+In order to get the value of each valid move ring the following function is used.
+
+```
+%valueOfEachValidMoveRing(+GameState,+Player,Level,+ListOfValidMoves,+OldListOfValues,-NewListOfValues)
+valueOfEachValidMoveRing(GameState,Player,Level,[],OldListOfValues,OldListOfValues).
+
+valueOfEachValidMoveRing(GameState,Player,Level,[ValidMove|TailListOfValidMoves],OldListOfValues,NewListOfValues):-
+    move(GameState,ValidMove,Player,NewGameState),
+    (Player = 'White' -> 
+        valid_moves(NewGameState,'WhiteBall',ListOfBallMoves)
+    ;
+        valid_moves(NewGameState,'BlackBall',ListOfBallMoves)
+    ),
+    (ListOfBallMoves = [] ->
+        valueOfEachValidMoveRing(GameState,Player,Level,TailListOfValidMoves,[0|OldListOfValues],NewListOfValues)
+    ;
+        choose_moveBall(GameState,Player,Level,ListOfBallMoves,BallMove),
+        move(NewGameState,BallMove,Player,NewBallGameState),
+        value(NewBallGameState,Player,Value),
+        valueOfEachValidMoveRing(GameState,Player,Level,TailListOfValidMoves,[Value|OldListOfValues],NewListOfValues)
+    ).
+```
+
+If the move is a vault over the enemy's balls it will be necessary to relocate them and as such to choose where these opponent balls are going.
+
+A function called choose_moveBallRelocate is called which is simillar to choose_moveBall however instead of trying to max the value of the GameState after the move,
+it tries to minimize this value because this functions is called only to relocate the opponents balls so
+it is in the players best interest to give its opponent the worst GameState possible.
+
+```
+%choose_moveBallRelocate(+GameState, +Player, +Level, +ListOfValidMoves, -Move)​
+choose_moveBallRelocate(GameState,Player,3,ListOfValidMoves,Move):-
+    valueOfEachValidMoveBall(GameState,Player,ListOfValidMoves,[],ListOfValues),
+    min_list(ListOfValues,MinValue),
+    indexOf(ListOfValues,MinValue,Position),
+    reverseL(ListOfValidMoves,RListOfValidMoves,[]),
+    nth0(Position,RListOfValidMoves,Move).
+```
+
+
+### Meddium difficulty :
+
+```Ring Step``` : 
+
+The exact same as the easy version.
+
+
+```Ball Step``` :
+
+The exact same as the hard version, both on choose_moveBall and choose_moveBallRelocate.
+
+### Easy difficulty :
+
+```Ring Step``` :
+
+Simillar to the Hard function however it call valueOfEachValidMoveRing with Level 1 which causes the evaluation of the best ballmove after each ringmove to be
+the one of easy level, calling choose_moveBall Easy version. Thus it won't make the best evaluation of the best ring move, making it easier for the opponent
+
+
+```
+choose_moveRing(GameState,Player,1,ListOfValidMoves,Move):-
+    valueOfEachValidMoveRing(GameState,Player,1,ListOfValidMoves,[],ListOfValues),
+    max_list(ListOfValues,MaxValue),
+    indexOf(ListOfValues,MaxValue,Position),
+    reverseL(ListOfValidMoves,RListOfValidMoves,[]),
+    nth0(Position,RListOfValidMoves,Move).
+```
+
+```Ball Step``` :
+
+The choose_moveBall function is simillar to Hard difficulty, it randomly returns a move to play from the list of Valid Moves. Actually its randomness is simply choosing always the move before the best one exept if its the move in position 0, 
+in which case it returns it
+
+```
+choose_moveBall(GameState,Player,1,ListOfValidMoves,Move):-
+    valueOfEachValidMoveBall(GameState,Player,ListOfValidMoves,[],ListOfValues),
+    max_list(ListOfValues,MaxValue),
+    indexOf(ListOfValues,MaxValue,Position),
+    (Position > 0 -> Position1 is Position - 1; Position1 is Position),
+    reverseL(ListOfValidMoves,RListOfValidMoves,[]),
+    nth0(Position1,RListOfValidMoves,Move).
+```
+
+If the ball move is a vault over opponnet balls then choose_moveBallRelocate is called.
+
+It is simillar to hard version in its flow.
+However instead of returning the worst move it randomly returns a move to play from the list of Valid Moves.
+Actually its randomness is simply choosing always the move before the worst one exept if its the move in position 0, 
+in which case it returns it.
+
+```
+choose_moveBallRelocate(GameState,Player,1,ListOfValidMoves,Move):-
+    valueOfEachValidMoveBall(GameState,Player,ListOfValidMoves,[],ListOfValues),
+    min_list(ListOfValues,MinValue),
+    indexOf(ListOfValues,MinValue,Position),
+    (Position > 1 -> Position1 is Position - 1; Position1 is Position),
+    reverseL(ListOfValidMoves,RListOfValidMoves,[]),
+    nth0(Position1,RListOfValidMoves,Move).
+```
 
 ## Conclusion
 This projects objective was to apply logic programming theory in Prolog in the form of a board game. 
