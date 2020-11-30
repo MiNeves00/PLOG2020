@@ -10,10 +10,17 @@ gameStart('Player','Player'):-
 gameStart('Player','Com'):- %To Do
     write('Starting Player vs Com game...'),
     nl,
-    intermediateMapV2(GameState), %Gets initial game state
+    initial(GameState), %Gets initial game state
     readLevel(Level),
     readWhosWho(White,Black),
     gameLoop(GameState, White, Black, Level).
+
+gameStart('Com','Com'):- %To Do
+    write('Starting Player vs Com game...'),
+    nl,
+    initial(GameState), %Gets initial game state
+    readLevel(Level),
+    gameLoop(GameState, 'Com', 'Com', Level).
 
 
 
@@ -42,7 +49,6 @@ gameLoop(GameState,'Player','Com',Level):- %Each player has a turn in a loop
     player_moveWrapped(GameState,'White',NewGameState,Won1),
     (Won1 = 'True' -> HasWon = 'True', Winner1 = 'Black' ; game_over(NewGameState,'White',HasWon), Winner1 = 'White', display_game(NewGameState,'Black')),
     (HasWon = 'False' ->  
-        display_game(NewGameState,'Black'),
         com_moveWrapped(NewGameState,'Black',Level,NewGameState2,Won2),
         (Won2 = 'True' -> HasWon2 = 'True', Winner2 = 'White' ; game_over(NewGameState2,'Black',HasWon2), Winner2 = 'Black'),
         (HasWon2 = 'False' ->
@@ -64,6 +70,24 @@ gameLoop(GameState,'Com','Player',Level):- %Each player has a turn in a loop
         (Won2 = 'True' -> HasWon2 = 'True', Winner2 = 'White' ; game_over(NewGameState2,'Black',HasWon2), Winner2 = 'Black'),
         (HasWon2 = 'False' ->
             gameLoop(NewGameState2,'Com','Player',Level) %Recursive call to continue to next player turns
+            ; 
+            won(Winner2)
+        )
+        ;
+        won(Winner1)
+    )
+    .
+
+
+gameLoop(GameState,'Com','Com',Level):- %Each player has a turn in a loop
+    display_game(GameState,'White'), %Displays game
+    com_moveWrapped(GameState,'White',Level,NewGameState,Won1),
+    (Won1 = 'True' -> HasWon = 'True', Winner1 = 'Black' ; game_over(NewGameState,'White',HasWon), Winner1 = 'White', display_game(NewGameState,'Black')),
+    (HasWon = 'False' ->  
+        com_moveWrapped(NewGameState,'Black',Level,NewGameState2,Won2),
+        (Won2 = 'True' -> HasWon2 = 'True', Winner2 = 'White' ; game_over(NewGameState2,'Black',HasWon2), Winner2 = 'Black'),
+        (HasWon2 = 'False' ->
+            gameLoop(NewGameState2,'Com','Com',Level) %Recursive call to continue to next player turns
             ; 
             won(Winner2)
         )
