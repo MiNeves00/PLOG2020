@@ -16,6 +16,14 @@ choose_moveBall(GameState,Player,1,ListOfValidMoves,Move):-
     nth0(Position,RListOfValidMoves,Move), nl,write('Move: '),write(Move),nl.
 
 
+choose_moveBallRelocate(GameState,Player,1,ListOfValidMoves,Move):-
+    valueOfEachValidMoveBall(GameState,Player,ListOfValidMoves,[],ListOfValues), nl,write('Values: '),write(ListOfValues),nl,
+    min_list(ListOfValues,MinValue), nl,write('MIN: '),write(MinValue),nl,
+    indexOf(ListOfValues,MinValue,Position), nl,write('Pos: '),write(Position),nl,
+    reverseL(ListOfValidMoves,RListOfValidMoves,[]),
+    nth0(Position,RListOfValidMoves,Move), nl,write('Move: '),write(Move),nl.
+
+
 
 %valueOfEachValidMoveBall(+GameState,+Player,+ListOfValidMoves,+OldListOfValues,-NewListOfValues)
 valueOfEachValidMoveBall(GameState,Player,[],OldListOfValues,OldListOfValues).

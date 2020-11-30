@@ -10,7 +10,7 @@ gameStart('Player','Player'):-
 gameStart('Player','Com'):- %To Do
     write('Starting Player vs Com game...'),
     nl,
-    initial(GameState), %Gets initial game state
+    intermediateMapV2(GameState), %Gets initial game state
     readLevel(Level),
     readWhosWho(White,Black),
     gameLoop(GameState, White, Black, Level).
@@ -151,7 +151,7 @@ ringStepCom(GameState,Player,Level,ListOfRingMoves,NewGameState):-
 %ballStepCom(+GameState, +Player, +Level, +ListOfBallMoves , -NewGameState)
 ballStepCom(GameState, Player, Level,ListOfBallMoves, NewGameState):-
     choose_moveBall(GameState,Player,Level,ListOfBallMoves, BallMove),
-    handleBallMove(GameState,BallMove,Player,NewGameState).
+    handleBallMoveCom(GameState,BallMove,Player,Level,NewGameState).
 
 
 
@@ -193,6 +193,7 @@ handleBallMove(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Pi
         ballStep(GameState,Player,NewGameState)
     ).
 
+
 %relocateStep(+GameState,+Moves,+Player,-NewGameState)
 relocateStep(GameState, [], _Player, NewGameState) :-
     NewGameState = GameState.
@@ -211,6 +212,44 @@ relocateStep(GameState, Moves, Player, NewGameState) :-
     ;
         relocateStep(GameState, Moves, Player, NewGameState)
     ).
+
+
+
+%handleBallMoveCom(+GameState,+Move,+Player,+Level,-NewGameState) 
+handleBallMoveCom(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,Level,NewGameState):-
+    isBallMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,Valid,ValidRelocateMoves),
+    (Valid = 'True' -> 
+        move(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, IntermediateGameState),
+        (Player = 'White' ->
+            relocateStepCom(IntermediateGameState,ValidRelocateMoves,'Black',Level,NewGameState)
+        ;
+            relocateStepCom(IntermediateGameState,ValidRelocateMoves, 'White',Level,NewGameState)
+        )
+    ; 
+        nl,write('Select a ball to move'),nl,nl,
+        ballStepCom(GameState,Player,Level,ValidRelocateMoves,NewGameState)
+    ).
+
+
+
+%relocateStepCom(+GameState,+Moves,+Player,Level,-NewGameState)
+relocateStepCom(GameState, [], _Player,Level, NewGameState) :-
+    NewGameState = GameState.
+
+relocateStepCom(GameState, Moves, Player,Level, NewGameState) :-
+    nl,
+    write('Opponent balls must be relocated'),nl,
+    choose_moveBallRelocate(GameState,Player,Level,Moves,Move),
+    removeMoves(Moves, Move, [], NewMoves),
+    isBallRelocateEndValid(GameState,Move,Player,ValidEnd),
+    (ValidEnd = 'True' ->
+        move(GameState, Move, Player, IntermediateGameState),
+        relocateStepCom(IntermediateGameState, NewMoves, Player,Level, NewGameState)
+    ;
+        relocateStepCom(GameState, Moves, Player,Level, NewGameState)
+    ).
+
+
 
 
 removeMoves([], _Move, OldMoves, NewMoves) :-
