@@ -1,5 +1,34 @@
 /**Choose Move*/
 %choose_move(+GameState, +Player, +Level, +ListOfValidMoves, -Move)​
+
+/**
+Hard Level
+Calculates the game state value of each move from the list of Valid Moves and tries to
+max this value, returns a move which maxes this
+*/
+choose_moveRing(GameState,Player,3,ListOfValidMoves,Move):-
+    valueOfEachValidMoveRing(GameState,Player,3,ListOfValidMoves,[],ListOfValues),
+    max_list(ListOfValues,MaxValue), nl,write('MAX: '),write(MaxValue),nl, %TO DO
+    indexOf(ListOfValues,MaxValue,Position), nl,write('Pos: '),write(Position),nl,
+    reverseL(ListOfValidMoves,RListOfValidMoves,[]),
+    nth0(Position,RListOfValidMoves,Move), nl,write('Move: '),write(Move),nl.
+
+/**
+Medium Level
+Calculates the game state value of each move from the list of Valid Moves and tries to
+max this value, returns a move which maxes this
+*/
+choose_moveRing(GameState,Player,2,ListOfValidMoves,Move):-
+    valueOfEachValidMoveRing(GameState,Player,1,ListOfValidMoves,[],ListOfValues),
+    max_list(ListOfValues,MaxValue), nl,write('MAX: '),write(MaxValue),nl, %TO DO
+    indexOf(ListOfValues,MaxValue,Position), nl,write('Pos: '),write(Position),nl,
+    reverseL(ListOfValidMoves,RListOfValidMoves,[]),
+    nth0(Position,RListOfValidMoves,Move), nl,write('Move: '),write(Move),nl.
+
+/**
+Easy Level
+Randomly returns a move to play from the list of Valid Moves
+*/
 choose_moveRing(GameState,Player,1,ListOfValidMoves,Move):-
     valueOfEachValidMoveRing(GameState,Player,1,ListOfValidMoves,[],ListOfValues),
     max_list(ListOfValues,MaxValue), nl,write('MAX: '),write(MaxValue),nl, %TO DO
@@ -8,7 +37,13 @@ choose_moveRing(GameState,Player,1,ListOfValidMoves,Move):-
     nth0(Position,RListOfValidMoves,Move), nl,write('Move: '),write(Move),nl.
 
 
-choose_moveBall(GameState,Player,1,ListOfValidMoves,Move):-
+
+/**
+Hard Level
+Calculates the game state value of each move from the list of Valid Moves and tries to
+max this value, returns a move which maxes this
+*/
+choose_moveBall(GameState,Player,3,ListOfValidMoves,Move):-
     valueOfEachValidMoveBall(GameState,Player,ListOfValidMoves,[],ListOfValues), nl,write('Values: '),write(ListOfValues),nl,
     max_list(ListOfValues,MaxValue), nl,write('MAX: '),write(MaxValue),nl,
     indexOf(ListOfValues,MaxValue,Position), nl,write('Pos: '),write(Position),nl,
@@ -16,13 +51,66 @@ choose_moveBall(GameState,Player,1,ListOfValidMoves,Move):-
     nth0(Position,RListOfValidMoves,Move), nl,write('Move: '),write(Move),nl.
 
 
-choose_moveBallRelocate(GameState,Player,1,ListOfValidMoves,Move):-
+/**
+Medium Level
+Calculates the game state value of each move from the list of Valid Moves and tries to
+max this value, returns a move which maxes this
+*/
+choose_moveBall(GameState,Player,2,ListOfValidMoves,Move):-
+    valueOfEachValidMoveBall(GameState,Player,ListOfValidMoves,[],ListOfValues), nl,write('Values: '),write(ListOfValues),nl,
+    max_list(ListOfValues,MaxValue), nl,write('MAX: '),write(MaxValue),nl,
+    indexOf(ListOfValues,MaxValue,Position), nl,write('Pos: '),write(Position),nl,
+    reverseL(ListOfValidMoves,RListOfValidMoves,[]),
+    nth0(Position,RListOfValidMoves,Move), nl,write('Move: '),write(Move),nl.
+
+/**
+Easy Level
+Randomly returns a move to play from the list of Valid Moves
+*/
+choose_moveBall(GameState,Player,1,ListOfValidMoves,Move):-
+    valueOfEachValidMoveBall(GameState,Player,ListOfValidMoves,[],ListOfValues), nl,write('Values: '),write(ListOfValues),nl,
+    max_list(ListOfValues,MaxValue), nl,write('MAX: '),write(MaxValue),nl,
+    indexOf(ListOfValues,MaxValue,Position), nl,write('Pos: '),write(Position),nl,
+    (Position > 0 -> Position1 is Position - 1; Position1 is Position),write('Pos1: '),write(Position1),nl,
+    reverseL(ListOfValidMoves,RListOfValidMoves,[]),
+    nth0(Position1,RListOfValidMoves,Move), nl,write('Move: '),write(Move),nl.
+
+/**
+Hard Level
+Calculates the game state value of each move from the list of Valid Moves and tries to
+max this value, returns a move which maxes this
+*/
+choose_moveBallRelocate(GameState,Player,3,ListOfValidMoves,Move):-
     valueOfEachValidMoveBall(GameState,Player,ListOfValidMoves,[],ListOfValues), nl,write('Values: '),write(ListOfValues),nl,
     min_list(ListOfValues,MinValue), nl,write('MIN: '),write(MinValue),nl,
     indexOf(ListOfValues,MinValue,Position), nl,write('Pos: '),write(Position),nl,
     reverseL(ListOfValidMoves,RListOfValidMoves,[]),
     nth0(Position,RListOfValidMoves,Move), nl,write('Move: '),write(Move),nl.
 
+/**
+Medium Level
+Calculates the game state value of each move from the list of Valid Moves and tries to
+minize this value so that the opponent gets the worst possible ball positioning, returns a move which minimizes this
+*/
+choose_moveBallRelocate(GameState,Player,2,ListOfValidMoves,Move):-
+    valueOfEachValidMoveBall(GameState,Player,ListOfValidMoves,[],ListOfValues), nl,write('Values: '),write(ListOfValues),nl,
+    min_list(ListOfValues,MinValue), nl,write('MIN: '),write(MinValue),nl,
+    indexOf(ListOfValues,MinValue,Position), nl,write('Pos: '),write(Position),nl,
+    reverseL(ListOfValidMoves,RListOfValidMoves,[]),
+    nth0(Position,RListOfValidMoves,Move), nl,write('Move: '),write(Move),nl.
+
+
+/**
+Easy Level
+Randomly returns a move to play from the list of Valid Moves
+*/
+choose_moveBallRelocate(GameState,Player,1,ListOfValidMoves,Move):-
+    valueOfEachValidMoveBall(GameState,Player,ListOfValidMoves,[],ListOfValues), nl,write('Values: '),write(ListOfValues),nl,
+    min_list(ListOfValues,MinValue), nl,write('MIN: '),write(MinValue),nl,
+    indexOf(ListOfValues,MinValue,Position), nl,write('Pos: '),write(Position),nl,
+    (Position > 1 -> Position1 is Position - 1; Position1 is Position),
+    reverseL(ListOfValidMoves,RListOfValidMoves,[]),
+    nth0(Position1,RListOfValidMoves,Move), nl,write('Move: '),write(Move),nl.
 
 
 %valueOfEachValidMoveBall(+GameState,+Player,+ListOfValidMoves,+OldListOfValues,-NewListOfValues)
