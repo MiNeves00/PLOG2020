@@ -396,7 +396,7 @@ value(GameState,'Black',Value):-
 ## Computer Play
 The Computer has 3 difficulties: *Easy, Meddium, Hard*.
 
-The computer always plays the move which he thinks is the best. But based on the diffuclty it will think diferently on which is the best move.
+The computer always plays the move which he thinks is the best at the moment, so it does a greedy aproach. But based on the diffuclty it will think diferently on which is the best move.
 
 ### Hard difficulty :
 
