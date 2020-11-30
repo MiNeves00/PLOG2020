@@ -1379,8 +1379,3 @@ won('White'):-
 won('Black'):-
     nl,nl,nl,
     write('|| Black wins ||'),nl,nl,nl.
-
-
-
-test(Num):- Nothing = 0.
-
