@@ -269,24 +269,12 @@ choose_moveRing(GameState,Player,3,ListOfValidMoves,Move):-
     nth0(Position,RListOfValidMoves,Move).
 ```
 
-```Ball Step``` :
+In order to get the value of each ring move the function valueOfEachValidMoveRing is used. 
 
-In order to choose a ball move a function called choose_moveBall is called it calculates the game state value of each move from the list of Valid Moves and tries to
-max this value, first returns a list of values indexed the same way as the ListOfValidMoves (after reversing the ListOfValidMoves).
-
-Then it returns the move which has the highest value. In case of a tie it returns the first one on the ListOfValidMoves.
-
-```
-%choose_moveBall(+GameState, +Player, +Level, +ListOfValidMoves, -Move)​
-choose_moveBall(GameState,Player,3,ListOfValidMoves,Move):-
-    valueOfEachValidMoveBall(GameState,Player,ListOfValidMoves,[],ListOfValues),
-    max_list(ListOfValues,MaxValue),
-    indexOf(ListOfValues,MaxValue,Position),
-    reverseL(ListOfValidMoves,RListOfValidMoves,[]),
-    nth0(Position,RListOfValidMoves,Move).
-```
-
-In order to get the value of each valid move ring the following function is used.
+For each valid ring move it calculates the NewGameState using that move and then using this
+NewGameState it calculates all valid ball moves and it uses this valid ball moves to call
+chooseMoveBall to get the best ball move for that ring move and calculates NewGameStateBall using this.
+Returns a list of values with the values of the best possible ball moves for each ringMove, indexed the reversed way from the ListOfValidMoves
 
 ```
 %valueOfEachValidMoveRing(+GameState,+Player,Level,+ListOfValidMoves,+OldListOfValues,-NewListOfValues)
@@ -307,6 +295,41 @@ valueOfEachValidMoveRing(GameState,Player,Level,[ValidMove|TailListOfValidMoves]
         value(NewBallGameState,Player,Value),
         valueOfEachValidMoveRing(GameState,Player,Level,TailListOfValidMoves,[Value|OldListOfValues],NewListOfValues)
     ).
+```
+
+
+```Ball Step``` :
+
+In order to choose a ball move a function called choose_moveBall is called it calculates the game state value of each move from the list of Valid Moves and tries to
+max this value, first returns a list of values indexed the same way as the ListOfValidMoves (after reversing the ListOfValidMoves).
+
+Then it returns the move which has the highest value. In case of a tie it returns the first one on the ListOfValidMoves.
+
+```
+%choose_moveBall(+GameState, +Player, +Level, +ListOfValidMoves, -Move)​
+choose_moveBall(GameState,Player,3,ListOfValidMoves,Move):-
+    valueOfEachValidMoveBall(GameState,Player,ListOfValidMoves,[],ListOfValues),
+    max_list(ListOfValues,MaxValue),
+    indexOf(ListOfValues,MaxValue,Position),
+    reverseL(ListOfValidMoves,RListOfValidMoves,[]),
+    nth0(Position,RListOfValidMoves,Move).
+```
+
+In order to get the value of each ball move the function valueOfEachValidMoveBall is used. 
+
+It calculates for each valid move the value of the GameState after this move and then saves it in a ListOfValues, 
+indexed the reversed way from the ListOfValidMoves
+Keeps calling itself until the ListOfValidMoves is empty
+
+```
+%valueOfEachValidMoveBall(+GameState,+Player,+ListOfValidMoves,+OldListOfValues,-NewListOfValues)
+valueOfEachValidMoveBall(GameState,Player,[],OldListOfValues,OldListOfValues).
+
+valueOfEachValidMoveBall(GameState,Player,[ValidMove|TailListOfValidMoves],OldListOfValues,NewListOfValues):-
+    move(GameState,ValidMove,Player,NewGameState),
+    value(NewGameState,Player,Value),
+    valueOfEachValidMoveBall(GameState,Player,TailListOfValidMoves,[Value|OldListOfValues],NewListOfValues).
+
 ```
 
 If the move is a vault over the enemy's balls it will be necessary to relocate them and as such to choose where these opponent balls are going.
