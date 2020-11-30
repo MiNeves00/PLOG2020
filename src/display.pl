@@ -20,14 +20,14 @@ initial(
 intermediateMap(
     [
         [ %Tabuleiro
-            [[empty],[blackRing | [empty]],[whiteRing | [empty]],[blackBall | [blackRing | [blackBase | [empty]]]], [blackRing | [blackBase | [empty]]]],
-            [[whiteRing | [empty]],[empty],[blackBall | [blackRing | [empty]]],[empty],[blackBall | [blackRing | [blackBase | [empty]]]]],
+            [[empty],[empty],[whiteRing | [empty]],[blackBall | [blackRing | [blackBase | [empty]]]], [blackRing | [blackBase | [empty]]]],
+            [[empty],[empty], [empty],[empty],[blackBall | [blackRing | [blackBase | [empty]]]]],
             [[whiteRing | [empty]],[empty],[whiteBall | [whiteRing | [empty]]],[empty],[blackRing | [empty]]],
             [[whiteBall | [whiteRing | [whiteBase | [empty]]]],[whiteRing | [empty]],[blackBall | [blackRing | [empty]]],[empty],[empty]],
-            [[whiteBall | [whiteRing | [whiteBase | [empty]]]],[whiteBall | [whiteRing | [whiteBase | [empty]]]],[whiteBall | [whiteRing | [empty]]],[empty],[empty]]
+            [[whiteBall | [whiteRing | [whiteBase | [empty]]]],[whiteRing | [whiteBase | [empty]]],[whiteRing | [empty]],[empty],[empty]]
         ], 
         [ %PecasDeCadaJogador
-            [whiteRing],%White
+            [],%White
             [blackRing,blackRing,blackRing] %Black
         ]
     ]
@@ -69,15 +69,15 @@ intermediateMapV3(
 endMap(
     [
         [ %Tabuleiro
-            [[],[],[],[blackBall | [blackRing | [blackBase | []]]],[blackBall | [blackRing | [blackBase | []]]]],
-            [[],[],[],[],[blackBall | [blackRing | [blackBase | []]]]],
-            [[],[],[],[],[]],
-            [[blackBall | [whiteRing | [whiteBase | []]]],[],[],[],[]],
-            [[blackBall | [whiteRing | [whiteBase | []]]],[blackBall | [whiteRing | [whiteBase | []]]],[],[],[]]
+            [[empty],[empty],[whiteBall | [whiteRing | [empty]]],[blackRing | [blackBase | [empty]]], [blackRing | [blackBase | [empty]]]],
+            [[empty],[empty], [empty],[empty],[blackRing | [blackBase | [empty]]]],
+            [[whiteRing | [empty]],[empty],[whiteBall | [whiteRing | [empty]]],[empty],[blackRing | [empty]]],
+            [[blackBall | [blackRing | [whiteRing | [whiteBase | [empty]]]]],[whiteBall | [whiteRing | [empty]]],[blackRing | [empty]],[empty],[empty]],
+            [[blackBall | [blackRing | [whiteBase | [empty]]]],[blackBall | [blackRing | [whiteBase | [empty]]]],[whiteRing | [empty]],[empty],[empty]]
         ], 
         [ %PecasDeCadaJogador
-            [whiteRing,whiteRing,whiteRing,whiteRing,whiteRing],%White
-            [blackRing,blackRing,blackRing,blackRing,blackRing] %Black
+            [whiteRing, whiteRing],%White
+            [] %Black
         ]
     ]
 ).
