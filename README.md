@@ -278,9 +278,64 @@ gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
         ;
         won(Winner1)
     ).
+
+gameLoop(GameState,'Player','Com',Level):- %Each player has a turn in a loop
+    display_game(GameState,'White'), %Displays game
+    player_moveWrapped(GameState,'White',NewGameState,Won1),
+    (Won1 = 'True' -> HasWon = 'True', Winner1 = 'Black' ; game_over(NewGameState,'White',HasWon), Winner1 = 'White', display_game(NewGameState,'Black')),
+    (HasWon = 'False' ->  
+        com_moveWrapped(NewGameState,'Black',Level,NewGameState2,Won2),
+        (Won2 = 'True' -> HasWon2 = 'True', Winner2 = 'White' ; game_over(NewGameState2,'Black',HasWon2), Winner2 = 'Black'),
+        (HasWon2 = 'False' ->
+            gameLoop(NewGameState2,'Player','Com',Level) %Recursive call to continue to next player turns
+            ; 
+            display_game(NewGameState2,'White'),
+            won(Winner2)
+        )
+        ;
+        won(Winner1)
+    )
+    .
+
+gameLoop(GameState,'Com','Player',Level):- %Each player has a turn in a loop
+    display_game(GameState,'White'), %Displays game
+    com_moveWrapped(GameState,'White',Level,NewGameState,Won1),
+    (Won1 = 'True' -> HasWon = 'True', Winner1 = 'Black' ; game_over(NewGameState,'White',HasWon), Winner1 = 'White', display_game(NewGameState,'Black')),
+    (HasWon = 'False' ->  
+        player_moveWrapped(NewGameState,'Black',NewGameState2,Won2),
+        (Won2 = 'True' -> HasWon2 = 'True', Winner2 = 'White' ; game_over(NewGameState2,'Black',HasWon2), Winner2 = 'Black'),
+        (HasWon2 = 'False' ->
+            gameLoop(NewGameState2,'Com','Player',Level) %Recursive call to continue to next player turns
+            ; 
+            display_game(NewGameState2,'White'),
+            won(Winner2)
+        )
+        ;
+        won(Winner1)
+    )
+    .
+
+
+gameLoop(GameState,'Com','Com',Level):- %Each player has a turn in a loop
+    display_game(GameState,'White'), %Displays game
+    com_moveWrapped(GameState,'White',Level,NewGameState,Won1),
+    (Won1 = 'True' -> HasWon = 'True', Winner1 = 'Black' ; game_over(NewGameState,'White',HasWon), Winner1 = 'White', display_game(NewGameState,'Black')),
+    (HasWon = 'False' ->  
+        com_moveWrapped(NewGameState,'Black',Level,NewGameState2,Won2),
+        (Won2 = 'True' -> HasWon2 = 'True', Winner2 = 'White' ; game_over(NewGameState2,'Black',HasWon2), Winner2 = 'Black'),
+        (HasWon2 = 'False' ->
+            gameLoop(NewGameState2,'Com','Com',Level) %Recursive call to continue to next player turns
+            ; 
+            display_game(NewGameState2,'White'),
+            won(Winner2)
+        )
+        ;
+        won(Winner1)
+    )
+    .
 ```
 
-For each play, player_moveWrapped, a wrapper on player_move, is called.
+For each play, player_moveWrapped, a wrapper on player_move, is called. If its Computers move it calls com_moveWrapped instead which calls choose_move (explained later in the Computer part) and then handles this move.
 A wrapper is needed in this case because the game can end immediately if there are no move valid moves.
 player_move is as such:
 ```
