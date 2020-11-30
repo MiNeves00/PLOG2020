@@ -165,11 +165,10 @@ A initial menu was created to let the user choose the game mode.
 ![menu](./docs/menu.png  "Menu")
 
 ## Valid Moves List
-To determine the valid moves list at any given time, it is necessary to know the current player and wether it is a ring move or a ball move. With that information, the board is scanned searching for pieces that can be moved, using the predicates isRingMoveStartValid and isBallMoveStartValid, which assess if at the starting position for a hypothetical move is a correct piece that should be moved, and scanned again searching for valid destinations using isRingMoveEndValid and isBallMoveEndValid, this last one assessing if the destination space of said move has a ring of the correct color, if the destionation position is adjacent to the starting position and, in case of a vault, if the opponent balls vaulted over can be relocated.
+To determine the valid moves list at any given time, it is necessary to know the current player and wether it is a ring move or a ball move. With that information, the board is scanned searching for pieces that can be moved, using the predicates ```isRingMoveStartValid``` and ```isBallMoveStartValid```, which assess if at the starting position for a hypothetical move is a correct piece that should be moved, and scanned again searching for valid destinations using ```isRingMoveEndValid``` and ```isBallMoveEndValid```, this last one assessing if the destination space of said move has a ring of the correct color, if the destionation position is adjacent to the starting position and, in case of a vault, if the opponent balls vaulted over can be relocated.
 
 A move is represented by a list of the starting and ending coordinates and the piece to be moved, as so:
-**[StartingColumn, StartingRow, DestinationColumn, DestinationRow, Piece]**
-This information is displayed before a move is inserted by the player, so that they know what are the valid moves they can insert.
+```[StartingColumn, StartingRow, DestinationColumn, DestinationRow, Piece]```.
 
 For example, a list of valid moves at a given time would be:
 
@@ -179,14 +178,61 @@ For example, a list of valid moves at a given time would be:
 
 Play flow is determined by the gameLoop predicate.
 
-![game loop](./docs/gameLoop_prolog.png  "gameLoop Code")
+```
+%gameLoop(-GameState, +TypeOfPlayer1, +TypeOfPlayer2)
+gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
+    display_game(GameState,'White'), %Displays game
+    player_moveWrapped(GameState,'White',NewGameState,Won1),
+    (Won1 = 'True' -> HasWon = 'True', Winner1 = 'Black' ; game_over(NewGameState,'White',HasWon), Winner1 = 'White'),
+    (HasWon = 'False' ->  
+        display_game(NewGameState,'Black'),
+        player_moveWrapped(NewGameState,'Black',NewGameState2,Won2),
+        (Won2 = 'True' -> HasWon2 = 'True', Winner2 = 'White' ; game_over(NewGameState2,'Black',HasWon2), Winner2 = 'Black'),
+        (HasWon2 = 'False' ->
+            gameLoop(NewGameState2,'Player','Player') %Recursive call to continue to next player turns
+            ; 
+            won(Winner2)
+        )
+        ;
+        won(Winner1)
+    ).
+```
 
-For each play, player_moveWrapped, a wrapper on player_move, is called. 
-player_move calls valid_moves for the rings and prints those valid moves on the screen and then ringStep is called. ringStep will call both readRingMove, that reads the player move, coordinate by coordinate, returning a move, and handleRingMove, which will verify if the move is valid and then call move(+GameState,+Move,-NewGameState), which will return the new game state for after the move is played. After this, display_game will be called so the player can visually understand what they played.
-This same process is repeated for the ball part of the move.
+For each play, player_moveWrapped, a wrapper on player_move, is called.
+A wrapper is needed in this case because the game can end immediately if there are no move valid moves.
+player_move is as such:
+```
+%player_move(+GameState,+Player,-NewGameState)
+player_move(GameState,Player,NewGameState):-
+    nl,
+    (Player = 'White' -> 
+        valid_moves(GameState,'WhiteRing',ListOfRingMoves)
+    ;
+        valid_moves(GameState,'BlackRing',ListOfRingMoves)
+    ),!,
+    (ListOfRingMoves = [] -> fail; UselessVar = 0),
+    value(GameState,Player,Value),
+    ringStep(GameState,Player,IntermediateGameState),
+    display_game(IntermediateGameState,Player),
+    (Player = 'White' -> 
+        valid_moves(IntermediateGameState,'WhiteBall',ListOfBallMoves)
+    ;
+        valid_moves(IntermediateGameState,'BlackBall',ListOfBallMoves)
+    ),!,
+    (ListOfBallMoves = [] -> fail; UselessVar2 = 0),
+    ballStep(IntermediateGameState,Player,NewGameState),
+    value(NewGameState,Player,NewValue).
+```
+```valid_moves```, which is described in the **Valid Moves List** is called for the rings then ```value``` is called, to assess the current game state and give it a numerical value. This will be detailed in the **Computer Play** section.
+```player_move``` is divided in ```ringStep``` and ```ballStep```.
+```ringStep``` will call both ```readRingMove```, that reads the player move, coordinate by coordinate, returning a move, and ```handleRingMove```, which will verify if the move is valid, meaning the starting position has a ring of the players colour on top to be moved and the destination has no ball on top. This is done using ```getValueInMapStackPosition``` ```getStackInListPosition``` predicates, that return the value on top of a given position on the board. If the move is valid, ```move``` is called, making use of ```removeValueFromMapUsingGameState``` and ```addValueInMap``` to remove the ring from one place and place it on another returning the new game state for after the move is played. After this, ```display_game``` will be called so the player can visually understand what they played.
+This same process is repeated for the ball part of the move, with ```ballStep``` being responsible for reading and validating the ball move. In the case of the ball, because their is a special move, the **vault** (described in the **Mitsudomoe** section), ```isBallMoveValid```, used to validate the move, needs to verify if the move is a vault and if it is valid one, meaning if the opponent balls vaulted over can be relocated. This is done by ```isBallVaultValid``` which checks if the destination has a ring of the players colour on top and if every space between the starting and the end spaces have balls. Also, if there are opponent balls being vaulted over, their position is saved and ```checkIfCanRelocate``` checks if they can relocate and saves the valid relocation moves. These moves are checked in ```handleBallMove```: if they are an empty list, there is no vault, but if they have moves, a valid vault was played and the opponents balls must be relocated. ```relocateStep``` will read the relocation moves, check against the valid relocation moves and, if valid, move the opponents balls. After each relocation, all the valid moves with the same starting position as the relocation just played are removed from the valid relocation moves list, as are the ones with the same destination.
+This concludes the move process.
+
 
 ## End of Game
-After every move, the predicate game_over is called, to check if the current game state corresponds to a winning one for the player that just played. This is done by calling areBallsOnOppositeBase, which will scan the opposing players home spaces to check if they are all being occupied by the players balls.
+After every move, the predicate ```game_over``` is called, to check if the current game state corresponds to a winning one for the player that just played. This is done by calling ```areBallsOnOppositeBase```, which will scan the opposing players home spaces to check if they are all being occupied by the players balls. It returns a boolean to the caller, ```gameLoop```, which ends the game if true.
+Besides that, ```player_moveWrapper``` could also end the game immediately if there are no valid moves.
 
 ## Board Evaluation
 After every move, the game state is evaluated in order to attribute a value to each player. 
@@ -195,9 +241,11 @@ After every move, the game state is evaluated in order to attribute a value to e
 
 ## Conclusion
 This projects objective was to apply logic programming theory in Prolog in the form of a board game. 
-The main difficulties encountered were about specific moves implementations, due to Prolog's recursive nature and backtracking, and also in the debugging process.
-The main aspect that could be improved is 
+The main difficulties encountered were about specific moves as the vault and its implementation, due to Prolog's recursive nature and backtracking, and also in the debugging process.
+The main aspect that could be improved is that the Game State internal representaion could include the player and even the valid moves, as is just includes the board and pieces on hand for now. Also, the API requested should have respected. 
 To conclude, the project was developed with success, with the final result being a correctly implemented game, and it was very educational helping us learn more about logic programming.
+
+When it comes to work distribution, Miguel did about 60% of the work and José 40%.
 
 ## Documentation
 
