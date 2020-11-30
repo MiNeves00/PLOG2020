@@ -3,46 +3,105 @@
 gameStart('Player','Player'):-
     write('Starting Player vs Player game...'),
     nl,
-    intermediateMap(GameState), %Gets initial game state
+    initial(GameState), %Gets initial game state
     gameLoop(GameState,'Player','Player').
 
-/*
+
 gameStart('Player','Com'):- %To Do
     write('Starting Player vs Com game...'),
     nl,
-    initial(InitialMap),
-    write('Initialized...'),
-    nl,
-    display_game(InitialMap).
+    initial(GameState), %Gets initial game state
+    readLevel(Level),
+    readWhosWho(White,Black),
+    gameLoop(GameState, White, Black, Level).
 
 gameStart('Com','Com'):- %To Do
-    write('Starting Com vs Com game...'),
+    write('Starting Player vs Com game...'),
     nl,
-    initial(InitialMap),
-    write('Initialized...'),
-    nl,
-    display_game(InitialMap).
-*/
+    initial(GameState), %Gets initial game state
+    readLevel(Level),
+    gameLoop(GameState, 'Com', 'Com', Level).
+
+
 
 /**Game Loop*/
 %gameLoop(-GameState, +TypeOfPlayer1, +TypeOfPlayer2)
 gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
     display_game(GameState,'White'), %Displays game
     player_moveWrapped(GameState,'White',NewGameState,Won1),
-    (Won1 = 'True' -> HasWon = 'True', Winner1 = 'Black' ; game_over(NewGameState,'White',HasWon), Winner1 = 'White'),
+    (Won1 = 'True' -> HasWon = 'True', Winner1 = 'Black' ; game_over(NewGameState,'White',HasWon), Winner1 = 'White', display_game(NewGameState,'Black')),
     (HasWon = 'False' ->  
-        display_game(NewGameState,'Black'),
         player_moveWrapped(NewGameState,'Black',NewGameState2,Won2),
         (Won2 = 'True' -> HasWon2 = 'True', Winner2 = 'White' ; game_over(NewGameState2,'Black',HasWon2), Winner2 = 'Black'),
         (HasWon2 = 'False' ->
             gameLoop(NewGameState2,'Player','Player') %Recursive call to continue to next player turns
             ; 
+            display_game(NewGameState2,'White'),
             won(Winner2)
         )
         ;
         won(Winner1)
     )
     .
+
+
+gameLoop(GameState,'Player','Com',Level):- %Each player has a turn in a loop
+    display_game(GameState,'White'), %Displays game
+    player_moveWrapped(GameState,'White',NewGameState,Won1),
+    (Won1 = 'True' -> HasWon = 'True', Winner1 = 'Black' ; game_over(NewGameState,'White',HasWon), Winner1 = 'White', display_game(NewGameState,'Black')),
+    (HasWon = 'False' ->  
+        com_moveWrapped(NewGameState,'Black',Level,NewGameState2,Won2),
+        (Won2 = 'True' -> HasWon2 = 'True', Winner2 = 'White' ; game_over(NewGameState2,'Black',HasWon2), Winner2 = 'Black'),
+        (HasWon2 = 'False' ->
+            gameLoop(NewGameState2,'Player','Com',Level) %Recursive call to continue to next player turns
+            ; 
+            display_game(NewGameState2,'White'),
+            won(Winner2)
+        )
+        ;
+        won(Winner1)
+    )
+    .
+
+gameLoop(GameState,'Com','Player',Level):- %Each player has a turn in a loop
+    display_game(GameState,'White'), %Displays game
+    com_moveWrapped(GameState,'White',Level,NewGameState,Won1),
+    (Won1 = 'True' -> HasWon = 'True', Winner1 = 'Black' ; game_over(NewGameState,'White',HasWon), Winner1 = 'White', display_game(NewGameState,'Black')),
+    (HasWon = 'False' ->  
+        player_moveWrapped(NewGameState,'Black',NewGameState2,Won2),
+        (Won2 = 'True' -> HasWon2 = 'True', Winner2 = 'White' ; game_over(NewGameState2,'Black',HasWon2), Winner2 = 'Black'),
+        (HasWon2 = 'False' ->
+            gameLoop(NewGameState2,'Com','Player',Level) %Recursive call to continue to next player turns
+            ; 
+            display_game(NewGameState2,'White'),
+            won(Winner2)
+        )
+        ;
+        won(Winner1)
+    )
+    .
+
+
+gameLoop(GameState,'Com','Com',Level):- %Each player has a turn in a loop
+    display_game(GameState,'White'), %Displays game
+    com_moveWrapped(GameState,'White',Level,NewGameState,Won1),
+    (Won1 = 'True' -> HasWon = 'True', Winner1 = 'Black' ; game_over(NewGameState,'White',HasWon), Winner1 = 'White', display_game(NewGameState,'Black')),
+    (HasWon = 'False' ->  
+        com_moveWrapped(NewGameState,'Black',Level,NewGameState2,Won2),
+        (Won2 = 'True' -> HasWon2 = 'True', Winner2 = 'White' ; game_over(NewGameState2,'Black',HasWon2), Winner2 = 'Black'),
+        (HasWon2 = 'False' ->
+            gameLoop(NewGameState2,'Com','Com',Level) %Recursive call to continue to next player turns
+            ; 
+            display_game(NewGameState2,'White'),
+            won(Winner2)
+        )
+        ;
+        won(Winner1)
+    )
+    .
+
+
+
 
 /**Player Move*/
 %Move = [ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece]
@@ -62,7 +121,6 @@ player_move(GameState,Player,NewGameState):-
         valid_moves(GameState,'BlackRing',ListOfRingMoves)
     ),!,
     (ListOfRingMoves = [] -> fail; UselessVar = 0),
-    value(GameState,Player,Value),
     ringStep(GameState,Player,IntermediateGameState),
     display_game(IntermediateGameState,Player),
     (Player = 'White' -> 
@@ -71,8 +129,7 @@ player_move(GameState,Player,NewGameState):-
         valid_moves(IntermediateGameState,'BlackBall',ListOfBallMoves)
     ),!,
     (ListOfBallMoves = [] -> fail; UselessVar2 = 0),
-    ballStep(IntermediateGameState,Player,NewGameState),
-    value(NewGameState,Player,NewValue).
+    ballStep(IntermediateGameState,Player,NewGameState).
 
 
 
@@ -87,7 +144,48 @@ ballStep(GameState, Player, NewGameState):-
     handleBallMove(GameState,BallMove,Player,NewGameState).
 
 
-/**Handle Move (for now not accurate) TO DO*/
+/**Com Move*/
+%com_moveWrapped(+GameState,+Player,+Level,-NewGameState,-Won)
+com_moveWrapped(GameState,Player,Level,NewGameState,Won):-
+    com_move(GameState,Player,Level,NewGameState), Won = 'False'.
+
+com_moveWrapped(GameState,Player,Level,NewGameState,Won):- Won = 'True'.
+
+%com_move(+GameState,+Player,Level,-NewGameState)
+com_move(GameState,Player,Level,NewGameState):-
+    nl,
+    (Player = 'White' -> 
+        valid_moves(GameState,'WhiteRing',ListOfRingMoves)
+    ;
+        valid_moves(GameState,'BlackRing',ListOfRingMoves)
+    ),!,
+    (ListOfRingMoves = [] -> fail; UselessVar = 0),
+    ringStepCom(GameState,Player,Level,ListOfRingMoves,IntermediateGameState),
+    display_game(IntermediateGameState,Player),
+    (Player = 'White' -> 
+        valid_moves(IntermediateGameState,'WhiteBall',ListOfBallMoves)
+    ;
+        valid_moves(IntermediateGameState,'BlackBall',ListOfBallMoves)
+    ),!,
+    (ListOfBallMoves = [] -> fail; UselessVar2 = 0),
+    ballStepCom(IntermediateGameState,Player,Level,ListOfBallMoves,NewGameState).
+
+
+%ringStepCom(+GameState, +Player, +Level, +ListOfRingMoves, -NewGameState)
+ringStepCom(GameState,Player,Level,ListOfRingMoves,NewGameState):-
+    choose_moveRing(GameState,Player,Level,ListOfRingMoves, RingMove),
+    handleRingMove(GameState,RingMove,Player,NewGameState).
+
+%ballStepCom(+GameState, +Player, +Level, +ListOfBallMoves , -NewGameState)
+ballStepCom(GameState, Player, Level,ListOfBallMoves, NewGameState):-
+    choose_moveBall(GameState,Player,Level,ListOfBallMoves, BallMove),
+    handleBallMoveCom(GameState,BallMove,Player,Level,NewGameState).
+
+
+
+
+
+/**Handle Move*/
 %handleRingMove(+GameState,+Move,+Player,-NewGameState) TO DO
 handleRingMove(GameState,[-1,-1,ColIndexEnd,RowIndexEnd,Piece], Player, NewGameState):-
     isRingMoveValid(GameState,[-1,-1,ColIndexEnd,RowIndexEnd,Piece], Player,Valid),
@@ -123,13 +221,14 @@ handleBallMove(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Pi
         ballStep(GameState,Player,NewGameState)
     ).
 
+
 %relocateStep(+GameState,+Moves,+Player,-NewGameState)
 relocateStep(GameState, [], _Player, NewGameState) :-
     NewGameState = GameState.
 
 relocateStep(GameState, Moves, Player, NewGameState) :-
     nl,
-    write('Opponent balls must be relocated'),
+    write('Opponent balls must be relocated'),nl,
     write('Insert relocating moves'),
     nl,
     readBallMove(Player, Move),
@@ -141,6 +240,44 @@ relocateStep(GameState, Moves, Player, NewGameState) :-
     ;
         relocateStep(GameState, Moves, Player, NewGameState)
     ).
+
+
+
+%handleBallMoveCom(+GameState,+Move,+Player,+Level,-NewGameState) 
+handleBallMoveCom(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,Level,NewGameState):-
+    isBallMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece],Player,Valid,ValidRelocateMoves),
+    (Valid = 'True' -> 
+        move(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,Piece], Player, IntermediateGameState),
+        (Player = 'White' ->
+            relocateStepCom(IntermediateGameState,ValidRelocateMoves,'Black',Level,NewGameState)
+        ;
+            relocateStepCom(IntermediateGameState,ValidRelocateMoves, 'White',Level,NewGameState)
+        )
+    ; 
+        nl,write('Select a ball to move'),nl,nl,
+        ballStepCom(GameState,Player,Level,ValidRelocateMoves,NewGameState)
+    ).
+
+
+
+%relocateStepCom(+GameState,+Moves,+Player,Level,-NewGameState)
+relocateStepCom(GameState, [], _Player,Level, NewGameState) :-
+    NewGameState = GameState.
+
+relocateStepCom(GameState, Moves, Player,Level, NewGameState) :-
+    nl,
+    write('Opponent balls must be relocated'),nl,
+    choose_moveBallRelocate(GameState,Player,Level,Moves,Move),
+    removeMoves(Moves, Move, [], NewMoves),
+    isBallRelocateEndValid(GameState,Move,Player,ValidEnd),
+    (ValidEnd = 'True' ->
+        move(GameState, Move, Player, IntermediateGameState),
+        relocateStepCom(IntermediateGameState, NewMoves, Player,Level, NewGameState)
+    ;
+        relocateStepCom(GameState, Moves, Player,Level, NewGameState)
+    ).
+
+
 
 
 removeMoves([], _Move, OldMoves, NewMoves) :-
@@ -303,15 +440,14 @@ isBallMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,P
         ) 
     ).
 
-/** TODO Add error messages */
 
-isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,3,0,Piece],'White','False').
-isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,4,0,Piece],'White','False').
-isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,4,1,Piece],'White','False').
+isBallMoveStartValid(GameState,[3,0,ColIndexEnd,RowIndexEnd,Piece],'White','False').
+isBallMoveStartValid(GameState,[4,0,ColIndexEnd,RowIndexEnd,Piece],'White','False').
+isBallMoveStartValid(GameState,[4,1,ColIndexEnd,RowIndexEnd,Piece],'White','False').
 
-isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,0,3,Piece],'Black','False').
-isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,0,4,Piece],'Black','False').
-isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,1,4,Piece],'Black','False').
+isBallMoveStartValid(GameState,[0,3,ColIndexEnd,RowIndexEnd,Piece],'Black','False').
+isBallMoveStartValid(GameState,[0,4,ColIndexEnd,RowIndexEnd,Piece],'Black','False').
+isBallMoveStartValid(GameState,[1,4,ColIndexEnd,RowIndexEnd,Piece],'Black','False').
 
 isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,_ColIndexEnd,_RowIndexEnd,Piece],Player,ValidStart):-
     getBoard(GameState,Board),
@@ -705,18 +841,16 @@ valid_moves(GameState, 'BlackBall', ListOfMoves):-
 
 
 
-%ringValidMoves(+GameState, +Player, -ListOfMoves) %TODO
+%ringValidMoves(+GameState, +Player, -ListOfMoves)
 ringValidMoves(GameState, 'WhiteRing', ListOfMoves):-
     ringStartValidMoves(GameState, 'White', 4, 4, [], ListOfStartMoves),
     ringEndValidMovesWraper(GameState, 'White', ListOfStartMoves, [], ListOfEndMoves),
-    ListOfMoves = ListOfEndMoves,
-    nl,nl,write('||||||LIST OF RING MOVES COL,ROW|||||'),nl,write(ListOfMoves),nl.
+    ListOfMoves = ListOfEndMoves.
 
 ringValidMoves(GameState, 'BlackRing', ListOfMoves):-
     ringStartValidMoves(GameState, 'Black', 4, 4, [], ListOfStartMoves),
     ringEndValidMovesWraper(GameState, 'Black', ListOfStartMoves, [], ListOfEndMoves),
-    ListOfMoves = ListOfEndMoves,
-    nl,nl,write('||||||LIST OF RING MOVES COL,ROW|||||'),nl,write(ListOfMoves),nl.
+    ListOfMoves = ListOfEndMoves.
 
 
 %ringStartValidMoves(+GameState, +Player, +Col, +Row, ListOfStartMoves, -NewListOfStartMoves) [Col,Row]
@@ -825,14 +959,12 @@ ringEndValidMoves(GameState, Player, ColStart, RowStart, Col, Row, ListOfEndMove
 ballValidMoves(GameState, 'WhiteBall', ListOfMoves):-
     ballStartValidMoves(GameState, 'White', 4, 4, [], ListOfStartMoves),
     ballEndValidMovesWraper(GameState, 'White', ListOfStartMoves, [], ListOfEndMoves),
-    ListOfMoves = ListOfEndMoves,
-    nl,nl,write('||||||LIST OF BALL MOVES COL,ROW|||||'),nl,write(ListOfMoves),nl. 
+    ListOfMoves = ListOfEndMoves. 
 
 ballValidMoves(GameState, 'BlackBall', ListOfMoves):-
     ballStartValidMoves(GameState, 'Black', 4, 4, [], ListOfStartMoves),
     ballEndValidMovesWraper(GameState, 'Black', ListOfStartMoves, [], ListOfEndMoves),
-    ListOfMoves = ListOfEndMoves,
-    nl,nl,write('||||||LIST OF BALL MOVES COL,ROW|||||'),nl,write(ListOfMoves),nl.   
+    ListOfMoves = ListOfEndMoves.   
 
 
 %ballStartValidMoves(+GameState, +Player, +Col, +Row, ListOfStartMoves, -NewListOfStartMoves) [Col,Row]
@@ -993,12 +1125,10 @@ isBallRelocateValid(GameState,[ColStart, RowStart,ColEnd,RowEnd,blackBall],'Blac
         ValidEnd = 'False'
     ).
 
-/**Check Win TO DO*/
+/**Check Win*/
 
 %game_over(+GameState,+Player,-HasWon)
 game_over(GameState,Player,HasWon):-
-    nl,
-    write('Checking if its a win'),
     getBoard(GameState,Board),
     areBallsOnOpositeBase(Board,Player,Bool),
     HasWon = Bool.
@@ -1055,12 +1185,12 @@ getOpponentBaseStack(Board,'Black',Base1,Base2,Base3):-
 
 %won(+WhoWon)
 won('White'):-
-    nl,
-    write('White wins'),nl.
+    nl,nl,nl,
+    write('|| White wins ||'),nl,nl,nl.
 
 won('Black'):-
-    nl,
-    write('Black wins'),nl.
+    nl,nl,nl,
+    write('|| Black wins ||'),nl,nl,nl.
 
 
 

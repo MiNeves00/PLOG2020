@@ -61,3 +61,83 @@ getStackInListPosition([Head|Tail],Col,Value):-
         Col > 0,
         Col1 is Col -1,
         getStackInListPosition(Tail,Col1,Value).
+
+
+
+/**Get Balls Of Player Colour*/
+%getBallsPositions(+GameState,+Player,-BallPos1,-BallPos2,-BallPos3)
+getBallsPositions([Board|Pieces],Player,BallPos1,BallPos2,BallPos3):-
+    getBallsPositionsAux(Board,Player,BallPos1Row,BallPos1Col,4,4),
+    Num1 is BallPos1Row-1,
+    getBallsPositionsAux(Board,Player,BallPos2Row,BallPos2Col,Num1,BallPos1Col),
+    Num2 is BallPos2Row-1,
+    getBallsPositionsAux(Board,Player,BallPos3Row,BallPos3Col,Num2,BallPos2Col),
+    BallPos1 = [BallPos1Row|BallPos1Col],
+    BallPos2 = [BallPos2Row|BallPos2Col],
+    BallPos3 = [BallPos3Row|BallPos3Col].
+    
+
+
+
+%getBallsPositionsAux(+Board,+Player,-BallRow1,-BallCol1,+Row,+Col)
+getBallsPositionsAux(Board,Player,BallRow1,BallCol1,-1,-1):-
+    getValueInMapStackPosition(Board,0,0,Stack),
+    isBallOfColorOnTop(Stack,Player,Bool),
+    (Bool = 'True' -> 
+        BallRow1 = 0, BallCol1 = 0
+    ;
+        write('panic getting balls')
+    ).
+
+getBallsPositionsAux(Board,Player,BallRow1,BallCol1,-1,Col):-
+    Col > -1, Col1 is Col-1,
+    getBallsPositionsAux(Board,Player,BallRow1,BallCol1,4,Col1).
+
+getBallsPositionsAux(Board,Player,BallRow1,BallCol1,Row,Col):-
+    Row > -1, Row1 is Row-1,
+    getValueInMapStackPosition(Board,Row,Col,Stack),
+    isBallOfColorOnTop(Stack,Player,Bool),
+    (Bool = 'True' -> 
+        BallRow1 = Row, BallCol1 = Col
+    ;
+        getBallsPositionsAux(Board,Player,BallRow1,BallCol1,Row1,Col)
+    ).
+
+max_list([H|T], Max) :-
+        max_list(T, H, Max).
+
+max_list([], Max, Max).
+
+max_list([H|T], Max0, Max) :-
+        Max1 is max(H, Max0),
+        max_list(T, Max1, Max).
+
+min_list([H|T], Min) :-
+        min_list(T, H, Min).
+
+min_list([], Min, Min).
+
+min_list([H|T], Min0, Min) :-
+        Min1 is min(H, Min0),
+        min_list(T, Min1, Min).
+
+
+nth0(0, [H|_], H).
+
+nth0(Index, [H | List], Elem) :-
+  Index > 0,
+  NextIndex is Index - 1,
+  nth0(NextIndex, List, Elem).
+
+
+indexOf([Element|_], Element, 0):- !.
+indexOf([_|Tail], Element, Index):-
+  indexOf(Tail, Element, Index1),
+  !,
+  Index is Index1+1.
+
+
+ reverseL([],Z,Z).
+
+ reverseL([H|T],Z,Acc) :- reverseL(T,Z,[H|Acc]).
+
