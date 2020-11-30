@@ -3,9 +3,14 @@
 
 /**
 Hard Level
-Calculates the game state value of each move from the list of Valid Moves and tries to
-max this value, returns a move which maxes this
+
+Calls valueOfEachValidMoveRing to get a ListOfValues of the best possible value of the game (after a consequent ball move) for each ring move.
+
+Finally using all of these values now in ListOfValues 
+(which correspond to the best GameState value possible in case of a ring move of the index the same as the index in this ListOfValues after reversing ListOfValidMoves),
+it finds the ring move which maxes this value after the ring move followed by a ballmove and returns this ring move.
 */
+%choose_moveRing(+GameState, +Player, +Level, +ListOfValidMoves, -Move)​
 choose_moveRing(GameState,Player,3,ListOfValidMoves,Move):-
     valueOfEachValidMoveRing(GameState,Player,3,ListOfValidMoves,[],ListOfValues),
     max_list(ListOfValues,MaxValue),
@@ -15,8 +20,8 @@ choose_moveRing(GameState,Player,3,ListOfValidMoves,Move):-
 
 /**
 Medium Level
-Calculates the game state value of each move from the list of Valid Moves and tries to
-max this value, returns a move which maxes this
+
+Uses the same function as for dificulty Easy
 */
 choose_moveRing(GameState,Player,2,ListOfValidMoves,Move):-
     valueOfEachValidMoveRing(GameState,Player,1,ListOfValidMoves,[],ListOfValues),
@@ -27,7 +32,9 @@ choose_moveRing(GameState,Player,2,ListOfValidMoves,Move):-
 
 /**
 Easy Level
-Randomly returns a move to play from the list of Valid Moves
+
+Simillar to the Hard function however it call valueOfEachValidMoveRing with Level 1 which causes the evaluation of the best ballmove after each ringmove to be
+the one of easy level, calling choose_moveBall Easy version. Thus it won't make the best evaluation of the best ring move, making it easier for the opponent
 */
 choose_moveRing(GameState,Player,1,ListOfValidMoves,Move):-
     valueOfEachValidMoveRing(GameState,Player,1,ListOfValidMoves,[],ListOfValues),
@@ -40,9 +47,12 @@ choose_moveRing(GameState,Player,1,ListOfValidMoves,Move):-
 
 /**
 Hard Level
+
 Calculates the game state value of each move from the list of Valid Moves and tries to
-max this value, returns a move which maxes this
+max this value, first return a list of values indexed the same way as the ListOfValidMoves (after reversing the ListOfValidMoves).
+Then it returns the move which has the highest value. In case of a tie it returns the first one on the ListOfValidMoves.
 */
+%choose_moveBall(+GameState, +Player, +Level, +ListOfValidMoves, -Move)​
 choose_moveBall(GameState,Player,3,ListOfValidMoves,Move):-
     valueOfEachValidMoveBall(GameState,Player,ListOfValidMoves,[],ListOfValues),
     max_list(ListOfValues,MaxValue),
@@ -53,6 +63,7 @@ choose_moveBall(GameState,Player,3,ListOfValidMoves,Move):-
 
 /**
 Medium Level
+
 Calculates the game state value of each move from the list of Valid Moves and tries to
 max this value, returns a move which maxes this
 */
@@ -65,6 +76,7 @@ choose_moveBall(GameState,Player,2,ListOfValidMoves,Move):-
 
 /**
 Easy Level
+
 Randomly returns a move to play from the list of Valid Moves
 */
 choose_moveBall(GameState,Player,1,ListOfValidMoves,Move):-
@@ -77,9 +89,11 @@ choose_moveBall(GameState,Player,1,ListOfValidMoves,Move):-
 
 /**
 Hard Level
+
 Calculates the game state value of each move from the list of Valid Moves and tries to
 max this value, returns a move which maxes this
 */
+%choose_moveBallRelocate(+GameState, +Player, +Level, +ListOfValidMoves, -Move)​
 choose_moveBallRelocate(GameState,Player,3,ListOfValidMoves,Move):-
     valueOfEachValidMoveBall(GameState,Player,ListOfValidMoves,[],ListOfValues),
     min_list(ListOfValues,MinValue),
@@ -89,8 +103,8 @@ choose_moveBallRelocate(GameState,Player,3,ListOfValidMoves,Move):-
 
 /**
 Medium Level
-Calculates the game state value of each move from the list of Valid Moves and tries to
-minize this value so that the opponent gets the worst possible ball positioning, returns a move which minimizes this
+
+The same as Hard Level
 */
 choose_moveBallRelocate(GameState,Player,2,ListOfValidMoves,Move):-
     valueOfEachValidMoveBall(GameState,Player,ListOfValidMoves,[],ListOfValues),
@@ -102,7 +116,11 @@ choose_moveBallRelocate(GameState,Player,2,ListOfValidMoves,Move):-
 
 /**
 Easy Level
-Randomly returns a move to play from the list of Valid Moves
+
+Simillar to Hard in its flow.
+However instead of returning the best move it randomly returns a move to play from the list of Valid Moves.
+Actually its randomness is simply choosing always the move before the best one exept if its the move in position 0, 
+in which case it returns it
 */
 choose_moveBallRelocate(GameState,Player,1,ListOfValidMoves,Move):-
     valueOfEachValidMoveBall(GameState,Player,ListOfValidMoves,[],ListOfValues),
@@ -113,6 +131,11 @@ choose_moveBallRelocate(GameState,Player,1,ListOfValidMoves,Move):-
     nth0(Position1,RListOfValidMoves,Move).
 
 
+/**
+Calculates for each valid move the value of the GameState after this move and then saves it in a ListOfValues, 
+indexed the reversed way from the ListOfValidMoves
+Keeps calling itself until the ListOfValidMoves is empty
+*/
 %valueOfEachValidMoveBall(+GameState,+Player,+ListOfValidMoves,+OldListOfValues,-NewListOfValues)
 valueOfEachValidMoveBall(GameState,Player,[],OldListOfValues,OldListOfValues).
 
@@ -121,7 +144,12 @@ valueOfEachValidMoveBall(GameState,Player,[ValidMove|TailListOfValidMoves],OldLi
     value(NewGameState,Player,Value),
     valueOfEachValidMoveBall(GameState,Player,TailListOfValidMoves,[Value|OldListOfValues],NewListOfValues).
 
-
+/**
+For each valid ring move calculates the NewGameState using that move and then using this
+NewGameState it calculates all valid ball moves and it uses this valid ball moves to call
+chooseMoveBall to get the best ball move for that ring move and calculates NewGameStateBall using this.
+Returns a list of values with the values of the best possible ball moves for each ringMove, indexed the reversed way from the ListOfValidMoves
+*/
 %valueOfEachValidMoveRing(+GameState,+Player,Level,+ListOfValidMoves,+OldListOfValues,-NewListOfValues)
 valueOfEachValidMoveRing(GameState,Player,Level,[],OldListOfValues,OldListOfValues).
 
@@ -143,7 +171,14 @@ valueOfEachValidMoveRing(GameState,Player,Level,[ValidMove|TailListOfValidMoves]
 
 
 
-/**Evaluate GameState*/
+/*
+*Evaluate GameState
+
+Based on a GameState and on the player which is moving next calculates the value of this GameState,
+which simply means it calculates just how good is a GameState for said player. The higger this value the better for this player.
+This value increases based on proximity to the enemy base positions and in case a ball is on the enemy base it increases by 20 for each ball there,
+this is done in order to motivate playing the balls into the enemy base.
+*/
 %value(+GameState, +Player, -Value)​ Calculates value based on proximity of balls to enemy base
 value(GameState,'White',Value):-
     getBallsPositions(GameState,'White',[Row1|Col1],[Row2|Col2],[Row3|Col3]),
