@@ -33,6 +33,39 @@ intermediateMap(
     ]
 ).
 
+intermediateMapV2(
+    [
+        [ %Tabuleiro
+            [[empty],[blackRing | [empty]],[whiteRing | [empty]],[blackBall | [blackRing | [blackBase | [empty]]]], [blackRing | [blackBase | [empty]]]],
+            [[whiteRing | [empty]],[empty],[blackBall | [blackRing | [empty]]],[empty],[blackBall | [blackRing | [blackBase | [empty]]]]],
+            [[whiteRing | [empty]],[empty],[whiteBall | [whiteRing | [empty]]],[empty],[whiteBall| [whiteRing | [empty]]]],
+            [[whiteRing | [whiteBase | [empty]]],[whiteRing | [empty]],[blackBall | [blackRing | [empty]]],[empty],[empty]],
+            [[whiteBall | [whiteRing | [whiteBase | [empty]]]],[whiteBall | [whiteRing | [whiteBase | [empty]]]],[whiteBall | [whiteRing | [empty]]],[empty],[empty]]
+        ], 
+        [ %PecasDeCadaJogador
+            [whiteRing],%White
+            [blackRing,blackRing,blackRing] %Black
+        ]
+    ]
+).
+
+intermediateMapV3(
+    [
+        [ %Tabuleiro
+            [[empty],[blackBall | [blackRing | [blackBase | [empty]]]],[whiteRing | [empty]],[whiteBall | [whiteRing | [whiteBase | [empty]]]], [whiteBall | [whiteRing | [whiteBase | [empty]]]]],
+            [[whiteRing | [empty]],[empty],[blackBall | [blackRing | [empty]]],[empty],[blackRing | [empty]]],
+            [[whiteRing | [empty]],[empty],[whiteBall | [whiteRing | [empty]]],[empty],[whiteBall| [whiteRing | [empty]]]],
+            [[whiteRing | [whiteBase | [empty]]],[whiteRing | [empty]],[blackBall | [blackRing | [empty]]],[empty],[empty]],
+            [[blackRing | [blackBase | [empty]]],[blackBall | [blackRing | [blackBase | [empty]]]],[whiteBall | [whiteRing | [empty]]],[empty],[empty]]
+        ], 
+        [ %PecasDeCadaJogador
+            [whiteRing],%White
+            [blackRing,blackRing,blackRing] %Black
+        ]
+    ]
+).
+
+
 endMap(
     [
         [ %Tabuleiro

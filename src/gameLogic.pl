@@ -132,7 +132,7 @@ com_move(GameState,Player,Level,NewGameState):-
         valid_moves(GameState,'BlackRing',ListOfRingMoves)
     ),!,
     (ListOfRingMoves = [] -> fail; UselessVar = 0),
-    ringStep(GameState,Player,IntermediateGameState), %TO DO
+    ringStepCom(GameState,Player,Level,ListOfRingMoves,IntermediateGameState),
     display_game(IntermediateGameState,Player),
     (Player = 'White' -> 
         valid_moves(IntermediateGameState,'WhiteBall',ListOfBallMoves)
@@ -199,7 +199,7 @@ relocateStep(GameState, [], _Player, NewGameState) :-
 
 relocateStep(GameState, Moves, Player, NewGameState) :-
     nl,
-    write('Opponent balls must be relocated'),
+    write('Opponent balls must be relocated'),nl,
     write('Insert relocating moves'),
     nl,
     readBallMove(Player, Move),
@@ -374,13 +374,13 @@ isBallMoveValid(GameState,[ColIndexBegin,RowIndexBegin,ColIndexEnd,RowIndexEnd,P
     ).
 
 
-isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,3,0,Piece],'White','False').
-isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,4,0,Piece],'White','False').
-isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,4,1,Piece],'White','False').
+isBallMoveStartValid(GameState,[3,0,ColIndexEnd,RowIndexEnd,Piece],'White','False').
+isBallMoveStartValid(GameState,[4,0,ColIndexEnd,RowIndexEnd,Piece],'White','False').
+isBallMoveStartValid(GameState,[4,1,ColIndexEnd,RowIndexEnd,Piece],'White','False').
 
-isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,0,3,Piece],'Black','False').
-isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,0,4,Piece],'Black','False').
-isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,1,4,Piece],'Black','False').
+isBallMoveStartValid(GameState,[0,3,ColIndexEnd,RowIndexEnd,Piece],'Black','False').
+isBallMoveStartValid(GameState,[0,4,ColIndexEnd,RowIndexEnd,Piece],'Black','False').
+isBallMoveStartValid(GameState,[1,4,ColIndexEnd,RowIndexEnd,Piece],'Black','False').
 
 isBallMoveStartValid(GameState,[ColIndexBegin,RowIndexBegin,_ColIndexEnd,_RowIndexEnd,Piece],Player,ValidStart):-
     getBoard(GameState,Board),
@@ -774,7 +774,7 @@ valid_moves(GameState, 'BlackBall', ListOfMoves):-
 
 
 
-%ringValidMoves(+GameState, +Player, -ListOfMoves) %TODO
+%ringValidMoves(+GameState, +Player, -ListOfMoves)
 ringValidMoves(GameState, 'WhiteRing', ListOfMoves):-
     ringStartValidMoves(GameState, 'White', 4, 4, [], ListOfStartMoves),
     ringEndValidMovesWraper(GameState, 'White', ListOfStartMoves, [], ListOfEndMoves),

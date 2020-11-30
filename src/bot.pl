@@ -1,10 +1,15 @@
 /**Choose Move*/
 %choose_move(+GameState, +Player, +Level, +ListOfValidMoves, -Move)​
-choose_moveRing(GameState,Player,1,[Move|ListOfValidMoves],Move).
+choose_moveRing(GameState,Player,1,ListOfValidMoves,Move):-
+    valueOfEachValidMoveRing(GameState,Player,1,ListOfValidMoves,[],ListOfValues),
+    max_list(ListOfValues,MaxValue), nl,write('MAX: '),write(MaxValue),nl, %TO DO
+    indexOf(ListOfValues,MaxValue,Position), nl,write('Pos: '),write(Position),nl,
+    reverseL(ListOfValidMoves,RListOfValidMoves,[]),
+    nth0(Position,RListOfValidMoves,Move), nl,write('Move: '),write(Move),nl.
 
 
 choose_moveBall(GameState,Player,1,ListOfValidMoves,Move):-
-    valueOfEachValidMove(GameState,Player,ListOfValidMoves,[],ListOfValues), nl,write('Values: '),write(ListOfValues),nl,
+    valueOfEachValidMoveBall(GameState,Player,ListOfValidMoves,[],ListOfValues), nl,write('Values: '),write(ListOfValues),nl,
     max_list(ListOfValues,MaxValue), nl,write('MAX: '),write(MaxValue),nl,
     indexOf(ListOfValues,MaxValue,Position), nl,write('Pos: '),write(Position),nl,
     reverseL(ListOfValidMoves,RListOfValidMoves,[]),
@@ -12,22 +17,33 @@ choose_moveBall(GameState,Player,1,ListOfValidMoves,Move):-
 
 
 
-%valueOfEachValidMove(+GameState,+Player,+ListOfValidMoves,+OldListOfValues,-NewListOfValues)
-valueOfEachValidMove(GameState,Player,[],OldListOfValues,OldListOfValues).
+%valueOfEachValidMoveBall(+GameState,+Player,+ListOfValidMoves,+OldListOfValues,-NewListOfValues)
+valueOfEachValidMoveBall(GameState,Player,[],OldListOfValues,OldListOfValues).
 
-valueOfEachValidMove(GameState,Player,[ValidMove|TailListOfValidMoves],OldListOfValues,NewListOfValues):-
+valueOfEachValidMoveBall(GameState,Player,[ValidMove|TailListOfValidMoves],OldListOfValues,NewListOfValues):-
     move(GameState,ValidMove,Player,NewGameState),
     value(NewGameState,Player,Value),
-    valueOfEachValidMove(GameState,Player,TailListOfValidMoves,[Value|OldListOfValues],NewListOfValues).
+    valueOfEachValidMoveBall(GameState,Player,TailListOfValidMoves,[Value|OldListOfValues],NewListOfValues).
 
-%posOfHighestValue(+ListOfValues,MaxValue,+Index,-Pos)
-posOfHighestValue([MaxValue|TailListOfValues],MaxValue,0,0).
-posOfHighestValue([MaxValue|TailListOfValues],MaxValue,Index,Pos):- Pos is Index - 1.
 
-posOfHighestValue([H|TailListOfValues],MaxValue,Index,Pos):-
-    Index1 is Index+1,
-    posOfHighestValue(TailListOfValidMoves,MaxValue,Index1,Pos).
-    
+%valueOfEachValidMoveRing(+GameState,+Player,Level,+ListOfValidMoves,+OldListOfValues,-NewListOfValues)
+valueOfEachValidMoveRing(GameState,Player,Level,[],OldListOfValues,OldListOfValues).
+
+valueOfEachValidMoveRing(GameState,Player,Level,[ValidMove|TailListOfValidMoves],OldListOfValues,NewListOfValues):-
+    move(GameState,ValidMove,Player,NewGameState),
+    (Player = 'White' -> 
+        valid_moves(NewGameState,'WhiteBall',ListOfBallMoves)
+    ;
+        valid_moves(NewGameState,'BlackBall',ListOfBallMoves)
+    ),
+    (ListOfBallMoves = [] ->
+        valueOfEachValidMoveRing(GameState,Player,Level,TailListOfValidMoves,[0|OldListOfValues],NewListOfValues)
+    ;
+        choose_moveBall(GameState,Player,Level,ListOfBallMoves,BallMove),
+        move(NewGameState,BallMove,Player,NewBallGameState),
+        value(NewBallGameState,Player,Value),
+        valueOfEachValidMoveRing(GameState,Player,Level,TailListOfValidMoves,[Value|OldListOfValues],NewListOfValues)
+    ).
 
 
 
