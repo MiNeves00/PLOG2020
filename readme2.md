@@ -38,12 +38,40 @@ If at any point you cannot do either step, you lose.
 ## Internal Game Representation
 ### Board
 The board is represented internally using a three-dimensional matrix (list of lists of stacks). The outer 5x5 matrix represents the spaces on the board, and a stack is used in each space to represent the stack of pieces on that space. Initially, every stack has an ```empty``` identifier, except for the starting spaces of each player, which have a stack of ball on top of ring on top of base. This also is on top of the ```empty``` identifier.
+
+```
+[ %Tabuleiro
+    [[empty],[blackRing | [empty]],[whiteRing | [empty]],[blackBall | [blackRing | [blackBase | [empty]]]], [blackRing | [blackBase | [empty]]]],
+    [[whiteRing | [empty]],[empty],[blackBall | [blackRing | [empty]]],[empty],[blackBall | [blackRing | [blackBase | [empty]]]]],
+    [[whiteRing | [empty]],[empty],[whiteBall | [whiteRing | [empty]]],[empty],[whiteBall| [whiteRing | [empty]]]],
+    [[whiteRing | [whiteBase | [empty]]],[whiteRing | [empty]],[blackBall | [blackRing | [empty]]],[empty],[empty]],
+    [[whiteBall | [whiteRing | [whiteBase | [empty]]]],[whiteBall | [whiteRing | [whiteBase | [empty]]]],[whiteBall | [whiteRing | [empty]]],[empty],[empty]]
+    ]
+```
+
 ### Pieces
 Rings and Balls are represented by atoms: ```whiteRing``` and ```blackRing``` are the atoms used to represent rings and ```whiteBall``` and ```blackBall``` are the atoms used to represent balls. There are also special atoms ```empty```, that represents an empty space and ```whiteBase``` and ```blackBase```, which represent each players home spaces.
+
+```
+[ %PecasDeCadaJogador
+    [whiteRing],%White
+    [blackRing,blackRing,blackRing] %Black
+]
+```
 ### Pieces in Hand
 Each players pieces in hand is represented by a list of ring atoms.
 ### Current Player
 The current player is determined by a predicate gameLoop, that switches between players' turns.
+
+It proceds do display the game before the player moves any pieces, then it displays it after each move of each player whether its a ring or ball move.
+
+One iteration of gameLoop consists of a white player move (of both ring and ball) and a black player move (also of both ring and ball).
+
+In case a player is left without any valid moves available the predicate player_moveWrapped returns True in the Variable Won which then proceds to terminate the game with the opponent winning.
+
+If the player has not yet lost due to lack of available moves, after he moves the predicate game_over is called to assert whether the player who has moved won in that move.
+
+In case of a win the predicate won with the name of the winner is called.
 
 ```
 %gameLoop(-GameState, +TypeOfPlayer1, +TypeOfPlayer2)
@@ -64,6 +92,7 @@ gameLoop(GameState,'Player','Player'):- %Each player has a turn in a loop
         won(Winner1)
     ).
 ```
+
 
 ### Initial state
 ```
@@ -160,7 +189,9 @@ Current player is indicated on screen by the predicate printWhoMoves.
 
 
 ### Menu
-A initial menu was created to let the user choose the game mode.
+A initial menu was created to let the user choose the game mode. 
+
+In case of option 1 the game starts imediatly. However in options 2 and 3 a difficulty for the Com is asked. In addition in option 2 only it is also asked who will play as White pieces.
 
 ![menu](./docs/menu.png  "Menu")
 
@@ -173,6 +204,57 @@ A move is represented by a list of the starting and ending coordinates and the p
 For example, a list of valid moves at a given time would be:
 
 ![valid moves](./docs/valid_moves_example.png  "Valid Moves Example")
+
+
+Depending on the piece and its color a different valid_moves is called.
+
+```
+%valid_moves(+GameState, +Player, -ListOfMoves)
+valid_moves(GameState, 'WhiteRing', ListOfMoves):-
+    ringValidMoves(GameState, 'WhiteRing', ListOfMoves).
+
+valid_moves(GameState, 'BlackRing', ListOfMoves):-
+    ringValidMoves(GameState, 'BlackRing', ListOfMoves).
+
+valid_moves(GameState, 'WhiteBall', ListOfMoves):-
+    ballValidMoves(GameState, 'WhiteBall', ListOfMoves).
+
+valid_moves(GameState, 'BlackBall', ListOfMoves):-
+    ballValidMoves(GameState, 'BlackBall', ListOfMoves).
+```
+
+In the case of a ring, ringValidMoves is called which checks the valid moves start position using ringStartValidMoves, followed by checking the end valid positions using ringEndValidMovesWraper.
+
+```
+%ringValidMoves(+GameState, +Player, -ListOfMoves)
+ringValidMoves(GameState, 'WhiteRing', ListOfMoves):-
+    ringStartValidMoves(GameState, 'White', 4, 4, [], ListOfStartMoves),
+    ringEndValidMovesWraper(GameState, 'White', ListOfStartMoves, [], ListOfEndMoves),
+    ListOfMoves = ListOfEndMoves.
+
+ringValidMoves(GameState, 'BlackRing', ListOfMoves):-
+    ringStartValidMoves(GameState, 'Black', 4, 4, [], ListOfStartMoves),
+    ringEndValidMovesWraper(GameState, 'Black', ListOfStartMoves, [], ListOfEndMoves),
+    ListOfMoves = ListOfEndMoves.
+
+```
+
+The function ringEndValidMovesWraper uses also the List of rings start valid positions returned before to assert what are the moves ending valid positions, it then returns a list of valid ring moves.
+
+The same logic is applied in case of a ball, ballValidMoves is called which checks the valid moves start position using ballStartValidMoves, followed by checking the end valid positions using ballEndValidMovesWraper.
+
+```
+%ballValidMoves(+GameState, +Player, -ListOfMoves) %TODO
+ballValidMoves(GameState, 'WhiteBall', ListOfMoves):-
+    ballStartValidMoves(GameState, 'White', 4, 4, [], ListOfStartMoves),
+    ballEndValidMovesWraper(GameState, 'White', ListOfStartMoves, [], ListOfEndMoves),
+    ListOfMoves = ListOfEndMoves. 
+
+ballValidMoves(GameState, 'BlackBall', ListOfMoves):-
+    ballStartValidMoves(GameState, 'Black', 4, 4, [], ListOfStartMoves),
+    ballEndValidMovesWraper(GameState, 'Black', ListOfStartMoves, [], ListOfEndMoves),
+    ListOfMoves = ListOfEndMoves.   
+```
 
 ## Play Execution
 
@@ -231,8 +313,34 @@ This concludes the move process.
 
 
 ## End of Game
-After every move, the predicate ```game_over``` is called, to check if the current game state corresponds to a winning one for the player that just played. This is done by calling ```areBallsOnOppositeBase```, which will scan the opposing players home spaces to check if they are all being occupied by the players balls. It returns a boolean to the caller, ```gameLoop```, which ends the game if true.
-Besides that, ```player_moveWrapper``` could also end the game immediately if there are no valid moves.
+After every move, the predicate ```game_over``` is called, to check if the current game state corresponds to a winning one for the player that just played. 
+
+This is done by calling ```areBallsOnOppositeBase```, which will scan the opposing players home spaces to check if they are all being occupied by the players balls. It returns a boolean to the caller, ```gameLoop```, which ends the game if true.
+Besides that, ```player_moveWrapper``` could also end the game immediately if there are no valid moves. 
+
+
+
+```
+%game_over(+GameState,+Player,-HasWon)
+game_over(GameState,Player,HasWon):-
+    getBoard(GameState,Board),
+    areBallsOnOpositeBase(Board,Player,Bool),
+    HasWon = Bool.
+```
+
+If a player has won the predicate whon with the name of the player who has won is called.
+
+```
+%won(+WhoWon)
+won('White'):-
+    nl,nl,nl,
+    write('|| White wins ||'),nl,nl,nl.
+
+won('Black'):-
+    nl,nl,nl,
+    write('|| Black wins ||'),nl,nl,nl.
+```
+
 
 ## Board Evaluation
 This function is mainly used by the computer when its choosing a move, whether a ball or ring move, in order to understand which move would give himself the best advantage.
@@ -242,6 +350,47 @@ which simply means it calculates just how good is a GameState for said player. T
 
 This value increases based on proximity to the enemy base positions and in case a ball is on the enemy base it increases by 20 for each ball there,
 this is done in order to motivate playing the balls into the enemy base.
+
+```
+%value(+GameState, +Player, -Value)​ Calculates value based on proximity of balls to enemy base
+value(GameState,'White',Value):-
+    getBallsPositions(GameState,'White',[Row1|Col1],[Row2|Col2],[Row3|Col3]),
+    Res1 is 4-Row1+Col1,
+    Res2 is 4-Row2+Col2,
+    Res3 is 4-Row3+Col3,
+    Res is Res1 + Res2 + Res3,
+
+    getBoard(GameState,Board),
+    getOpponentBaseStack(Board,'White',Base1,Base2,Base3),
+    isBallOfColorOnTop(Base1,'White',Bool1),
+    isBallOfColorOnTop(Base2,'White',Bool2),
+    isBallOfColorOnTop(Base3,'White',Bool3),
+    (Bool1 = 'True' -> ValueBool1 is 20; ValueBool1 is 0),
+    (Bool2 = 'True' -> ValueBool2 is 20; ValueBool2 is 0),
+    (Bool3 = 'True' -> ValueBool3 is 20; ValueBool3 is 0),
+
+    Value is Res + ValueBool1 + ValueBool2 +ValueBool3.
+
+
+
+value(GameState,'Black',Value):-
+    getBallsPositions(GameState,'Black',[Row1|Col1],[Row2|Col2],[Row3|Col3]),
+    Res1 is Row1+4-Col1,
+    Res2 is Row2+4-Col2,
+    Res3 is Row3+4-Col3,
+    Res is Res1 + Res2 + Res3,
+
+    getBoard(GameState,Board),
+    getOpponentBaseStack(Board,'Black',Base1,Base2,Base3),
+    isBallOfColorOnTop(Base1,'Black',Bool1),
+    isBallOfColorOnTop(Base2,'Black',Bool2),
+    isBallOfColorOnTop(Base3,'Black',Bool3),
+    (Bool1 = 'True' -> ValueBool1 is 20; ValueBool1 is 0),
+    (Bool2 = 'True' -> ValueBool2 is 20; ValueBool2 is 0),
+    (Bool3 = 'True' -> ValueBool3 is 20; ValueBool3 is 0),
+
+    Value is Res + ValueBool1 + ValueBool2 +ValueBool3.
+```
 
 
 ## Computer Play
@@ -411,8 +560,10 @@ choose_moveBallRelocate(GameState,Player,1,ListOfValidMoves,Move):-
 
 ## Conclusion
 This projects objective was to apply logic programming theory in Prolog in the form of a board game. 
-The main difficulties encountered were about specific moves as the vault and its implementation, due to Prolog's recursive nature and backtracking, and also in the debugging process.
-The main aspect that could be improved is that the Game State internal representaion could include the player and even the valid moves, as is just includes the board and pieces on hand for now. Also, the API requested should have respected. 
+The main difficulties encountered were about specific moves as the vault and its implementation, due to Prolog's recursive nature and backtracking, and also in the debugging process. In addition the use of stacks in a map in our game due to it having a three-dimensional aspect to it also increased the dificulty although it also improved our understanding and ability to use Prolog efectively.
+
+The main aspect that could be improved is that the Game State internal representaion could include the player and even the valid moves, as is just includes the board and pieces on hand for now. Also, the API requested should have been fully respected, which was mainly not possible again due to our GameState not including everything it should. In addition, a even harder mode for the Com would be possible to implement if instead of only analyzing the current move (or in case of the ring the ring move followed by a ball move), if the analysis was conducted also on the following opponent move, as not only does the player want to improve his pieces positioning but also he does not want to give advantages to the opponent while doing this.
+
 To conclude, the project was developed with success, with the final result being a correctly implemented game, and it was very educational helping us learn more about logic programming.
 
 When it comes to work distribution, Miguel did about 60% of the work and José 40%.
