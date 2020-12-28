@@ -10,18 +10,18 @@
 
 grape:-
     /*generate random solvable state*/
-    state(InitialState), 
-    printState(InitialState),
+    state2(InitialState), 
     getLength(InitialState,Length),
     printState(InitialState,Length,0),
-    findSolution(InitialState, Solution).
-    printState(Solution).
+    findSolution(InitialState, Solution),
+    printRow(Solution).
 
 %findSolution(State,Solution)
-findSolution([FirstRow|T], Solution):-
+findSolution([FirstRow|T], Vars):-
     declareVars([FirstRow|T],Vars),
     length(FirstRow,FirstRowLength),
-    applyRestrictions(Vars,FirstRowLength).
+    applyRestrictions(Vars,FirstRowLength),
+    labeling([], Vars).
 
 
 %declareVars(-State,+Vars) Returns Vars ordered like State
