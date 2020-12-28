@@ -5,13 +5,7 @@
 
 ### FEUP MIEIC PLOG 3rd year 2020/2021
 
-##PROJ1
 
-![mitsudomoe logo](./Proj1/docs/logo.png  "Mitsudomoe Logo")
-__Class 2__
-__Group Mitsudomoe_1__
-
-##PROJ2
 
 Grapes Puzzle
 
