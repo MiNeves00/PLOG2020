@@ -35,3 +35,10 @@ nth_membro(N,[_|T],M):-
     N>1,
     N1 is N-1,
     nth_membro(N1,T,M).
+
+writeTabs(0).
+
+writeTabs(Length) :-
+    write('  '),
+    Length1 is Length-1,
+    writeTabs(Length1).

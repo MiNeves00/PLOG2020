@@ -49,3 +49,30 @@ printRow([Head|Tail]) :-
     write(' | '),
     printRow(Tail).
 
+%printSolution(-Solution, -Length, -Index)
+printSolution(_, 0, _).
+
+printSolution(_, _, 1) :-
+    write('| '),
+    fail.
+
+printSolution(Solution, Length, Index) :-
+    printSolutionRow(Solution, Length, Index),
+    write('\n\n'),
+    Row is 6 - Length,
+    writeTabs(Row),
+    write('| '),
+    Length1 is Length - 1,
+    Index1 is Index + Length,
+    printSolution(Solution, Length1, Index1).
+
+%printSolutionRow(-Solution, -Length, -Index)
+printSolutionRow(Solution, 0, _).
+
+printSolutionRow(Solution, Length, Index) :-
+    nth_membro(Index,Solution,Item),
+    write(Item),
+    write(' | '),
+    Index1 is Index + 1,
+    Length1 is Length - 1,
+    printSolutionRow(Solution, Length1, Index1).
