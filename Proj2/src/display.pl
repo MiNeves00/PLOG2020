@@ -19,6 +19,17 @@ state2(
     ]
 ).
 
+state3(
+    [ %1%2%3%4%5
+      [A,B,C,D,E],%5
+      [F,G,H,F],  %4
+      [I,J,K],    %3
+      [L,M],      %2
+      [N]         %1 
+    
+    ]
+).
+
 %printState(-List, -Length, -N)
 printState([],Length,Length).
 
@@ -37,3 +48,4 @@ printRow([Head|Tail]) :-
     write(Head), %Escreve sempre a cabeca da lista
     write(' | '),
     printRow(Tail).
+

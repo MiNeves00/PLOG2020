@@ -32,12 +32,13 @@ declareVars([FirstRow|Tail],Vars):-
     MaxNum is 9*2^(Length-1),
     domain(Vars,1,MaxNum).
 
-%applyRestrictions(-Vars,-FirstRowLength).
+%applyRestrictions(-Vars,-FirstRowLength)
 applyRestrictions(Vars, FirstRowLength):-
     sort(Vars,VarsDistinct),
     all_distinct(VarsDistinct),
     restrictFirstRow(Vars,FirstRowLength),
-    restrictSum(Vars, FirstRowLength, 1).
+    restrictSum(Vars, FirstRowLength, 1),
+    restrictMaxMinValue(Vars, FirstRowLength, 1, FirstRowLength).
 
 
 %restrictFirstRow(-List, -Length)
@@ -77,8 +78,6 @@ restrictSumOnRow(Vars, RowLength, Index, N):-
     PosSummed2 is Index + 1,
     nth_membro(PosSummed2,Vars,Summed2),
     PosRes is Index + RowLength,
-    write(PosRes),
-    write('\n'),
     nth_membro(PosRes,Vars,Res),
     Res #= Summed1 + Summed2,
     Index1 is Index + 1,    /* Avancar para o proximo numero na linha */
@@ -87,7 +86,37 @@ restrictSumOnRow(Vars, RowLength, Index, N):-
 
 
 
+%restrictMaxMinValue(-Vars, -RowLength, -Index, -TotalHeight)
+restrictMaxMinValue(Vars, 0, _, TotalHeight).
+
+restrictMaxMinValue(Vars, RowLength, Index, TotalHeight):-
+    restrictMaxMinValueOfRow(Vars, RowLength, Index, 1, TotalHeight),
+    RowLength1 is RowLength - 1,
+    Index1 is Index + RowLength,
+    restrictMaxMinValue(Vars, RowLength1, Index1, TotalHeight).
 
 
+%restrictMaxMinValueOfRow(-Vars, -RowLength, -Index, -N, -TotalHeight)
+restrictMaxMinValueOfRow(Vars, RowLength, _, N, TotalHeight):- N is RowLength + 1.
 
+restrictMaxMinValueOfRow(Vars, RowLength, Index, N, TotalHeight):-
+    nth_membro(Index, Vars, Value),
+    MaxNum is 9*2^(TotalHeight - RowLength) + 1,
+    Value #< MaxNum,
+    MinNum is 2^(TotalHeight - RowLength) - 1,
+    Value #> MinNum,
+    Index1 is Index + 1,
+    N1 is N + 1,
+    restrictMaxMinValueOfRow(Vars, RowLength, Index1, N1, TotalHeight).
+
+
+/* Restricoes de geração de problema a ser implementadas */
+
+/*
+
+1. 1ºa Linha minimo de 2 celulas e máximo grande
+2. Em cada divisão de triangulos possivel o vertice inferior do triangulo nao pode ter a cor de nenhuma celula do triangulo
+3. 
+
+*/
 
