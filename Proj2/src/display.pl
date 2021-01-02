@@ -50,20 +50,20 @@ printRow([Head|Tail]) :-
     printRow(Tail).
 
 %printSolution(-Solution, -Length, -Index)
-printSolution(_, 0, _).
+printSolution(_, 0, _, _).
 
-printSolution(_, _, 1) :-
+printSolution(_, _, _,1) :-
     fail.
 
-printSolution(Solution, Length, Index) :-
+printSolution(Solution, Length, OldLength, Index) :-
     write(' | '),
     printSolutionRow(Solution, Length, Index),
     write('\n\n'),
-    Row is 6 - Length,
+    Row is OldLength + 1 - Length,
     writeTabs(Row),
     Length1 is Length - 1,
     Index1 is Index + Length,
-    printSolution(Solution, Length1, Index1).
+    printSolution(Solution, Length1, OldLength, Index1).
 
 %printSolutionRow(-Solution, -Length, -Index)
 printSolutionRow(Solution, 0, _).

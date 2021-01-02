@@ -14,7 +14,7 @@ grape:-
     getLength(InitialState,Length),
     printState(InitialState,Length,0),
     findSolution(InitialState, Solution),
-    printSolution(Solution, Length, 1).
+    printSolution(Solution, Length, Length, 1).
 
 %findSolution(State,Solution)
 findSolution([FirstRow|T], Vars):-
