@@ -16,10 +16,10 @@ grape:-
     printState(InitialState,Length,0),
     findSolution(InitialState, Solution),
     printSolution(Solution, Length, Length, 1),
-    write('\nGenerating\n'),
-    generateFirstRow(5, FirstRow),
-    completeBoard(FirstRow, 5, Board, [FirstRow | T]),
-    printState([FirstRow | T], 5, 0).
+    write('\nGenerating\n\n'),
+    generateFirstRow(10, FirstRow),
+    completeBoard(FirstRow, 10, Board, [FirstRow | T]),
+    printGeneratedBoard([FirstRow | T], 10, 0).
 
 
 %findSolution(State,Solution)

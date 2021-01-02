@@ -38,7 +38,7 @@ printState([H|T],Length,N):-
     N1 is N + 1,
     printRow(H), %Imprime a linha do tabuleiro
     write('\n\n'),
-    write2Tabs(N1),
+    writeTabs(N1),
     printState(T,Length,N1).
     
 %printRow(-List)
@@ -48,6 +48,44 @@ printRow([Head|Tail]) :-
     write(Head), %Escreve sempre a cabeca da lista
     write(' | '),
     printRow(Tail).
+
+%printGeneratedBoard(-List, -Length, -N)
+printGeneratedBoard([],Length,Length).
+
+printGeneratedBoard([H|T],Length,N):-
+    write(' | '),
+    N1 is N + 1,
+    printGeneratedRow(H), %Imprime a linha do tabuleiro
+    write('\n\n'),
+    writeTabs(N1),
+    printGeneratedBoard(T,Length,N1).
+    
+%printGeneratedRow(-List)
+printGeneratedRow([]).
+
+printGeneratedRow([Head|Tail]) :-
+    (Head < 10 ->
+        write('  '),
+        write(Head),
+        write('  ')
+    ;
+        (Head < 100 ->
+            write(' '),
+            write(Head),
+            write('  ')
+        ;
+            (Head < 1000 ->
+                write(' '),
+                write(Head),
+                write(' ')
+            ;
+                write(Head),
+                write(' ')
+            )
+        ) 
+    ),
+    write(' | '),
+    printGeneratedRow(Tail).    
 
 %printSolution(-Solution, -Length, -Index)
 printSolution(_, 0, _, _).
@@ -71,12 +109,24 @@ printSolutionRow(Solution, 0, _).
 printSolutionRow(Solution, Length, Index) :-
     nth_membro(Index,Solution,Item),
     (Item < 10 ->
-        write(' '),
+        write('  '),
         write(Item),
-        write(' ')
+        write('  ')
     ;
-        write(Item),
-        write(' ')
+        (Item < 100 ->
+            write(' '),
+            write(Item),
+            write('  ')
+        ;
+            (Item < 1000 ->
+                write(' '),
+                write(Item),
+                write(' ')
+            ;
+                write(Item),
+                write(' ')
+            )
+        ) 
     ),
     write(' | '),
     Index1 is Index + 1,
