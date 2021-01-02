@@ -1,3 +1,4 @@
+%generateFirstRow(+Length, -Row)
 generateFirstRow(0, FirstRow).
 
 generateFirstRow(Length, [H | T]) :-
@@ -6,7 +7,7 @@ generateFirstRow(Length, [H | T]) :-
     Length1 is Length - 1,
     generateFirstRow(Length1, T).
 
-
+%completeBoard(+OldRow, +Length, +Board, -NewBoard)
 completeBoard(_, 1, Board, Board).
 
 completeBoard(OldRow, Length, Board, NewBoard) :-
@@ -16,7 +17,7 @@ completeBoard(OldRow, Length, Board, NewBoard) :-
     append(Board, [NewRow], IntermediateBoard),
     completeBoard(NewRow, Length1, IntermediateBoard, NewBoard).
 
-
+%completeRow(+OldRow, +Length, -NewRow)
 completeRow(_, 1, _).
 
 completeRow([H1 | [H2 | T2]], Length, [Summed | NewT]) :-
