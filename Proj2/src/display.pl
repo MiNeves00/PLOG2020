@@ -34,11 +34,11 @@ state3(
 printState([],Length,Length).
 
 printState([H|T],Length,N):-
-    write('    '),
-    write('   |  '),
+    write(' | '),
     N1 is N + 1,
     printRow(H), %Imprime a linha do tabuleiro
-    write('\n-------|-------|-------|-------|-------|-------|\n'),
+    write('\n\n'),
+    write2Tabs(N1),
     printState(T,Length,N1).
     
 %printRow(-List)
@@ -53,15 +53,14 @@ printRow([Head|Tail]) :-
 printSolution(_, 0, _).
 
 printSolution(_, _, 1) :-
-    write('| '),
     fail.
 
 printSolution(Solution, Length, Index) :-
+    write(' | '),
     printSolutionRow(Solution, Length, Index),
     write('\n\n'),
     Row is 6 - Length,
     writeTabs(Row),
-    write('| '),
     Length1 is Length - 1,
     Index1 is Index + Length,
     printSolution(Solution, Length1, Index1).
@@ -71,7 +70,14 @@ printSolutionRow(Solution, 0, _).
 
 printSolutionRow(Solution, Length, Index) :-
     nth_membro(Index,Solution,Item),
-    write(Item),
+    (Item < 10 ->
+        write(' '),
+        write(Item),
+        write(' ')
+    ;
+        write(Item),
+        write(' ')
+    ),
     write(' | '),
     Index1 is Index + 1,
     Length1 is Length - 1,

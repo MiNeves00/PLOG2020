@@ -39,7 +39,7 @@ nth_membro(N,[_|T],M):-
 writeTabs(0).
 
 writeTabs(Length) :-
-    write('  '),
+    write('   '),
     Length1 is Length-1,
     writeTabs(Length1).
 

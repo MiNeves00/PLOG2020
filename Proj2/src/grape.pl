@@ -10,7 +10,7 @@
 
 grape:-
     /*generate random solvable state*/
-    state2(InitialState), 
+    state3(InitialState), 
     getLength(InitialState,Length),
     printState(InitialState,Length,0),
     findSolution(InitialState, Solution),
@@ -26,7 +26,7 @@ findSolution([FirstRow|T], Vars):-
 
 %declareVars(-State,+Vars) Returns Vars ordered like State
 declareVars([FirstRow|Tail],Vars):-
-    write('\nDeclaring\n'),
+    write('\nDeclaring\n\n'),
     length(FirstRow,Length),
     flatten([FirstRow|Tail],Vars),
     MaxNum is 9*2^(Length-1),
