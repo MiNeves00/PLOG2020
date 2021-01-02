@@ -19,7 +19,12 @@ grape:-
     write('\nGenerating\n'),
     generateFirstRow(5, FirstRow),
     completeBoard(FirstRow, 5, Board, [FirstRow | T]),
-    printState([FirstRow | T], 5, 0).
+    printState([FirstRow | T], 5, 0),
+    createDatabaseColors([FirstRow | T], 5),
+    colour(2, Var),
+    write('\n'),
+    write(Var),
+    write('\n').
 
 
 %findSolution(State,Solution)
