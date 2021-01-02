@@ -1,9 +1,10 @@
 :-consult('utils.pl').
 :-consult('display.pl').
+:-consult('generate.pl').
 :- use_module(library(clpfd)).
 :- use_module(library(system)).
 :- use_module(library(lists)).
-
+:- use_module(library(random)).
 
 
 
@@ -14,7 +15,12 @@ grape:-
     getLength(InitialState,Length),
     printState(InitialState,Length,0),
     findSolution(InitialState, Solution),
-    printSolution(Solution, Length, Length, 1).
+    printSolution(Solution, Length, Length, 1),
+    write('\nGenerating\n'),
+    generateFirstRow(5, FirstRow),
+    completeBoard(FirstRow, 5, Board, [FirstRow | T]),
+    printState([FirstRow | T], 5, 0).
+
 
 %findSolution(State,Solution)
 findSolution([FirstRow|T], Vars):-
@@ -64,10 +70,6 @@ restrictSum(Vars, RowLength, Index):-
     Index1 is Index + RowLength,    /* Vou para o primeiro indice da proxima linha */
     restrictSum(Vars, RowLength1, Index1).
 
-
-
-
-    
 
 %restrictSumOnRow(-Vars, -RowLength, -Index, -N)
 restrictSumOnRow(Vars, RowLength, _, RowLength).
@@ -119,4 +121,5 @@ restrictMaxMinValueOfRow(Vars, RowLength, Index, N, TotalHeight):-
 3. 
 
 */
+
 
