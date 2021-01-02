@@ -1,3 +1,4 @@
+:- dynamic(colour/2).
 :-consult('utils.pl').
 :-consult('display.pl').
 :-consult('generate.pl').
@@ -5,6 +6,7 @@
 :- use_module(library(system)).
 :- use_module(library(lists)).
 :- use_module(library(random)).
+
 
 
 
@@ -21,10 +23,11 @@ grape:-
     completeBoard(FirstRow, 5, Board, [FirstRow | T]),
     printState([FirstRow | T], 5, 0),
     createDatabaseColors([FirstRow | T], 5),
-    colour(2, Var),
-    write('\n'),
-    write(Var),
-    write('\n').
+    write('\nAssigning\n'),
+    generateBoard([FirstRow | T], 5, [], NewBoard),
+    printState(NewBoard, Length, 0),
+    findSolution(NewBoard, NewSolution),
+    printSolution(NewSolution, Length, Length, 1).
 
 
 %findSolution(State,Solution)

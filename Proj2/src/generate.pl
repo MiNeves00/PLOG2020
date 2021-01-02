@@ -33,13 +33,14 @@ color(4,Var)
 color(Num,Var)
 nth
  */
+
 %createDatabaseColors(+Board, +Length)
-createDatabaseColors(Board, 0).
-createDatabaseColors([Row | Tail], Length):-
-    Length > 0,
-    rowDatabaseColors(Row, Length),
-    Length1 is Length - 1,
-    createDatabaseColors(Tail, Length1).
+createDatabaseColors(Board, Length):-
+    flatten(Board, FlatList),
+    sort(FlatList, SetList),
+    length(SetList, N),
+    rowDatabaseColors(SetList, N),
+    printGeneratedColoursRow(SetList).
 
 %rowDatabaseColors(+Row, +Length)
 rowDatabaseColors(_, 0).
@@ -47,3 +48,28 @@ rowDatabaseColors([H | T], Length):-
     assert(colour(H, Var)),
     Length1 is Length - 1,
     rowDatabaseColors(T, Length1).
+
+
+%generateBoard(+Board, +Length, +IntermediateBoard, -NewBoard)
+generateBoard(_, 0, NewBoard, NewBoard).
+
+generateBoard([Row | Tail], Length, IntermediateBoard, NewBoard):-
+    Length > 0,
+    generateRow(Row, Length, [], NewRow),
+    append(IntermediateBoard, [NewRow], NewIntermediateBoard),
+    Length1 is Length - 1,
+    generateBoard(Tail, Length1, NewIntermediateBoard, NewBoard).
+
+
+%generateBoard(+Row, +Length, -IntermediateRow, -NewRow)
+generateRow(_, 0, NewRow ,NewRow).
+
+generateRow([H | T], Length, IntermediateRow, NewRow):-
+    Length > 0,
+    colour(H, Var),
+    append(IntermediateRow, [Var], NewIntermediateRow),
+    Length1 is Length - 1,
+    generateRow(T, Length1, NewIntermediateRow, NewRow).
+
+
+

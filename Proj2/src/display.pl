@@ -60,6 +60,46 @@ printGeneratedBoard([H|T],Length,N):-
     writeTabs(N1),
     printGeneratedBoard(T,Length,N1).
     
+
+%printGeneratedColoursBoard(-List, -Length, -N)
+printGeneratedColoursBoard([],Length,Length).
+
+printGeneratedColoursBoard([H|T],Length,N):-
+    write(' | '),
+    N1 is N + 1,
+    printGeneratedColoursRow(H), %Imprime a linha do tabuleiro
+    write('\n\n'),
+    writeTabs(N1),
+    printGeneratedColoursBoard(T,Length,N1).
+
+%printGeneratedColoursRow(-List)
+printGeneratedColoursRow([]).
+
+printGeneratedColoursRow([Head|Tail]) :-
+    (Head < 10 ->
+        write('  '),
+        write(colour(Head,Var)),
+        write('  ')
+    ;
+        (Head < 100 ->
+            write(' '),
+            write(colour(Head,Var)),
+            write('  ')
+        ;
+            (Head < 1000 ->
+                write(' '),
+                write(colour(Head,Var)),
+                write(' ')
+            ;
+                write(colour(Head,Var)),
+                write(' ')
+            )
+        ) 
+    ),
+    write(' | '),
+    printGeneratedColoursRow(Tail).    
+
+
 %printGeneratedRow(-List)
 printGeneratedRow([]).
 
