@@ -42,3 +42,10 @@ writeTabs(Length) :-
     write('  '),
     Length1 is Length-1,
     writeTabs(Length1).
+
+write2Tabs(0).
+
+write2Tabs(Length) :-
+    write('    '),
+    Length1 is Length-1,
+    write2Tabs(Length1).
