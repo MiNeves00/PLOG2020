@@ -8,6 +8,8 @@ state1(
     ]
 ).
 
+statelist1([A,B,B,C,D,A,E,C,F,G]).
+
 state2(
     [ %1%2%3%4%5
       [A,A,B,C,D],%5
@@ -18,6 +20,8 @@ state2(
     
     ]
 ).
+
+statelist2([A,A,B,C,D,B,E,F,G,H,D,I,J,K,L]).
 
 state3(
     [ %1%2%3%4%5
@@ -70,6 +74,33 @@ printRow([Head|Tail]) :-
     write(Head), %Escreve sempre a cabeca da lista
     write(' | '),
     printRow(Tail).
+
+%printStateList(-List, -Length, -OldLength, -Index)
+printStateList(_, 0, _, _).
+
+printStateList(_, _, _,1) :-
+    fail.
+
+printStateList(List, Length, OldLength, Index) :-
+    write(' | '),
+    printStateListRow(List, Length, Index),
+    write('\n\n'),
+    Row is OldLength + 1 - Length,
+    writeTabs(Row),
+    Length1 is Length - 1,
+    Index1 is Index + Length,
+    printStateList(List, Length1, OldLength, Index1).
+
+%printStateListRow(-List, -Length, -Index)
+printStateListRow(List, 0, _).
+
+printStateListRow(List, Length, Index) :-
+    nth_membro(Index,List,Item),
+    write(Item),
+    write(' | '),
+    Index1 is Index + 1,
+    Length1 is Length - 1,
+    printStateListRow(List, Length1, Index1).
 
 %printGeneratedBoard(-List, -Length, -N)
 printGeneratedBoard([],Length,Length).
@@ -156,7 +187,7 @@ printGeneratedColoursRow([Head|Tail]) :-
     printGeneratedColoursRow(Tail).    
   
 
-%printSolution(-Solution, -Length, -Index)
+%printSolution(-Solution, -Length, -OldLength, -Index)
 printSolution(_, 0, _, _).
 
 printSolution(_, _, _,1) :-

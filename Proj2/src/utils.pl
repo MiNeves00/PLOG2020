@@ -26,8 +26,9 @@ flatten(List, FlatList) :-
   flatten(NonList, Tl, [NonList|Tl]).
 
 
-getLength([FirstRow|T],Length):-
-    length(FirstRow,Length).
+getLength(List,Length):-
+    length(List,N),
+    Length is round(-0.5 + 0.5 * sqrt(1 + 8*N)).
 
 nth_membro(1,[M|_],M).
 
