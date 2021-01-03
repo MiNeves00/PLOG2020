@@ -24,7 +24,7 @@ grape:-
     write('\nState\n'),
     state4(State4),
     printState(State4, 5 ,0),
-    makeNumbersSameColour([FirstRow | T], ListOfPairs),
+    makeNumbersSameColour(State4, ListOfPairs),
     printRow(ListOfPairs),
     write('\nAssigning\n').
 
