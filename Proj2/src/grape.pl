@@ -10,7 +10,6 @@
 
 
 
-
 grape:-
     /*generate random solvable state*/
     state3(InitialState), 
@@ -22,18 +21,19 @@ grape:-
     generateFirstRow(5, FirstRow),
     completeBoard(FirstRow, 5, Board, [FirstRow | T]),
     printState([FirstRow | T], 5, 0),
-    createDatabaseColors([FirstRow | T], 5),
-    write('\nAssigning\n'),
-    generateBoard([FirstRow | T], 5, [], NewBoard),
-    printState(NewBoard, Length, 0),
-    findSolution(NewBoard, NewSolution),
-    printSolution(NewSolution, Length, Length, 1).
+    write('\nState\n'),
+    state4(State4),
+    printState(State4, 5 ,0),
+    makeNumbersSameColour([FirstRow | T], ListOfPairs),
+    printRow(ListOfPairs),
+    write('\nAssigning\n').
 
 
 %findSolution(State,Solution)
 findSolution([FirstRow|T], Vars):-
     declareVars([FirstRow|T],Vars),
     length(FirstRow,FirstRowLength),
+    printState([FirstRow|T],FirstRowLength,0),
     applyRestrictions(Vars,FirstRowLength),
     labeling([], Vars).
 

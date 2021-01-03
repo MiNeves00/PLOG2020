@@ -50,6 +50,44 @@ rowDatabaseColors([H | T], Length):-
     rowDatabaseColors(T, Length1).
 
 
+%makeNumbersSameColour(+Board, -ListOfPairs)
+makeNumbersSameColour(Board, ListOfPairs):-
+    flatten(Board, FlattenBoard),
+    sort(FlattenBoard, DifferentNums),
+    length(DifferentNums, Length),
+    getListOfSameColourPairs(FlattenBoard, DifferentNums, Length, [], ListOfPairs).
+
+%getListOfSameColourPairs(+FlattenBoard, +DifferentNums, +Length, +OldListOfPairs, -NewListOfPairs)
+getListOfSameColourPairs(_, _, 0, ListOfPairs, ListOfPairs).
+
+getListOfSameColourPairs(FlattenBoard, [DiffNum | Tail], Lenght, OldListOfPairs, NewListOfPairs):-
+    Lenght > 0,
+    Length1 is Lenght - 1,
+    select(DiffNum, FlattenBoard, NewFlatten), 
+    (member(DiffNum,NewFlatten) -> 
+        getSameColourPair(FlattenBoard, NewFlatten, DiffNum, Index1, Index2),
+        append(OldListOfPairs, [Index1-Index2], IntermediateListOfPairs),
+        DiffList = Tail
+        /*(member(DiffNum, RestBoard) ->
+            getListOfSameColourPairs(FlattenBoard, [DiffNum | Tail], Length1, IntermediateListOfPairs, NewListOfPairs)
+            DiffList = Tail
+        ;
+            DiffList = Tail
+        )*/
+    ;
+        IntermediateListOfPairs = OldListOfPairs,
+        DiffList = Tail
+    ),
+    getListOfSameColourPairs(FlattenBoard, DiffList, Length1, IntermediateListOfPairs, NewListOfPairs).
+
+%getSameColourPair(+FlattenBoard, +RestBoard, +DiffNum, -Index1, -Index2)
+getSameColourPair(FlattenBoard, RestBoard, DiffNum, Index1, Index2):-
+    indexOf(FlattenBoard, DiffNum, Index1),
+    nth1F(Index1, FlattenBoard, DiffNum, ThrashBoard),
+    indexOf(RestBoard, DiffNum, InterIndex2),
+    Index2 is InterIndex2 + 1.
+
+
 %generateBoard(+Board, +Length, +IntermediateBoard, -NewBoard)
 generateBoard(_, 0, NewBoard, NewBoard).
 
@@ -61,12 +99,11 @@ generateBoard([Row | Tail], Length, IntermediateBoard, NewBoard):-
     generateBoard(Tail, Length1, NewIntermediateBoard, NewBoard).
 
 
-%generateBoard(+Row, +Length, -IntermediateRow, -NewRow)
+%generateRow(+Row, +Length, -IntermediateRow, -NewRow)
 generateRow(_, 0, NewRow ,NewRow).
 
 generateRow([H | T], Length, IntermediateRow, NewRow):-
     Length > 0,
-    colour(H, Var),
     append(IntermediateRow, [Var], NewIntermediateRow),
     Length1 is Length - 1,
     generateRow(T, Length1, NewIntermediateRow, NewRow).

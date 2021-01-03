@@ -30,6 +30,17 @@ state3(
     ]
 ).
 
+state4(
+    [ %1%2%3%4%5
+      [2,2,1,1,1],%5
+      [4,3,2,2],  %4
+      [7,5,4],    %3
+      [12,9],     %2
+      [21]        %1 
+    
+    ]
+).
+
 %printState(-List, -Length, -N)
 printState([],Length,Length).
 
@@ -61,44 +72,6 @@ printGeneratedBoard([H|T],Length,N):-
     printGeneratedBoard(T,Length,N1).
     
 
-%printGeneratedColoursBoard(-List, -Length, -N)
-printGeneratedColoursBoard([],Length,Length).
-
-printGeneratedColoursBoard([H|T],Length,N):-
-    write(' | '),
-    N1 is N + 1,
-    printGeneratedColoursRow(H), %Imprime a linha do tabuleiro
-    write('\n\n'),
-    writeTabs(N1),
-    printGeneratedColoursBoard(T,Length,N1).
-
-%printGeneratedColoursRow(-List)
-printGeneratedColoursRow([]).
-
-printGeneratedColoursRow([Head|Tail]) :-
-    (Head < 10 ->
-        write('  '),
-        write(colour(Head,Var)),
-        write('  ')
-    ;
-        (Head < 100 ->
-            write(' '),
-            write(colour(Head,Var)),
-            write('  ')
-        ;
-            (Head < 1000 ->
-                write(' '),
-                write(colour(Head,Var)),
-                write(' ')
-            ;
-                write(colour(Head,Var)),
-                write(' ')
-            )
-        ) 
-    ),
-    write(' | '),
-    printGeneratedColoursRow(Tail).    
-
 
 %printGeneratedRow(-List)
 printGeneratedRow([]).
@@ -125,7 +98,52 @@ printGeneratedRow([Head|Tail]) :-
         ) 
     ),
     write(' | '),
-    printGeneratedRow(Tail).    
+    printGeneratedRow(Tail).  
+
+%printGeneratedColoursBoard(-List, -Length, -N)
+printGeneratedColoursBoard([],Length,Length).
+
+printGeneratedColoursBoard([H|T],Length,N):-
+    write(' | '),
+    N1 is N + 1,
+    printGeneratedColoursRow(H), %Imprime a linha do tabuleiro
+    write('\n\n'),
+    writeTabs(N1),
+    printGeneratedColoursBoard(T,Length,N1).
+
+
+
+%printGeneratedColoursRow(-List)
+printGeneratedColoursRow([]).
+
+printGeneratedColoursRow([Head|Tail]) :-
+    (Head < 10 ->
+        write('  '),
+        colour(Head,Var),
+        write(Var),
+        write('  ')
+    ;
+        (Head < 100 ->
+            write(' '),
+            colour(Head,Var),
+            write(Var),
+            write('  ')
+        ;
+            (Head < 1000 ->
+                write(' '),
+                colour(Head,Var),
+                write(Var),
+                write(' ')
+            ;
+                colour(Head,Var),
+                write(Var),
+                write(' ')
+            )
+        ) 
+    ),
+    write(' | '),
+    printGeneratedColoursRow(Tail).    
+  
 
 %printSolution(-Solution, -Length, -Index)
 printSolution(_, 0, _, _).
