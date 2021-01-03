@@ -99,6 +99,19 @@ getSameColourPair(FlattenBoard, RestBoard, DiffNum, Index1, Index2):-
     Index2 is InterIndex2 + 1.
     
     
+%assignColoursToBoard(+FlatBoard, +ListOfPairs, +PairLen)
+assignColoursToBoard(_, _, 0).
+
+assignColoursToBoard(FlatBoard, [I1-I2 | Tail], PairLen):-
+    PairLen > 0,
+    PairLen1 is PairLen - 1,
+    nth1F(I1, FlatBoard, Var1, _),
+    nth1F(I2, FlatBoard, Var2, _),
+    Var1 = Var2,
+    assignColoursToBoard(FlatBoard, Tail, PairLen1).
+
+
+
 
 
 %generateBoard(+Board, +Length, +IntermediateBoard, -NewBoard)
