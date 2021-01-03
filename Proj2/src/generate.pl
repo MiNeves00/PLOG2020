@@ -65,37 +65,29 @@ getListOfSameColourPairs(FlattenBoard, [DiffNum | Tail], Lenght, OldListOfPairs,
     Length1 is Lenght - 1,
     select(DiffNum, FlattenBoard, NewFlatten), 
     (member(DiffNum,NewFlatten) -> 
-
-        getSameColourPair(FlattenBoard, NewFlatten, DiffNum, Index1, Index2),
-        append(OldListOfPairs, [Index1-Index2], IntermediateListOfPairs),
-        select(DiffNum, NewFlatten, RestBoard),
-        (member(DiffNum, RestBoard) ->
-
-            getSameColourPair(NewFlatten, RestBoard, DiffNum, I1, I2),
-            ActualI2 is I2 + 1,
-            append(IntermediateListOfPairs, [Index2-ActualI2], NewIntermediateListOfPairs)
-        ;
-            NewIntermediateListOfPairs = IntermediateListOfPairs
-        )
+        getAllSameColourPairs(FlattenBoard, NewFlatten, DiffNum, -1, OldListOfPairs, IntermediateListOfPairs)
     ;
-        NewIntermediateListOfPairs = OldListOfPairs
+        IntermediateListOfPairs = OldListOfPairs
        
     ),
-    getListOfSameColourPairs(FlattenBoard, Tail, Length1, NewIntermediateListOfPairs, NewListOfPairs).
+    getListOfSameColourPairs(FlattenBoard, Tail, Length1, IntermediateListOfPairs, NewListOfPairs).
 
 
-%getAllSameColourPairs(+FlattenBoard, +NewFlatten, +DiffNum, +OldListOfPairs, -NewListOfPairs)
-getAllSameColourPairs(_, _, -1, NewListOfPairs, NewListOfPairs).
+%getAllSameColourPairs(+FlattenBoard, +NewFlatten, +DiffNum, +CarryNum, +OldListOfPairs, -NewListOfPairs)
+getAllSameColourPairs(_, _, -1, _, NewListOfPairs, NewListOfPairs).
 
-getAllSameColourPairs(FlattenBoard, NewFlatten, DiffNum, OldListOfPairs, NewListOfPairs):-
+getAllSameColourPairs(FlattenBoard, NewFlatten, DiffNum, CarryNum, OldListOfPairs, NewListOfPairs):-
 
     getSameColourPair(FlattenBoard, NewFlatten, DiffNum, Index1, Index2),
-    append(OldListOfPairs, [Index1-Index2], IntermediateListOfPairs),
+    CarryNum1 is CarryNum + 1,
+    ActualIndex1 is Index1 + CarryNum1,
+    ActualIndex2 is Index2 + CarryNum1,
+    append(OldListOfPairs, [ActualIndex1-ActualIndex2], IntermediateListOfPairs),
     select(DiffNum, NewFlatten, RestBoard),
     (member(DiffNum, RestBoard) ->
-        getAllSameColourPairs(NewFlatten, RestBoard, DiffNum, IntermediateListOfPairs, NewListOfPairs)
+        getAllSameColourPairs(NewFlatten, RestBoard, DiffNum, CarryNum1, IntermediateListOfPairs, NewListOfPairs)
     ;
-        getAllSameColourPairs(NewFlatten, RestBoard, -1, IntermediateListOfPairs, NewListOfPairs)
+        getAllSameColourPairs(NewFlatten, RestBoard, -1, CarryNum1, IntermediateListOfPairs, NewListOfPairs)
     ).
 
 
