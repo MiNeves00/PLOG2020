@@ -65,27 +65,33 @@ getListOfSameColourPairs(FlattenBoard, [DiffNum | Tail], Lenght, OldListOfPairs,
     Length1 is Lenght - 1,
     select(DiffNum, FlattenBoard, NewFlatten), 
     (member(DiffNum,NewFlatten) -> 
-        getSameColourPair(FlattenBoard, NewFlatten, DiffNum, Index1, Index2),
+        getSameColourPair(FlattenBoard, NewFlatten, DiffNum, Index1, Index2, RestBoard),
         append(OldListOfPairs, [Index1-Index2], IntermediateListOfPairs),
-        DiffList = Tail
-        /*(member(DiffNum, RestBoard) ->
-            getListOfSameColourPairs(FlattenBoard, [DiffNum | Tail], Length1, IntermediateListOfPairs, NewListOfPairs)
-            DiffList = Tail
+        NewIntermediateListOfPairs = IntermediateListOfPairs
+/*        (member(DiffNum, RestBoard) ->
+            select(DiffNum, RestBoard, NewRestBoard),
+            getSameColourPair(RestBoard, NewRestBoard, DiffNum, I1, I2, _),
+            ActualI1 is I1 + 2,
+            ActualI2 is I2 + 2,
+            append(IntermediateListOfPairs, [I1-I2], NewIntermediateListOfPairs)
         ;
-            DiffList = Tail
+            NewIntermediateListOfPairs = IntermediateListOfPairs
         )*/
     ;
-        IntermediateListOfPairs = OldListOfPairs,
-        DiffList = Tail
+        NewIntermediateListOfPairs = OldListOfPairs
+       
     ),
-    getListOfSameColourPairs(FlattenBoard, DiffList, Length1, IntermediateListOfPairs, NewListOfPairs).
+    getListOfSameColourPairs(FlattenBoard, Tail, Length1, NewIntermediateListOfPairs, NewListOfPairs).
 
-%getSameColourPair(+FlattenBoard, +RestBoard, +DiffNum, -Index1, -Index2)
-getSameColourPair(FlattenBoard, RestBoard, DiffNum, Index1, Index2):-
+%getSameColourPair(+FlattenBoard, +RestBoard, +DiffNum, -Index1, -Index2, -NewRestBoard)
+getSameColourPair(FlattenBoard, RestBoard, DiffNum, Index1, Index2, NewNewRestBoard):-
     indexOf(FlattenBoard, DiffNum, Index1),
-    nth1F(Index1, FlattenBoard, DiffNum, ThrashBoard),
+    nth1F(Index1, FlattenBoard, DiffNum, NewRestBoard),
     indexOf(RestBoard, DiffNum, InterIndex2),
+    
+    nth1F(InterIndex2, NewRestBoard, DiffNum, NewNewRestBoard),
     Index2 is InterIndex2 + 1.
+    
 
 
 %generateBoard(+Board, +Length, +IntermediateBoard, -NewBoard)
