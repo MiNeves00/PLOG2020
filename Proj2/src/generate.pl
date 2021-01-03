@@ -72,7 +72,6 @@ getListOfSameColourPairs(FlattenBoard, [DiffNum | Tail], Lenght, OldListOfPairs,
         (member(DiffNum, RestBoard) ->
 
             getSameColourPair(NewFlatten, RestBoard, DiffNum, I1, I2),
-            ActualI1 is I1 + 2,
             ActualI2 is I2 + 1,
             append(IntermediateListOfPairs, [Index2-ActualI2], NewIntermediateListOfPairs)
         ;
@@ -83,6 +82,22 @@ getListOfSameColourPairs(FlattenBoard, [DiffNum | Tail], Lenght, OldListOfPairs,
        
     ),
     getListOfSameColourPairs(FlattenBoard, Tail, Length1, NewIntermediateListOfPairs, NewListOfPairs).
+
+
+%getAllSameColourPairs(+FlattenBoard, +NewFlatten, +DiffNum, +OldListOfPairs, -NewListOfPairs)
+getAllSameColourPairs(_, _, -1, NewListOfPairs, NewListOfPairs).
+
+getAllSameColourPairs(FlattenBoard, NewFlatten, DiffNum, OldListOfPairs, NewListOfPairs):-
+
+    getSameColourPair(FlattenBoard, NewFlatten, DiffNum, Index1, Index2),
+    append(OldListOfPairs, [Index1-Index2], IntermediateListOfPairs),
+    select(DiffNum, NewFlatten, RestBoard),
+    (member(DiffNum, RestBoard) ->
+        getAllSameColourPairs(NewFlatten, RestBoard, DiffNum, IntermediateListOfPairs, NewListOfPairs)
+    ;
+        getAllSameColourPairs(NewFlatten, RestBoard, -1, IntermediateListOfPairs, NewListOfPairs)
+    ).
+
 
 %getSameColourPair(+FlattenBoard, +RestBoard, +DiffNum, -Index1, -Index2)
 getSameColourPair(FlattenBoard, RestBoard, DiffNum, Index1, Index2):-
