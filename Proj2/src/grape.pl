@@ -11,31 +11,33 @@
 
 grape:-
     /*generate random solvable state*/
-    state3(InitialState), 
+    statelist1(InitialState),
     getLength(InitialState,Length),
-    printState(InitialState,Length,0),
-    findSolution(InitialState, Solution),
+    write('\n'),
+    printStateList(InitialState, Length, Length, 1),
+    write('\n'),
+    findSolution(InitialState, Length, Solution),
     printSolution(Solution, Length, Length, 1),
+    write('>>> Insert number of rows: '),
+    read(Input),
+    handleInput(Input),
     write('\nGenerating\n\n'),
-    generateFirstRow(10, FirstRow),
-    completeBoard(FirstRow, 10, Board, [FirstRow | T]),
-    printGeneratedBoard([FirstRow | T], 10, 0).
+    generateFirstRow(Input, FirstRow),
+    completeBoard(FirstRow, Input, Board, [FirstRow | T]),
+    printGeneratedBoard([FirstRow | T], Input, 0).
 
 
 %findSolution(State,Solution)
-findSolution([FirstRow|T], Vars):-
-    declareVars([FirstRow|T],Vars),
-    length(FirstRow,FirstRowLength),
-    applyRestrictions(Vars,FirstRowLength),
+findSolution(Vars, Length, Vars):-
+    declareVars(Vars, Length),
+    applyRestrictions(Vars,Length),
     labeling([], Vars).
 
 
 %declareVars(-State,+Vars) Returns Vars ordered like State
-declareVars([FirstRow|Tail],Vars):-
+declareVars(Vars, Length):-
     write('\nDeclaring\n\n'),
-    length(FirstRow,Length),
-    flatten([FirstRow|Tail],Vars),
-    MaxNum is 9*2^(Length-1),
+    MaxNum is (9*2^(Length-1)),
     domain(Vars,1,MaxNum).
 
 %applyRestrictions(-Vars,-FirstRowLength)
@@ -122,4 +124,10 @@ restrictMaxMinValueOfRow(Vars, RowLength, Index, N, TotalHeight):-
 
 */
 
+handleInput(Input):-
+    Input > 0.
 
+handleInput(_SomeOther):-
+    write('Input incorrect please insert your option again: '),
+    read(Input),
+    handleInput(Input).
