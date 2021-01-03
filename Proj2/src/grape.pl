@@ -18,6 +18,7 @@ grape:-
     write('\n'),
     findSolution(InitialState, Length, Solution),
     printSolution(Solution, Length, Length, 1),
+    write('\n'),
     write('>>> Insert number of rows: '),
     read(Input),
     handleInput(Input),
