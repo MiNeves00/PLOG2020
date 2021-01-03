@@ -22,9 +22,9 @@ grape:-
     completeBoard(FirstRow, 5, Board, [FirstRow | T]),
     printState([FirstRow | T], 5, 0),
     write('\nState\n'),
-    state4(State4),
-    printState(State4, 5 ,0),
-    makeNumbersSameColour(State4, ListOfPairs),
+    state5(State5),
+    printState(State5, 5 ,0),
+    makeNumbersSameColour(State5, ListOfPairs),
     printRow(ListOfPairs),
     write('\nAssigning\n').
 

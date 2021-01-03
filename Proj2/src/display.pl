@@ -41,6 +41,17 @@ state4(
     ]
 ).
 
+state5(
+    [ %1%2%3%4%5
+      [2,2,1,1,1],%5
+      [4,3,2,2],  %4
+      [7,1,4],    %3
+      [12,9],     %2
+      [4]        %1 
+    
+    ]
+).
+
 %printState(-List, -Length, -N)
 printState([],Length,Length).
 
