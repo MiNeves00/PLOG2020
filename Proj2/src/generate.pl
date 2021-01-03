@@ -68,7 +68,7 @@ getListOfSameColourPairs(FlattenBoard, [DiffNum | Tail], Lenght, OldListOfPairs,
         getSameColourPair(FlattenBoard, NewFlatten, DiffNum, Index1, Index2, RestBoard),
         append(OldListOfPairs, [Index1-Index2], IntermediateListOfPairs),
         NewIntermediateListOfPairs = IntermediateListOfPairs
-/*        (member(DiffNum, RestBoard) ->
+        /*(member(DiffNum, RestBoard) ->
             select(DiffNum, RestBoard, NewRestBoard),
             getSameColourPair(RestBoard, NewRestBoard, DiffNum, I1, I2, _),
             ActualI1 is I1 + 2,
@@ -88,9 +88,9 @@ getSameColourPair(FlattenBoard, RestBoard, DiffNum, Index1, Index2, NewNewRestBo
     indexOf(FlattenBoard, DiffNum, Index1),
     nth1F(Index1, FlattenBoard, DiffNum, NewRestBoard),
     indexOf(RestBoard, DiffNum, InterIndex2),
+    Index2 is InterIndex2 + 1,
+    select(DiffNum, NewRestBoard, NewNewRestBoard).
     
-    nth1F(InterIndex2, NewRestBoard, DiffNum, NewNewRestBoard),
-    Index2 is InterIndex2 + 1.
     
 
 
