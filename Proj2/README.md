@@ -9,6 +9,15 @@
 
 Grapes Puzzle
 
+Instalation and Execution
+
+In order to play Mitusomoe you must:
+
+    Run sicstus with command ./sicstus
+    Consult game file using consult('pathto/grape.pl').
+    Enter command grape. in SICStus
+
+
 ##### Authors:
 
 up201608657 Miguel Carreira Neves
