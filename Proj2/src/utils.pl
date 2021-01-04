@@ -74,12 +74,25 @@ find_nth1(N, [Head|Rest0], Elem, [Head|Rest]) :-
     find_nth1(M, Rest0, Elem, Rest).
 
 
-/*
-select(X, [Head|Tail], Rest) :-
-    select3_(Tail, Head, X, Rest).
-  
-select3_(Tail, Head, Head, Tail).
+/* Time tracking */
 
-select3_([Head2|Tail], Head, X, [Head|Rest]) :-
-    select3_(Tail, Head2, X, Rest).
-*/
+testStats(Vars, Lenght):-
+    declareVars(Vars, Lenght),
+    reset_timer,
+    applyRestrictions(Vars, Lenght),
+    print_time('PostingConstraints: '),
+    labeling([], Vars),
+    print_time('LabelingTime: '),
+    fd_statistics,statistics.
+
+reset_timer:-
+    statistics(total_runtime, _).
+
+print_time(Msg):-
+    statistics(total_runtime,[_,T]),
+    TS is ((T//10)*10)/1000,
+    nl,
+    write(Msg),
+    write(TS),
+    write('s'),
+    nl, nl.
