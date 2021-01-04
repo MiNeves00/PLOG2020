@@ -6,7 +6,11 @@
 :- use_module(library(lists)).
 :- use_module(library(random)).
 
-
+/** grape
+    Main predicate
+    Asks for input, generates board, assigns colours to board and then solves board
+    Prints boards while executing
+*/
 grape:-
     write('Generating a random problem to solve\n'),
     write('>>> Insert number of rows: '),
@@ -33,28 +37,41 @@ grape:-
     printSolution(Solution, Input, Input, 1).
 
 
-
+/** findSolution
+    Calls necessary steps for solving board
+    (Declaring variables and setting domain, applying constraints and labeling)
+*/
 %findSolution(+Vars, +Length, -Solution)
 findSolution(Vars, Length, Vars):-
     declareVars(Vars, Length),
     applyRestrictions(Vars,Length),
     labeling([], Vars).
 
-
+/** declareVars
+    Given Vars (list of variables), sets domain
+    Domain follows formula for maximum given a first row length
+*/
 %declareVars(+Vars, +Lenght) Returns Vars ordered like State
 declareVars(Vars, Length):-
     MaxNum is (9*2^(Length-1)),
     domain(Vars,1,MaxNum).
 
+/** applyRestrictions
+    Calls necessary predicates to apply constraints to variables
+    (All distinct, first row constraints, sum constraints and maximum and minimum value per row constraints)
+*/
 %applyRestrictions(-Vars,-FirstRowLength)
 applyRestrictions(Vars, FirstRowLength):-
-    sort(Vars,VarsDistinct),
-    all_distinct(VarsDistinct),
+    sort(Vars,VarsDistinct), %Eliminates duplicates
+    all_distinct(VarsDistinct), %Variables must be distinct
     restrictFirstRow(Vars,FirstRowLength),
     restrictSum(Vars, FirstRowLength, 1),
     restrictMaxMinValue(Vars, FirstRowLength, 1, FirstRowLength).
 
-
+/** restrictFirstRow
+    Applies constraints to first row
+    All elements of first row must be less than 10
+*/
 %restrictFirstRow(-List, -Length)
 restrictFirstRow(_,0).
 
@@ -63,11 +80,10 @@ restrictFirstRow([Head|Tail],Length) :-
     Length1 is Length - 1,
     restrictFirstRow(Tail,Length1).
 
-
-/* Fazer isto FirstRowLenght - 1 vezes */
-    /* Fazer isto num vezes = LengthRow - 1 vezes */
-        /* Index + LengthRow is Index + Index + 1  */
-
+/** restrictSum
+    Applies sum restrictions for each element
+    Each element corresponds the
+*/
 %restrictSum(-Vars,-RowLength, -Index) RowNum = RowLength
 restrictSum(Vars, 1, _).
 
