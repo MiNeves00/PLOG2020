@@ -8,7 +8,6 @@
 :- use_module(library(random)).
 
 
-/*
 grape:-
     write('Generating a random problem to solve\n'),
     write('>>> Insert number of rows: '),
@@ -19,7 +18,7 @@ grape:-
     completeBoard(FirstRow, Input, Board, [FirstRow | T]),
     printGeneratedBoard([FirstRow | T], Input, 0),
     makeNumbersSameColour([FirstRow | T], ListOfPairs),
-    write('\nPairs\n'),
+    write('\nPairs\n\n'),
     printRow(ListOfPairs),
     write('\nGenerating Without Values\n\n'),
     generateBoard([FirstRow | T], Input, [], GeneratedBoard),
@@ -29,36 +28,10 @@ grape:-
     flatten(GeneratedBoard, FlatBoard),
     assignColoursToBoard(FlatBoard, ListOfPairs, PairLen),
     printStateList(FlatBoard, Input, Input, 1),
-    write('\n\nFinding Solution for Generated Problem\n'),
-    %findSolution(FlatBoard, Input, Solution),
-    testStats(FlatBoard, Input).
-    %printSolution(Solution, Input, Input, 1).
-*/
-
-grape:-
-    write('Generating a random problem to solve\n'),
-    write('>>> Insert number of rows: '),
-    read(Input),
-    handleInput(Input),
-    write('\nGenerating With Values\n\n'),
-    generateFirstRow(Input, FirstRow),
-    completeBoard(FirstRow, Input, Board, [FirstRow | T]),
-    printGeneratedBoard([FirstRow | T], Input, 0),
-    makeNumbersSameColour([FirstRow | T], ListOfPairs),
-    write('\nPairs\n'),
-    %printRow(ListOfPairs),
-    write('\nGenerating Without Values\n\n'),
-    generateBoard([FirstRow | T], Input, [], GeneratedBoard),
-    %printState(GeneratedBoard, Input, 0),
-    write('\nAssigning Colours\n\n'),
-    length(ListOfPairs, PairLen),
-    flatten(GeneratedBoard, FlatBoard),
-    assignColoursToBoard(FlatBoard, ListOfPairs, PairLen),
-    %printStateList(FlatBoard, Input, Input, 1),
-    write('\n\nFinding Solution for Generated Problem\n'),
-    %findSolution(FlatBoard, Input, Solution),
-    testStats(FlatBoard, Input).
-    %printSolution(Solution, Input, Input, 1).
+    write('\nSolution for Generated Problem\n\n'),
+    findSolution(FlatBoard, Input, Solution),
+    %testStats(FlatBoard, Input).
+    printSolution(Solution, Input, Input, 1).
 
 
 
@@ -71,7 +44,6 @@ findSolution(Vars, Length, Vars):-
 
 %declareVars(+Vars, +Lenght) Returns Vars ordered like State
 declareVars(Vars, Length):-
-    write('\nDeclaring\n\n'),
     MaxNum is (9*2^(Length-1)),
     domain(Vars,1,MaxNum).
 

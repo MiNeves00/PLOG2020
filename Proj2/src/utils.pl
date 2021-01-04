@@ -77,8 +77,9 @@ find_nth1(N, [Head|Rest0], Elem, [Head|Rest]) :-
 /* Time tracking */
 
 testStats(Vars, Lenght):-
-    declareVars(Vars, Lenght),
+    
     reset_timer,
+    declareVars(Vars, Lenght),
     applyRestrictions(Vars, Lenght),
     print_time('PostingConstraints: '),
     labeling([], Vars),

@@ -29,30 +29,6 @@ completeRow([H1 | [H2 | T2]], Length, [Summed | NewT]) :-
     completeRow([H2 | T2], Length1, NewT).
 
 
-/*
-color(2,Var)
-color(2,_18312)
-color(4,Var)
-color(Num,Var)
-nth
- */
-
-%createDatabaseColors(+Board, +Length)
-createDatabaseColors(Board, Length):-
-    flatten(Board, FlatList),
-    sort(FlatList, SetList),
-    length(SetList, N),
-    rowDatabaseColors(SetList, N),
-    printGeneratedColoursRow(SetList).
-
-%rowDatabaseColors(+Row, +Length)
-rowDatabaseColors(_, 0).
-rowDatabaseColors([H | T], Length):-
-    assert(colour(H, Var)),
-    Length1 is Length - 1,
-    rowDatabaseColors(T, Length1).
-
-
 %makeNumbersSameColour(+Board, -ListOfPairs)
 makeNumbersSameColour(Board, ListOfPairs):-
     flatten(Board, FlattenBoard),
