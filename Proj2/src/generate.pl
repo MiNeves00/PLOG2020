@@ -3,6 +3,8 @@ generateFirstRow(0, FirstRow).
 
 generateFirstRow(Length, [H | T]) :-
     Length > 0,
+    getrand(Rand),
+    setrand(Rand),
     random(1, 9, H),
     Length1 is Length - 1,
     generateFirstRow(Length1, T).
