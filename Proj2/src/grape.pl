@@ -18,7 +18,7 @@ grape:-
     completeBoard(FirstRow, Input, Board, [FirstRow | T]),
     printGeneratedBoard([FirstRow | T], Input, 0),
     makeNumbersSameColour([FirstRow | T], ListOfPairs),
-    write('\nPairs\n'),
+    write('\nPairs\n\n'),
     printRow(ListOfPairs),
     write('\nGenerating Without Values\n\n'),
     generateBoard([FirstRow | T], Input, [], GeneratedBoard),
@@ -28,7 +28,7 @@ grape:-
     flatten(GeneratedBoard, FlatBoard),
     assignColoursToBoard(FlatBoard, ListOfPairs, PairLen),
     printStateList(FlatBoard, Input, Input, 1),
-    write('\n\nFinding Solution for Generated Problem\n'),
+    write('\nSolution for Generated Problem\n\n'),
     findSolution(FlatBoard, Input, Solution),
     %testStats(FlatBoard, Input).
     printSolution(Solution, Input, Input, 1).
