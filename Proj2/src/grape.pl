@@ -1,4 +1,3 @@
-:- dynamic(colour/2).
 :-consult('utils.pl').
 :-consult('display.pl').
 :-consult('generate.pl').
