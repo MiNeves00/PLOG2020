@@ -1,3 +1,6 @@
+/** generateFirstRow
+    generates and returns a first row based on length and fills it with random numbers between 1 and 9
+*/
 %generateFirstRow(+Length, -Row)
 generateFirstRow(0, FirstRow).
 
@@ -9,6 +12,12 @@ generateFirstRow(Length, [H | T]) :-
     Length1 is Length - 1,
     generateFirstRow(Length1, T).
 
+/** completeBoard
+    completes the rest of the board after the first line is already filled,
+    calls completeRow on each iteration of each row, iterates lenghts - 1 times since
+    the first row is already defined
+    returns this new board
+*/
 %completeBoard(+OldRow, +Length, +Board, -NewBoard)
 completeBoard(_, 1, Board, Board).
 
@@ -19,6 +28,11 @@ completeBoard(OldRow, Length, Board, NewBoard) :-
     append(Board, [NewRow], IntermediateBoard),
     completeBoard(NewRow, Length1, IntermediateBoard, NewBoard).
 
+/** completeRow
+    completes a row taking into account that 
+    each position is the sum of the two elements above itself,
+    iterates the length of the row - 1 times
+*/
 %completeRow(+OldRow, +Length, -NewRow)
 completeRow(_, 1, _).
 
@@ -28,7 +42,10 @@ completeRow([H1 | [H2 | T2]], Length, [Summed | NewT]) :-
     Length1 is Length - 1,
     completeRow([H2 | T2], Length1, NewT).
 
-
+/** makeNumbersSameColour
+    uses sort to get all diferent numbers in the board and then calls getListOfSameColourPairs,
+    returns a list of pairs in the format [..., PosNum1-PosNum2, ...]
+*/
 %makeNumbersSameColour(+Board, -ListOfPairs)
 makeNumbersSameColour(Board, ListOfPairs):-
     flatten(Board, FlattenBoard),
@@ -36,6 +53,10 @@ makeNumbersSameColour(Board, ListOfPairs):-
     length(DifferentNums, Length),
     getListOfSameColourPairs(FlattenBoard, DifferentNums, Length, [], ListOfPairs).
 
+/** getListOfSameColourPairs
+    iterates thourgh every different number and checks for each numbers if a equal number exists in the board,
+    if it does it calls getAllSameColourPairs.
+*/
 %getListOfSameColourPairs(+FlattenBoard, +DifferentNums, +Length, +OldListOfPairs, -NewListOfPairs)
 getListOfSameColourPairs(_, _, 0, ListOfPairs, ListOfPairs).
 
@@ -51,7 +72,13 @@ getListOfSameColourPairs(FlattenBoard, [DiffNum | Tail], Lenght, OldListOfPairs,
     ),
     getListOfSameColourPairs(FlattenBoard, Tail, Length1, IntermediateListOfPairs, NewListOfPairs).
 
-
+/** getAllSameColourPairs
+    when its called it is because there exists another number in the board equal to the one being analysed,
+    so its function is to save their positions to the ListOfPairs, called NewListOfPairs, then it evaluates
+    if theres still exists a number equal to the one being analysed which its position has yet to be saved it
+    removes the number with the lowest index out of the two it saved before and then calls it self recursivly in order to
+    save the positions.
+*/
 %getAllSameColourPairs(+FlattenBoard, +NewFlatten, +DiffNum, +CarryNum, +OldListOfPairs, -NewListOfPairs)
 getAllSameColourPairs(_, _, -1, _, NewListOfPairs, NewListOfPairs).
 
@@ -69,14 +96,20 @@ getAllSameColourPairs(FlattenBoard, NewFlatten, DiffNum, CarryNum, OldListOfPair
         getAllSameColourPairs(NewFlatten, RestBoard, -1, CarryNum1, IntermediateListOfPairs, NewListOfPairs)
     ).
 
-
+/** getSameColourPair
+    uses the predicate indexOf in order to get the index of both equal numbers with the lowest index in the board
+    and then returns them
+*/
 %getSameColourPair(+FlattenBoard, +RestBoard, +DiffNum, -Index1, -Index2)
 getSameColourPair(FlattenBoard, RestBoard, DiffNum, Index1, Index2):-
     indexOf(FlattenBoard, DiffNum, Index1),
     indexOf(RestBoard, DiffNum, InterIndex2),
     Index2 is InterIndex2 + 1.
     
-    
+/** assignColoursToBoard
+    using the list of pairs it iterates through the ListOfPairs and for each pair it finds the elements
+    in their position and unifies them
+*/
 %assignColoursToBoard(+FlatBoard, +ListOfPairs, +PairLen)
 assignColoursToBoard(_, _, 0).
 
@@ -91,7 +124,10 @@ assignColoursToBoard(FlatBoard, [I1-I2 | Tail], PairLen):-
 
 
 
-
+/** generateBoard
+    generates a board based on a length with empty variables in it,
+    calls generateRow each row
+*/
 %generateBoard(+Board, +Length, +IntermediateBoard, -NewBoard)
 generateBoard(_, 0, NewBoard, NewBoard).
 
@@ -102,7 +138,9 @@ generateBoard([Row | Tail], Length, IntermediateBoard, NewBoard):-
     Length1 is Length - 1,
     generateBoard(Tail, Length1, NewIntermediateBoard, NewBoard).
 
-
+/** generateRow
+    fills each row with empty variables based on the length of itself
+*/
 %generateRow(+Row, +Length, -IntermediateRow, -NewRow)
 generateRow(_, 0, NewRow ,NewRow).
 
