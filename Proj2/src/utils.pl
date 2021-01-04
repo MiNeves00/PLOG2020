@@ -1,35 +1,37 @@
-
-
-%flatten2(-List, +FlatList)
-flatten2([], []) :- !.
-flatten2([L|Ls], FlatL) :-
-    !,
-    flatten2(L, NewL),
-    flatten2(Ls, NewLs),
-    append(NewL, NewLs, FlatL).
-flatten2(L, [L]).
-
-
+/** Flatten
+    Turns list of lists into one single same-level list
+*/
+%flatten(-List, +FlatList)
 flatten(List, FlatList) :-
-      flatten(List, [], FlatList0),
-      !,
-      FlatList = FlatList0.
+    flatten(List, [], FlatList0),
+    !,
+    FlatList = FlatList0.
   
-  flatten(Var, Tl, [Var|Tl]) :-
-      var(Var),
-      !.
-  flatten([], Tl, Tl) :- !.
-  flatten([Hd|Tl], Tail, List) :-
-      !,
-      flatten(Hd, FlatHeadTail, List),
-     flatten(Tl, Tail, FlatHeadTail).
-  flatten(NonList, Tl, [NonList|Tl]).
+flatten(Var, Tl, [Var|Tl]) :-
+    var(Var),
+    !.
 
+flatten([], Tl, Tl) :- !.
 
+flatten([Hd|Tl], Tail, List) :-
+    !,
+    flatten(Hd, FlatHeadTail, List),
+    flatten(Tl, Tail, FlatHeadTail).
+
+flatten(NonList, Tl, [NonList|Tl]).
+
+/** getLength
+    Gets the first row length of a state using just a list
+*/
+%getLength(+List, -Length)
 getLength(List,Length):-
     length(List,N),
     Length is round(-0.5 + 0.5 * sqrt(1 + 8*N)).
 
+/** nth_membro
+    Gets the nth member in a list
+*/
+%nth_membro(+Index, +List, -Member)
 nth_membro(1,[M|_],M).
 
 nth_membro(N,[_|T],M):-
@@ -37,6 +39,10 @@ nth_membro(N,[_|T],M):-
     N1 is N-1,
     nth_membro(N1,T,M).
 
+/** writeTabs
+    Writes tabs to display the state
+*/
+%writeTabs(+Lenght)
 writeTabs(0).
 
 writeTabs(Length) :-
@@ -44,9 +50,10 @@ writeTabs(Length) :-
     Length1 is Length-1,
     writeTabs(Length1).
 
-
-
-
+/** indexOf
+    Retrieves index of given element in a list
+*/
+%indexOf(+List, +Element, -Index)
 indexOf([Element|_], Element, 1). % We found the element
 
 indexOf([_|Tail], Element, Index):-
@@ -74,8 +81,11 @@ find_nth1(N, [Head|Rest0], Elem, [Head|Rest]) :-
     find_nth1(M, Rest0, Elem, Rest).
 
 
-/* Time tracking */
+/** Time tracking 
+    Set of given predicates to test statistics
+*/
 
+%testStats(+Vars, +Length)
 testStats(Vars, Lenght):-
     
     reset_timer,
@@ -86,9 +96,11 @@ testStats(Vars, Lenght):-
     print_time('LabelingTime: '),
     fd_statistics,statistics.
 
+%reser_timer
 reset_timer:-
     statistics(total_runtime, _).
 
+%print_time(+Msg)
 print_time(Msg):-
     statistics(total_runtime,[_,T]),
     TS is ((T//10)*10)/1000,
