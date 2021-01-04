@@ -1,3 +1,5 @@
+/* Example states */
+
 state1(
     [ %1%2%3%4
       [A,B,B,C],%4
@@ -56,6 +58,10 @@ state5(
     ]
 ).
 
+/** printState
+    Prints a state given the state as a list of lists
+    Uses printRow to print each row
+*/
 %printState(-List, -Length, -N)
 printState([],Length,Length).
 
@@ -75,6 +81,10 @@ printRow([Head|Tail]) :-
     write(' | '),
     printRow(Tail).
 
+/** printStateList
+    Prints a state given the state as a single list
+    Uses printStateListRow to print each row
+*/
 %printStateList(-List, -Length, -OldLength, -Index)
 printStateList(_, 0, _, _).
 
@@ -102,6 +112,10 @@ printStateListRow(List, Length, Index) :-
     Length1 is Length - 1,
     printStateListRow(List, Length1, Index1).
 
+/** printGeneratedBoard
+    Prints a generated board given the board as a single list 
+    Uses printGeneratedRow to print each row
+*/
 %printGeneratedBoard(-List, -Length, -N)
 printGeneratedBoard([],Length,Length).
 
@@ -113,8 +127,6 @@ printGeneratedBoard([H|T],Length,N):-
     writeTabs(N1),
     printGeneratedBoard(T,Length,N1).
     
-
-
 %printGeneratedRow(-List)
 printGeneratedRow([]).
 
@@ -142,6 +154,10 @@ printGeneratedRow([Head|Tail]) :-
     write(' | '),
     printGeneratedRow(Tail).  
 
+/** printSolution
+    Prints a solution given the solution as a single list
+    Uses printSolutionRow to print each row
+*/
 %printSolution(-Solution, -Length, -OldLength, -Index)
 printSolution(_, 0, _, _).
 
