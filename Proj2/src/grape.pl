@@ -51,7 +51,7 @@ findSolution(Vars, Length, Vars):-
     Given Vars (list of variables), sets domain
     Domain follows formula for maximum given a first row length
 */
-%declareVars(+Vars, +Lenght) Returns Vars ordered like State
+%declareVars(+Vars, +Lenght)
 declareVars(Vars, Length):-
     MaxNum is (9*2^(Length-1)),
     domain(Vars,1,MaxNum).
@@ -81,8 +81,9 @@ restrictFirstRow([Head|Tail],Length) :-
     restrictFirstRow(Tail,Length1).
 
 /** restrictSum
-    Applies sum restrictions for each element
-    Each element corresponds the
+    Applies sum constraints for each element
+    Each element corresponds the sum of the two adjecent elements on the row before it
+    Uses restrictSumOnRow
 */
 %restrictSum(-Vars,-RowLength, -Index) RowNum = RowLength
 restrictSum(Vars, 1, _).
@@ -91,10 +92,13 @@ restrictSum(Vars, 1, _).
 restrictSum(Vars, RowLength, Index):-
     restrictSumOnRow(Vars, RowLength, Index, 1),
     RowLength1 is RowLength - 1,
-    Index1 is Index + RowLength,    /* Vou para o primeiro indice da proxima linha */
+    Index1 is Index + RowLength, %advance to first elemnt in next line
     restrictSum(Vars, RowLength1, Index1).
 
-
+/** restrictSumOnRow
+    Applies sum constraints for each element of the row
+    Keeps an index to find the variables ot be summed
+*/
 %restrictSumOnRow(-Vars, -RowLength, -Index, -N)
 restrictSumOnRow(Vars, RowLength, _, RowLength).
 
@@ -106,12 +110,13 @@ restrictSumOnRow(Vars, RowLength, Index, N):-
     PosRes is Index + RowLength,
     nth_membro(PosRes,Vars,Res),
     Res #= Summed1 + Summed2,
-    Index1 is Index + 1,    /* Avancar para o proximo numero na linha */
+    Index1 is Index + 1, %advance to next element in line
     N1 is N + 1,
     restrictSumOnRow(Vars, RowLength, Index1, N1).
 
-
-
+/** restrictMaxMinValue
+    Applies maximum and minimum constraints for each row
+*/
 %restrictMaxMinValue(-Vars, -RowLength, -Index, -TotalHeight)
 restrictMaxMinValue(Vars, 0, _, TotalHeight).
 
@@ -121,7 +126,10 @@ restrictMaxMinValue(Vars, RowLength, Index, TotalHeight):-
     Index1 is Index + RowLength,
     restrictMaxMinValue(Vars, RowLength1, Index1, TotalHeight).
 
-
+/** restrictMaxMinValueofRow
+    Applies maximum and minimum constraints for each element in a row
+    Maximum and minimum follow formulas given size of board and current row length
+*/
 %restrictMaxMinValueOfRow(-Vars, -RowLength, -Index, -N, -TotalHeight)
 restrictMaxMinValueOfRow(Vars, RowLength, _, N, TotalHeight):- N is RowLength + 1.
 
@@ -135,17 +143,9 @@ restrictMaxMinValueOfRow(Vars, RowLength, Index, N, TotalHeight):-
     N1 is N + 1,
     restrictMaxMinValueOfRow(Vars, RowLength, Index1, N1, TotalHeight).
 
-
-/* Restricoes de geração de problema a ser implementadas */
-
-/*
-
-1. 1ºa Linha minimo de 2 celulas e máximo grande
-2. Em cada divisão de triangulos possivel o vertice inferior do triangulo nao pode ter a cor de nenhuma celula do triangulo
-3. 
-
+/** handleInput
+    Handles input from user
 */
-
 handleInput(Input):-
     Input > 0.
 
